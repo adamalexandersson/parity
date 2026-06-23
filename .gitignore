@@ -1,0 +1,10 @@
+/node_modules/
+/vendor/
+.phpunit.cache/
+composer.lock
+package-lock.json
+.DS_Store
+
+# Keep the precompiled editor bundle committed for Composer consumers.
+!dist/
+dist/*.map

@@ -1,0 +1,42 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - 'v*'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+
+            - name: Install JS dependencies
+              run: npm ci
+
+            - name: Build editor bundle
+              run: npm run build
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.3'
+
+            - name: Install Composer dependencies
+              run: composer install --no-interaction --prefer-dist
+
+            - name: Run tests
+              run: composer test
+
+            - name: Create release archive
+              run: |
+                  git archive --format=zip HEAD -o sprout.zip
+                  zip -ur sprout.zip dist/
+
+            - uses: softprops/action-gh-release@v2
+              with:
+                  files: sprout.zip

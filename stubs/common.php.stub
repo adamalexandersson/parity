@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Shared Sprout class maps for ->includeCommon('key').
+ *
+ * @see https://github.com/adamalexandersson/sprout/blob/main/docs/schema-v1.md
+ */
+return [
+    //
+];

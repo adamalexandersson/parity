@@ -1,0 +1,53 @@
+{
+    "name": "adamalexandersson/sprout",
+    "type": "package",
+    "description": "Schema-driven cross-runtime components for Roots Sage/Acorn",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adam Alexandersson",
+            "email": "adam@example.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Sprout\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sprout\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "gehrisandro/tailwind-merge-php": "^1.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "roots/acorn": "^5.0|^6.0"
+    },
+    "extra": {
+        "acorn": {
+            "providers": [
+                "Sprout\\Providers\\SproutServiceProvider"
+            ],
+            "aliases": {
+                "Sprout": "Sprout\\Facades\\Sprout"
+            }
+        }
+    },
+    "require-dev": {
+        "laravel/pint": "^1.29",
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:parity": "npm run build && phpunit --filter ParityTest",
+        "format": "pint"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
