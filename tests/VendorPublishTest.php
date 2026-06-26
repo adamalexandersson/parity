@@ -4,19 +4,22 @@ namespace Sprout\Tests;
 
 use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase;
-use Sprout\Console\InstallCommand;
 use Sprout\Providers\SproutServiceProvider;
 
-class InstallCommandTest extends TestCase
+class VendorPublishTest extends TestCase
 {
     protected function tearDown(): void
     {
-        if (File::exists(app_path('Providers/SproutServiceProvider.php'))) {
-            File::delete(app_path('Providers/SproutServiceProvider.php'));
+        if (File::exists(config_path('sprout.php'))) {
+            File::delete(config_path('sprout.php'));
         }
 
         if (File::exists(config_path('sprout/common.php'))) {
             File::delete(config_path('sprout/common.php'));
+        }
+
+        if (File::isDirectory(config_path('sprout'))) {
+            File::deleteDirectory(config_path('sprout'));
         }
 
         parent::tearDown();
@@ -29,16 +32,13 @@ class InstallCommandTest extends TestCase
         ];
     }
 
-    public function test_install_publishes_theme_files(): void
+    public function test_sprout_tag_publishes_config_files_only(): void
     {
-        $this->artisan('sprout:install')
+        $this->artisan('vendor:publish', ['--tag' => 'sprout'])
             ->assertExitCode(0);
 
-        $this->assertFileExists(app_path('Providers/SproutServiceProvider.php'));
+        $this->assertFileExists(config_path('sprout.php'));
         $this->assertFileExists(config_path('sprout/common.php'));
-        $this->assertStringContainsString(
-            'Theme integration for Sprout',
-            File::get(app_path('Providers/SproutServiceProvider.php'))
-        );
+        $this->assertFileDoesNotExist(app_path('Providers/SproutServiceProvider.php'));
     }
 }

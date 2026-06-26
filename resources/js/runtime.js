@@ -4,11 +4,15 @@ import { SCHEMA_VERSION } from './schema/version.js';
 
 const registry = {};
 
+function getSproutConfig() {
+    return window.sprout?.config ?? {};
+}
+
 function bootstrapComponents() {
-    const configs = window.componentConfig ?? {};
+    const configs = getSproutConfig();
 
     Object.keys(configs).forEach((name) => {
-        if (['common', 'schemaVersion', 'icons', 'iconAjaxUrl', 'iconAjaxNonce', 'tokens'].includes(name)) {
+        if (['common', 'schemaVersion', 'tokens'].includes(name)) {
             return;
         }
 
@@ -18,6 +22,8 @@ function bootstrapComponents() {
     });
 }
 
+const config = getSproutConfig();
+
 bootstrapComponents();
 
 function getComponent(name) {
@@ -25,9 +31,9 @@ function getComponent(name) {
         return registry[name];
     }
 
-    const config = window.componentConfig?.[name];
+    const componentConfig = getSproutConfig()[name];
 
-    if (config && typeof config === 'object' && config.schemaVersion) {
+    if (componentConfig && typeof componentConfig === 'object' && componentConfig.schemaVersion) {
         return registerComponent(name, registry);
     }
 
@@ -37,7 +43,9 @@ function getComponent(name) {
 }
 
 window.sprout = {
+    ...(typeof window.sprout === 'object' ? window.sprout : {}),
     version: SCHEMA_VERSION,
+    config,
     components: registry,
     createComponent,
     registerComponent: (name) => registerComponent(name, registry),

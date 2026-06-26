@@ -78,7 +78,7 @@ export function createComponent(componentName, registry = {}) {
         blockProps: injectedBlockProps,
         ...componentProps
     }) {
-        const config = window.componentConfig?.[componentName] ?? {};
+        const config = window.sprout?.config?.[componentName] ?? {};
         const namedSlotNames = resolveNamedSlotNames(config);
 
         const structureProps = Object.fromEntries(

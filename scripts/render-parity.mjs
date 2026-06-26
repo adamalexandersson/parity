@@ -6,8 +6,10 @@ const cases = JSON.parse(input);
 const results = {};
 
 for (const [name, caseItem] of Object.entries(cases)) {
-    globalThis.componentConfig = {
-        button: caseItem.schema,
+    globalThis.sprout = {
+        config: {
+            button: caseItem.schema,
+        },
     };
 
     const renderer = new SchemaRenderer('button', caseItem.props, caseItem.schema);

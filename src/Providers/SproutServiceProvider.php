@@ -8,7 +8,6 @@ use Sprout\Console\CacheCommand;
 use Sprout\Console\ClearCommand;
 use Sprout\Console\DoctorCommand;
 use Sprout\Console\GenerateEditorExportsCommand;
-use Sprout\Console\InstallCommand;
 use Sprout\Console\MakeCommand;
 use Sprout\Console\SafelistCommand;
 use Sprout\Editor\EditorAssets;
@@ -44,9 +43,16 @@ class SproutServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__.'/../../config/sprout.php' => $this->app->configPath('sprout.php'),
-            __DIR__.'/../../stubs/SproutServiceProvider.stub' => app_path('Providers/SproutServiceProvider.php'),
             __DIR__.'/../../stubs/common.php.stub' => config_path('sprout/common.php'),
         ], 'sprout');
+
+        $this->publishes([
+            __DIR__.'/../../config/sprout.php' => $this->app->configPath('sprout.php'),
+        ], 'sprout-config');
+
+        $this->publishes([
+            __DIR__.'/../../stubs/common.php.stub' => config_path('sprout/common.php'),
+        ], 'sprout-common');
 
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'Sprout');
 
@@ -54,7 +60,6 @@ class SproutServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                InstallCommand::class,
                 MakeCommand::class,
                 SafelistCommand::class,
                 CacheCommand::class,

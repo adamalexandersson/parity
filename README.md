@@ -8,29 +8,18 @@ Define a component once in PHP. Sprout renders it identically on the front end (
 
 ```bash
 composer require adamalexandersson/sprout
-wp acorn sprout:install
+wp acorn vendor:publish --tag=sprout
 ```
 
-Register the published provider in `app/Providers/ThemeServiceProvider.php`:
-
-```php
-$this->app->register(\Sprout\Providers\SproutServiceProvider::class);
-$this->app->register(SproutServiceProvider::class);
-```
-
-The package provider registers Sprout itself. The theme provider (`app/Providers/SproutServiceProvider.php`) is your extension point for transforms and editor config.
-
-### Publish options
+The package auto-registers via Composer. Publish config files for theme overrides:
 
 ```bash
-# Publish theme provider + config/sprout/common.php stub
-wp acorn sprout:install
+# Publish all Sprout config (sprout.php + config/sprout/common.php stub)
+wp acorn vendor:publish --tag=sprout
 
-# Publish package config only
-wp acorn vendor:publish --tag=sprout --provider="Sprout\\Providers\\SproutServiceProvider"
-
-# Overwrite existing published files
-wp acorn sprout:install --force
+# Publish individual config files
+wp acorn vendor:publish --tag=sprout-config
+wp acorn vendor:publish --tag=sprout-common
 ```
 
 ### Gutenberg editor exports (optional)
@@ -73,7 +62,7 @@ During local development with a path repository:
 
 Sprout auto-discovers components from `app/View/Components` with a static `schema()` method. No theme Blade shell is required for schema-only components — Sprout provides a default wrapper. Override by adding `resources/views/components/{namespace}/{name}.blade.php` when needed.
 
-Extend Sprout in `app/Providers/SproutServiceProvider.php`:
+Extend Sprout from any service provider that boots with your theme — for example an integration `Init.php` or `AppServiceProvider`:
 
 ```php
 use Sprout\Facades\Sprout;
@@ -159,12 +148,11 @@ export default function Edit({ attributes, setAttributes }) {
 }
 ```
 
-Sprout auto-enqueues the precompiled editor bundle and injects `window.componentConfig` with your component schemas.
+Sprout auto-enqueues the precompiled editor bundle and injects `window.sprout.config` with your component schemas.
 
 ## Commands
 
 ```bash
-wp acorn sprout:install
 wp acorn sprout:make Button --ui
 wp acorn sprout:generate-editor-exports
 wp acorn sprout:safelist

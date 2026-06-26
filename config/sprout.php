@@ -62,7 +62,6 @@ return [
     'editor' => [
         'script_handle' => 'sprout',
         'script_path' => 'dist/sprout.js',
-        'config_global' => 'componentConfig',
         'runtime_global' => 'sprout',
         'exports_path' => 'resources/js/sprout/components.js',
     ],

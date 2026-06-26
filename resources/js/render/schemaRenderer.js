@@ -1,10 +1,14 @@
 import { ClassFactory, InlineStyleFactory } from '../support/factories.js';
 import { assertSchemaVersion } from '../schema/version.js';
 
+function getSproutConfig() {
+    return window.sprout?.config ?? {};
+}
+
 export class SchemaRenderer {
     constructor(componentName, props = {}, config = null) {
         this.componentName = componentName;
-        this.config = config ?? window.componentConfig?.[componentName] ?? {};
+        this.config = config ?? getSproutConfig()[componentName] ?? {};
         this.props = props;
 
         assertSchemaVersion(this.config);
@@ -118,7 +122,7 @@ export class SchemaRenderer {
             }
 
             if (rule.mode === 'token') {
-                const tokenClasses = window.componentConfig?.tokens?.[rule.tokenGroup]?.[rule.token];
+                const tokenClasses = getSproutConfig().tokens?.[rule.tokenGroup]?.[rule.token];
 
                 if (tokenClasses) {
                     classes.apply(tokenClasses);
@@ -157,7 +161,7 @@ export class SchemaRenderer {
 
         const prop = match.props?.[0] ?? match.common;
         const value = this.normalizeLookupValue(this.lookupValue(prop));
-        const map = window.componentConfig?.common?.[match.common] ?? {};
+        const map = getSproutConfig().common?.[match.common] ?? {};
 
         if (map.base && map.responsive) {
             if (map.base[value]) {
@@ -179,7 +183,7 @@ export class SchemaRenderer {
     }
 
     applyCommonMapEntry(commonKey, normalizedValue, classes) {
-        const common = window.componentConfig?.common ?? {};
+        const common = getSproutConfig().common ?? {};
         const map = common[commonKey] ?? {};
 
         if (map[normalizedValue]) {

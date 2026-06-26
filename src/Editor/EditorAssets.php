@@ -39,10 +39,10 @@ class EditorAssets
 
         wp_enqueue_script($handle);
 
-        wp_localize_script(
+        wp_add_inline_script(
             $handle,
-            config('sprout.editor.config_global', 'componentConfig'),
-            $this->buildConfig()
+            sprintf('window.sprout=window.sprout||{};window.sprout.config=%s;', wp_json_encode($this->buildConfig())),
+            'before'
         );
     }
 
@@ -51,8 +51,7 @@ class EditorAssets
     {
         $configJson = wp_json_encode($this->buildConfig());
         $inlineScript = sprintf(
-            '<script>window.%s=%s;</script>',
-            config('sprout.editor.config_global', 'componentConfig'),
+            '<script>window.sprout=window.sprout||{};window.sprout.config=%s;</script>',
             $configJson
         );
 
