@@ -50,7 +50,7 @@ final class SlotResolver
     }
 
     /**
-     * @param array<string, mixed> $structure Built structure tree from SchemaRenderer
+     * @param  array<string, mixed>  $structure  Built structure tree from SchemaRenderer
      * @return list<string>
      */
     public static function collectDefaultSlotTargets(array $structure, ?string $slotElement): array

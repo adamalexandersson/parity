@@ -9,12 +9,15 @@ use Sprout\Console\ClearCommand;
 use Sprout\Console\DoctorCommand;
 use Sprout\Console\GenerateEditorExportsCommand;
 use Sprout\Console\MakeCommand;
+use Sprout\Console\ManifestCommand;
 use Sprout\Console\SafelistCommand;
-use Sprout\Editor\EditorAssets;
+use Sprout\Contracts\Host;
+use Sprout\Editor\EditorConfigBuilder;
 use Sprout\Registries\ComponentRegistry;
 use Sprout\Registries\TransformRegistry;
 use Sprout\Render\SchemaRenderer;
 use Sprout\Sprout;
+use Sprout\Support\HostResolver;
 
 class SproutServiceProvider extends ServiceProvider
 {
@@ -22,7 +25,11 @@ class SproutServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/sprout.php', 'sprout');
 
-        $this->app->singleton(TransformRegistry::class);
+        $this->app->singleton(Host::class, fn () => HostResolver::resolve());
+
+        $this->app->singleton(TransformRegistry::class, function ($app) {
+            return new TransformRegistry($app->make(Host::class));
+        });
         $this->app->singleton(ComponentRegistry::class);
         $this->app->singleton(ConfigCollector::class);
         $this->app->singleton(SchemaRenderer::class, function ($app) {
@@ -30,13 +37,17 @@ class SproutServiceProvider extends ServiceProvider
                 $app->make(TransformRegistry::class),
             );
         });
-        $this->app->singleton(EditorAssets::class);
+        $this->app->singleton(EditorConfigBuilder::class);
 
         $this->app->singleton('sprout', function ($app) {
             return new Sprout($app);
         });
 
         $this->app->alias('sprout', Sprout::class);
+
+        if ($this->app->make(Host::class)->name() === 'wordpress') {
+            $this->app->register(WordPressServiceProvider::class);
+        }
     }
 
     public function boot(): void
@@ -65,16 +76,9 @@ class SproutServiceProvider extends ServiceProvider
                 CacheCommand::class,
                 ClearCommand::class,
                 DoctorCommand::class,
+                ManifestCommand::class,
                 GenerateEditorExportsCommand::class,
             ]);
-        }
-
-        $this->app->make(EditorAssets::class)->register();
-
-        if (function_exists('add_action')) {
-            add_action('init', function () {
-                $this->app->make('sprout')->discoverComponents();
-            }, 10);
         }
     }
 

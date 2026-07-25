@@ -19,4 +19,15 @@ return [
         'defaultSlot' => 'body.inner.content',
         'slotTargets' => ['body.inner.content'],
     ],
+    'void-media' => [
+        'schema' => require __DIR__.'/void-media.php',
+        'props' => [
+            'src' => 'https://example.com/image.jpg',
+            'alt' => 'Example',
+            'name' => 'token',
+            'disabled' => true,
+        ],
+        'defaultSlot' => null,
+        'slotTargets' => [],
+    ],
 ];

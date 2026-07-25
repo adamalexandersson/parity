@@ -4,6 +4,7 @@ namespace Sprout\Config;
 
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
+use Sprout\Contracts\Host;
 use Sprout\View\Component as SproutComponent;
 
 class ConfigCollector
@@ -11,11 +12,18 @@ class ConfigCollector
     /** @var array<string, array<string, mixed>> */
     protected array $configs = [];
 
+    /** @var array<string, class-string> */
+    protected array $classes = [];
+
     protected bool $discovered = false;
 
-    public function register(string $name, array $schema): void
+    public function register(string $name, array $schema, ?string $class = null): void
     {
         $this->configs[$name] = $schema;
+
+        if ($class !== null) {
+            $this->classes[$name] = $class;
+        }
     }
 
     public function get(string $name): ?array
@@ -23,6 +31,21 @@ class ConfigCollector
         $this->ensureDiscovered();
 
         return $this->configs[$name] ?? null;
+    }
+
+    public function classFor(string $name): ?string
+    {
+        $this->ensureDiscovered();
+
+        return $this->classes[$name] ?? null;
+    }
+
+    /** @return array<string, class-string> */
+    public function classes(): array
+    {
+        $this->ensureDiscovered();
+
+        return $this->classes;
     }
 
     /** @return array<string, array<string, mixed>> */
@@ -48,6 +71,14 @@ class ConfigCollector
             return true;
         }
 
+        try {
+            if (app()->bound(Host::class)) {
+                return app(Host::class)->shouldAutoDiscover();
+            }
+        } catch (\Throwable) {
+            //
+        }
+
         return function_exists('did_action') && did_action('init');
     }
 
@@ -58,8 +89,8 @@ class ConfigCollector
         }
 
         $this->discovered = true;
-        $path = $path ?? app_path('View/Components');
-        $namespace = $namespace ?? 'App\\View\\Components';
+        $path = $path ?? config('sprout.components.path') ?? app_path('View/Components');
+        $namespace = $namespace ?? config('sprout.components.namespace') ?? 'App\\View\\Components';
 
         if (! is_dir($path)) {
             return;
@@ -90,7 +121,7 @@ class ConfigCollector
             }
 
             $name = $schema['name'] ?? $this->nameFromClass($reflection->getShortName());
-            $this->register($name, $schema);
+            $this->register($name, $schema, $class);
         }
     }
 

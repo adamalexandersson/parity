@@ -2,6 +2,7 @@
 
 namespace Sprout\View;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\View\Component as BladeComponent;
 use Sprout\Config\ConfigCollector;
 use Sprout\Render\SchemaRenderer;
@@ -91,7 +92,7 @@ abstract class Component extends BladeComponent
     {
         $renderer = app(SchemaRenderer::class);
         $this->attr = $renderer->renderComponentAttributes($this->schema, $this->props, $this->name);
-        $this->structure = $renderer->renderStructure($this->schema, $this->props);
+        $this->structure = $renderer->renderStructure($this->schema, $this->props, $this->name);
         $this->slotElement = $this->schema['defaultSlot'] ?? null;
 
         app(ConfigCollector::class)->register($this->name, $this->schema);
@@ -187,12 +188,12 @@ abstract class Component extends BladeComponent
         if (isset($data['__laravel_slots']) && is_array($data['__laravel_slots'])) {
             $slots = collect($data['__laravel_slots'])
                 ->except(['__default'])
-                ->filter(fn ($value) => $value instanceof \Illuminate\Contracts\Support\Htmlable)
+                ->filter(fn ($value) => $value instanceof Htmlable)
                 ->all();
         } else {
             $slots = collect($data)
                 ->except(['slot', 'attributes', '__laravel_slots'])
-                ->filter(fn ($value) => $value instanceof \Illuminate\Contracts\Support\Htmlable)
+                ->filter(fn ($value) => $value instanceof Htmlable)
                 ->all();
         }
 

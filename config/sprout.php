@@ -4,6 +4,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Host environment
+    |--------------------------------------------------------------------------
+    |
+    | null = auto-detect (WordPress when add_action exists, otherwise Laravel).
+    | Override with "laravel" or "wordpress".
+    |
+    */
+    'host' => env('SPROUT_HOST'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Schema version
     |--------------------------------------------------------------------------
     */
@@ -45,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Class composition strategy
+    |--------------------------------------------------------------------------
+    |
+    | "tailwind" uses tailwind-merge (default). "passthrough" concatenates and
+    | deduplicates class tokens without conflict resolution.
+    |
+    */
+    'classes' => [
+        'strategy' => env('SPROUT_CLASS_STRATEGY', 'tailwind'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Default component shell view
     |--------------------------------------------------------------------------
     |
@@ -64,6 +88,13 @@ return [
         'script_path' => 'dist/sprout.js',
         'runtime_global' => 'sprout',
         'exports_path' => 'resources/js/sprout/components.js',
+        'manifest_path' => 'resources/js/sprout/manifest.json',
+        'types_path' => 'resources/js/sprout/components.d.ts',
+        /*
+        | "suppress" (default) — strip Alpine x-* / :bind attrs in Gutenberg.
+        | "emit" — leave Alpine attrs on the canvas (requires Alpine in the editor).
+        */
+        'alpine' => env('SPROUT_EDITOR_ALPINE', 'suppress'),
     ],
 
 ];

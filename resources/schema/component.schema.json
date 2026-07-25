@@ -1,0 +1,232 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sprout.dev/schema/component.schema.json",
+    "title": "Sprout component schema",
+    "type": "object",
+    "required": ["schemaVersion", "name"],
+    "additionalProperties": true,
+    "properties": {
+        "schemaVersion": {
+            "type": "string",
+            "const": "1.0"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1
+        },
+        "tag": {
+            "type": ["string", "null"]
+        },
+        "defaultSlot": {
+            "type": ["string", "null"]
+        },
+        "linkable": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "namedSlots": {
+            "type": "array",
+            "items": { "type": "string" }
+        },
+        "classRules": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/classRule" }
+        },
+        "matches": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/match" }
+        },
+        "attributes": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/attribute" }
+        },
+        "styles": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/style" }
+        },
+        "children": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/$defs/node" }
+        }
+    },
+    "$defs": {
+        "conditionOperators": {
+            "type": "string",
+            "enum": [
+                "truthy",
+                "falsy",
+                "equals",
+                "notEquals",
+                "==",
+                "!=",
+                "any",
+                "all",
+                "in",
+                "notIn",
+                "gt",
+                "gte",
+                "lt",
+                "lte",
+                "contains",
+                "empty",
+                "notEmpty"
+            ]
+        },
+        "casts": {
+            "type": "string",
+            "enum": ["string", "boolean", "integer", "url", "cssUrl"]
+        },
+        "outcomeTypes": {
+            "type": "string",
+            "enum": ["classes", "attr", "style"]
+        },
+        "classRuleModes": {
+            "type": "string",
+            "enum": ["token", "element", "modifier"]
+        },
+        "slotKinds": {
+            "type": "string",
+            "enum": ["default", "named"]
+        },
+        "condition": {
+            "oneOf": [
+                { "type": "null" },
+                { "type": "string", "minLength": 1 },
+                {
+                    "type": "object",
+                    "required": ["operator"],
+                    "properties": {
+                        "operator": { "$ref": "#/$defs/conditionOperators" },
+                        "prop": { "type": "string" },
+                        "value": true,
+                        "conditions": {
+                            "type": "array",
+                            "items": { "$ref": "#/$defs/condition" }
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            ]
+        },
+        "classRule": {
+            "type": "object",
+            "properties": {
+                "classes": { "type": "string" },
+                "condition": { "$ref": "#/$defs/condition" },
+                "mode": { "$ref": "#/$defs/classRuleModes" },
+                "tokenGroup": { "type": "string" },
+                "token": { "type": "string" },
+                "element": { "type": "string" },
+                "modifier": { "type": "string" }
+            },
+            "additionalProperties": true
+        },
+        "outcome": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+                "type": { "$ref": "#/$defs/outcomeTypes" },
+                "value": true,
+                "name": { "type": "string" },
+                "property": { "type": "string" }
+            },
+            "additionalProperties": true
+        },
+        "match": {
+            "type": "object",
+            "properties": {
+                "props": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                },
+                "common": { "type": "string" },
+                "condition": { "$ref": "#/$defs/condition" },
+                "cases": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "default": {
+                    "type": ["array", "null"],
+                    "items": { "$ref": "#/$defs/outcome" }
+                }
+            },
+            "additionalProperties": true
+        },
+        "attribute": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+                "name": { "type": "string", "minLength": 1 },
+                "source": { "type": ["string", "null"] },
+                "cast": { "type": "string" },
+                "condition": { "$ref": "#/$defs/condition" },
+                "value": true,
+                "default": true,
+                "uniqueId": { "type": ["string", "null"] },
+                "idRef": { "type": ["string", "null"] },
+                "interpolateIds": { "type": ["boolean", "null"] }
+            },
+            "additionalProperties": true
+        },
+        "style": {
+            "type": "object",
+            "required": ["property"],
+            "properties": {
+                "property": { "type": "string", "minLength": 1 },
+                "source": { "type": ["string", "null"] },
+                "cast": { "type": "string" },
+                "cssUrl": { "type": "boolean" },
+                "condition": { "$ref": "#/$defs/condition" },
+                "default": true
+            },
+            "additionalProperties": true
+        },
+        "node": {
+            "type": "object",
+            "properties": {
+                "tag": { "type": ["string", "null"] },
+                "fragment": { "type": "boolean" },
+                "path": { "type": "string" },
+                "classRules": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/classRule" }
+                },
+                "matches": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/match" }
+                },
+                "attributes": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/attribute" }
+                },
+                "styles": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/style" }
+                },
+                "slot": {
+                    "type": ["object", "null"],
+                    "properties": {
+                        "name": { "type": ["string", "null"] },
+                        "default": { "type": "boolean" }
+                    },
+                    "additionalProperties": true
+                },
+                "richText": { "type": ["object", "null"] },
+                "componentRef": { "type": ["string", "null"] },
+                "componentMappingKey": { "type": ["string", "null"] },
+                "componentMapping": { "type": ["object", "null"] },
+                "componentClass": { "type": ["string", "null"] },
+                "visible": { "$ref": "#/$defs/condition" },
+                "hidden": { "$ref": "#/$defs/condition" },
+                "children": {
+                    "type": "object",
+                    "additionalProperties": { "$ref": "#/$defs/node" }
+                }
+            },
+            "additionalProperties": true
+        }
+    }
+}

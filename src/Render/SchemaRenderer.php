@@ -3,10 +3,13 @@
 namespace Sprout\Render;
 
 use Sprout\Concerns\EvaluatesConditions;
+use Sprout\Exceptions\SchemaException;
 use Sprout\Registries\TransformRegistry;
 use Sprout\Support\AttributeFactory;
 use Sprout\Support\ClassFactory;
+use Sprout\Support\IdInterpolator;
 use Sprout\Support\InlineStyleFactory;
+use Sprout\Support\InstanceIds;
 
 class SchemaRenderer
 {
@@ -14,6 +17,8 @@ class SchemaRenderer
 
     /** @var array<string, mixed> */
     protected array $contextProps = [];
+
+    protected ?InstanceIds $instanceIds = null;
 
     public function __construct(
         protected TransformRegistry $transforms,
@@ -23,18 +28,22 @@ class SchemaRenderer
     public function renderComponentAttributes(array $schema, array $props, ?string $componentName = null): array
     {
         $this->contextProps = $props;
+        $this->instanceIds = new InstanceIds($componentName ?? ($schema['name'] ?? 'component'), $props);
+        $this->predeclareIds($schema);
         $classes = new ClassFactory;
+        $styles = new InlineStyleFactory;
+        $attr = new AttributeFactory;
+
         $this->applyClassRules($schema['classRules'] ?? [], $props, $classes);
-        $this->applyMatches($schema['matches'] ?? [], $props, $classes, $schema);
+        $this->applyMatches($schema['matches'] ?? [], $props, $classes, $attr, $styles, $schema);
 
         if (! empty($props['class'])) {
             $classes->apply((string) $props['class']);
         }
 
-        $styles = new InlineStyleFactory;
         $this->applyStyles($schema['styles'] ?? [], $props, $styles);
+        $this->applyAttributes($schema['attributes'] ?? [], $props, $attr);
 
-        $attr = new AttributeFactory;
         $attr->add('class', $classes->get());
 
         $styleString = $styles->get();
@@ -47,15 +56,15 @@ class SchemaRenderer
             $attr->add('data-component', $componentName);
         }
 
-        $this->applyAttributes($schema['attributes'] ?? [], $props, $attr);
-
         return $attr->toArray();
     }
 
     /** @param array<string, mixed> $schema */
-    public function renderStructure(array $schema, array $props): array
+    public function renderStructure(array $schema, array $props, ?string $componentName = null): array
     {
         $this->contextProps = $props;
+        $this->instanceIds = new InstanceIds($componentName ?? ($schema['name'] ?? 'component'), $props);
+        $this->predeclareIds($schema);
         $built = [];
 
         foreach ($schema['children'] ?? [] as $key => $childSchema) {
@@ -75,14 +84,15 @@ class SchemaRenderer
         $path = $parentPath !== null ? "{$parentPath}.{$key}" : $key;
 
         $classes = new ClassFactory;
-        $this->applyClassRules($schema['classRules'] ?? [], $props, $classes);
-        $this->applyMatches($schema['matches'] ?? [], $props, $classes);
-
-        $attributes = [];
-        $this->applyAttributesToArray($schema['attributes'] ?? [], $props, $attributes);
-
         $styles = new InlineStyleFactory;
+        $attr = new AttributeFactory;
+
+        $this->applyClassRules($schema['classRules'] ?? [], $props, $classes);
+        $this->applyMatches($schema['matches'] ?? [], $props, $classes, $attr, $styles);
+        $this->applyAttributes($schema['attributes'] ?? [], $props, $attr);
         $this->applyStyles($schema['styles'] ?? [], $props, $styles);
+
+        $attributes = $attr->toArray();
 
         if ($styles->get() !== '') {
             $attributes['style'] = $styles->get();
@@ -139,7 +149,9 @@ class SchemaRenderer
                 continue;
             }
 
-            if (($rule['mode'] ?? null) === 'token') {
+            $mode = $rule['mode'] ?? null;
+
+            if ($mode === 'token') {
                 $tokenClasses = config("sprout.tokens.{$rule['tokenGroup']}.{$rule['token']}");
 
                 if (is_string($tokenClasses) && $tokenClasses !== '') {
@@ -149,15 +161,29 @@ class SchemaRenderer
                 continue;
             }
 
+            // Reserved / unknown modes (e.g. element, modifier) are no-ops until implemented.
+            if ($mode !== null) {
+                continue;
+            }
+
             if (! empty($rule['classes'])) {
                 $classes->apply($rule['classes']);
             }
         }
     }
 
-    /** @param list<array<string, mixed>> $matches */
-    protected function applyMatches(array $matches, array $props, ClassFactory $classes, ?array $componentSchema = null): void
-    {
+    /**
+     * @param  list<array<string, mixed>>  $matches
+     * @param  array<string, mixed>|null  $componentSchema
+     */
+    protected function applyMatches(
+        array $matches,
+        array $props,
+        ClassFactory $classes,
+        AttributeFactory $attr,
+        InlineStyleFactory $styles,
+        ?array $componentSchema = null,
+    ): void {
         foreach ($matches as $match) {
             if (isset($match['common'])) {
                 $this->applyCommonMatch($match, $props, $classes);
@@ -173,18 +199,89 @@ class SchemaRenderer
             $matched = $this->findMatchCase($match['cases'] ?? [], $values);
             $outcomes = $matched ?? ($match['default'] ?? []);
 
-            $this->applyOutcomes($outcomes, $props, $classes);
+            $this->applyOutcomes($outcomes, $classes, $attr, $styles);
         }
     }
 
     /** @param list<array<string, mixed>> $outcomes */
-    protected function applyOutcomes(array $outcomes, array $props, ClassFactory $classes): void
-    {
+    protected function applyOutcomes(
+        array $outcomes,
+        ClassFactory $classes,
+        AttributeFactory $attr,
+        InlineStyleFactory $styles,
+    ): void {
         foreach ($outcomes as $outcome) {
-            match ($outcome['type']) {
+            $type = $outcome['type'] ?? null;
+
+            match ($type) {
                 'classes' => $classes->apply($outcome['value'] ?? ''),
-                default => null,
+                'attr' => $this->applyAttrOutcome($outcome, $attr),
+                'style' => $this->applyStyleOutcome($outcome, $styles),
+                null => null,
+                default => $this->failLoud(
+                    "Unknown match outcome type \"{$type}\".",
+                    is_string($this->contextProps['__path'] ?? null) ? $this->contextProps['__path'] : null,
+                ),
             };
+        }
+    }
+
+    /** @param array<string, mixed> $outcome */
+    protected function applyAttrOutcome(array $outcome, AttributeFactory $attr): void
+    {
+        if (! isset($outcome['name'])) {
+            return;
+        }
+
+        $value = $outcome['value'] ?? null;
+
+        if ($value === null || $value === false || $value === '') {
+            return;
+        }
+
+        $attr->add(
+            $outcome['name'],
+            $this->resolveAttributeValue($value, [
+                'interpolateIds' => $outcome['interpolateIds'] ?? null,
+            ])
+        );
+    }
+
+    /** @param array<string, mixed> $outcome */
+    protected function applyStyleOutcome(array $outcome, InlineStyleFactory $styles): void
+    {
+        if (! isset($outcome['property'])) {
+            return;
+        }
+
+        $value = $outcome['value'] ?? null;
+
+        if ($value === null || $value === false || $value === '') {
+            return;
+        }
+
+        $styles->add($outcome['property'], (string) $value);
+    }
+
+    protected function failLoud(string $message, ?string $path = null): void
+    {
+        if (! $this->isDebug()) {
+            return;
+        }
+
+        throw new SchemaException(
+            $message,
+            is_string($this->contextProps['__component'] ?? null) ? $this->contextProps['__component'] : null,
+            $path,
+        );
+    }
+
+    protected function isDebug(): bool
+    {
+        try {
+            return (bool) config('app.debug', false) || (bool) config('sprout.editor.debug', false);
+        } catch (\Throwable) {
+            return false;
         }
     }
 
@@ -302,9 +399,24 @@ class SchemaRenderer
                 continue;
             }
 
-            if ($definition['source'] === null) {
-                if ($definition['value'] !== null && $definition['value'] !== false) {
-                    $attr->add($definition['name'], $definition['value']);
+            if (! empty($definition['uniqueId'])) {
+                $attr->add($definition['name'] ?? 'id', $this->ids()->declare((string) $definition['uniqueId']));
+
+                continue;
+            }
+
+            if (! empty($definition['idRef'])) {
+                $attr->add($definition['name'], $this->ids()->declare((string) $definition['idRef']));
+
+                continue;
+            }
+
+            if (($definition['source'] ?? null) === null) {
+                if (($definition['value'] ?? null) !== null && $definition['value'] !== false) {
+                    $attr->add(
+                        $definition['name'],
+                        $this->resolveAttributeValue($definition['value'], $definition)
+                    );
                 }
 
                 continue;
@@ -320,36 +432,52 @@ class SchemaRenderer
                 continue;
             }
 
+            $casted = $this->transforms->cast($definition['cast'] ?? 'string', $value);
+
             $attr->add(
                 $definition['name'],
-                $this->transforms->cast($definition['cast'] ?? 'string', $value)
+                $this->resolveAttributeValue($casted, $definition)
             );
         }
     }
 
-    /** @param list<array<string, mixed>> $attributes */
-    protected function applyAttributesToArray(array $attributes, array $props, array &$target): void
+    /** @param array<string, mixed> $definition */
+    protected function resolveAttributeValue(mixed $value, array $definition): mixed
     {
-        foreach ($attributes as $definition) {
-            if (! $this->evaluateCondition($definition['condition'] ?? null)) {
-                continue;
+        if (! IdInterpolator::shouldInterpolate($value, $definition['interpolateIds'] ?? null)) {
+            return $value;
+        }
+
+        return IdInterpolator::interpolate(
+            (string) $value,
+            $this->ids(),
+            $this->isDebug(),
+            is_string($this->contextProps['__component'] ?? null) ? $this->contextProps['__component'] : null,
+        );
+    }
+
+    protected function ids(): InstanceIds
+    {
+        return $this->instanceIds ??= new InstanceIds('component', $this->contextProps);
+    }
+
+    /** @param array<string, mixed> $schema */
+    protected function predeclareIds(array $schema): void
+    {
+        foreach ($schema['attributes'] ?? [] as $definition) {
+            if (! empty($definition['uniqueId'])) {
+                $this->ids()->declare((string) $definition['uniqueId']);
             }
 
-            if ($definition['source'] === null) {
-                if ($definition['value'] !== null && $definition['value'] !== false) {
-                    $target[$definition['name']] = $definition['value'];
-                }
-
-                continue;
+            if (! empty($definition['idRef'])) {
+                $this->ids()->declare((string) $definition['idRef']);
             }
+        }
 
-            $value = $this->lookupValue($props, $definition['source']);
-
-            if ($value === null || $value === false || $value === '') {
-                continue;
+        foreach ($schema['children'] ?? [] as $child) {
+            if (is_array($child)) {
+                $this->predeclareIds($child);
             }
-
-            $target[$definition['name']] = $this->transforms->cast($definition['cast'] ?? 'string', $value);
         }
     }
 

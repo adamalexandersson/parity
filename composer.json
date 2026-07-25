@@ -1,7 +1,7 @@
 {
     "name": "adamalexandersson/sprout",
     "type": "package",
-    "description": "Schema-driven cross-runtime components for Roots Sage/Acorn",
+    "description": "Schema-driven cross-runtime components for Laravel Blade and WordPress Gutenberg",
     "license": "MIT",
     "authors": [
         {
@@ -22,8 +22,11 @@
     "require": {
         "php": "^8.2",
         "gehrisandro/tailwind-merge-php": "^1.0",
+        "illuminate/console": "^11.0|^12.0|^13.0",
+        "illuminate/filesystem": "^11.0|^12.0|^13.0",
         "illuminate/support": "^11.0|^12.0|^13.0",
-        "roots/acorn": "^5.0|^6.0"
+        "illuminate/view": "^11.0|^12.0|^13.0",
+        "opis/json-schema": "^2.4"
     },
     "extra": {
         "acorn": {
@@ -33,21 +36,39 @@
             "aliases": {
                 "Sprout": "Sprout\\Facades\\Sprout"
             }
+        },
+        "laravel": {
+            "providers": [
+                "Sprout\\Providers\\SproutServiceProvider"
+            ],
+            "aliases": {
+                "Sprout": "Sprout\\Facades\\Sprout"
+            }
         }
     },
     "require-dev": {
+        "larastan/larastan": "^3.0",
         "laravel/pint": "^1.29",
         "orchestra/testbench": "^10.0",
-        "phpunit/phpunit": "^11.0"
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
+    "suggest": {
+        "blade-ui-kit/blade-icons": "Required for mappedComponent nodes that render SVG icons via @svg().",
+        "roots/acorn": "Required for Sage/WordPress themes that use the Gutenberg editor adapter."
     },
     "scripts": {
-        "test": "phpunit",
-        "test:parity": "npm run build && phpunit --filter ParityTest",
+        "test": "pest",
+        "test:parity": "npm run build && pest --filter=Parity",
+        "test:js": "npm test",
+        "analyse": "phpstan analyse",
         "format": "pint"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
-    "minimum-stability": "dev",
     "prefer-stable": true
 }

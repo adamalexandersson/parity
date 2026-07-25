@@ -8,7 +8,7 @@ final class AttributeFactory
 
     public function add(string $attr = '', mixed $value = ''): void
     {
-        if ($attr === '') {
+        if ($attr === '' || ! self::isValidName($attr)) {
             return;
         }
 
@@ -27,5 +27,10 @@ final class AttributeFactory
     public function toArray(): array
     {
         return $this->attributes;
+    }
+
+    public static function isValidName(string $attr): bool
+    {
+        return (bool) preg_match('/^[a-zA-Z_:][\w:.-]*$/', $attr);
     }
 }

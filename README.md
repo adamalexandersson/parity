@@ -1,61 +1,74 @@
 # Sprout
 
-Schema-driven cross-runtime components for Roots Sage/Acorn themes.
+Schema-driven cross-runtime components for **Laravel Blade** and **WordPress Gutenberg** (via a WordPress host adapter).
 
-Define a component once in PHP. Sprout renders it identically on the front end (Blade) and in the Gutenberg editor (precompiled React runtime exposed as `window.sprout`).
+Define a component once in PHP. Sprout renders it identically on the front end (Blade) and — on WordPress — in the block editor (`window.sprout`).
+
+## Supported environments
+
+| Environment | Blade / schema | Gutenberg editor |
+|-------------|----------------|------------------|
+| Laravel | Yes | No (use your own bridge if needed) |
+| Sage / Acorn + WordPress | Yes | Yes (WordPress host auto-detected) |
 
 ## Install
+
+### Laravel
+
+```bash
+composer require adamalexandersson/sprout
+php artisan vendor:publish --tag=sprout
+```
+
+Register the provider if your app does not auto-discover packages:
+
+```php
+Sprout\Providers\SproutServiceProvider::class,
+```
+
+### Sage / Acorn (WordPress)
 
 ```bash
 composer require adamalexandersson/sprout
 wp acorn vendor:publish --tag=sprout
 ```
 
-The package auto-registers via Composer. Publish config files for theme overrides:
+Acorn auto-registers the provider via `extra.acorn`. The WordPress host activates when `add_action` exists and boots Gutenberg assets.
+
+Publish tags:
 
 ```bash
-# Publish all Sprout config (sprout.php + config/sprout/common.php stub)
 wp acorn vendor:publish --tag=sprout
-
-# Publish individual config files
 wp acorn vendor:publish --tag=sprout-config
 wp acorn vendor:publish --tag=sprout-common
 ```
 
-### Gutenberg editor exports (optional)
-
-If your theme uses Vite and named Sprout component imports in block editors:
+### Gutenberg editor exports (WordPress themes)
 
 ```bash
+wp acorn sprout:manifest
 wp acorn sprout:generate-editor-exports
 ```
 
-Add to `package.json`:
+Theme `package.json`:
 
 ```json
 {
   "scripts": {
+    "sprout:manifest": "wp acorn sprout:manifest",
     "sprout:exports": "wp acorn sprout:generate-editor-exports",
-    "prebuild": "npm run sprout:exports"
+    "sprout:sync": "npm run sprout:manifest && npm run sprout:exports",
+    "predev": "npm run sprout:sync",
+    "prebuild": "npm run sprout:sync"
   }
 }
 ```
 
-Configure the output path in `config/sprout.php` under `editor.exports_path` (default: `resources/js/sprout/components.js`).
+Vite aliases (see [docs/editor.md](docs/editor.md)):
 
-During local development with a path repository:
-
-```json
-"repositories": [
-    {
-        "type": "path",
-        "url": "../../../../../../Packages/sprout",
-        "options": { "symlink": true }
-    }
-],
-"require": {
-    "adamalexandersson/sprout": "@dev"
-}
+```js
+'@sprout/runtime': path.resolve(__dirname, 'vendor/adamalexandersson/sprout/resources/js/editor/runtime.js'),
+'@sprout/components': '/resources/js/sprout/components.js',
 ```
 
 ## Theme integration
@@ -73,6 +86,7 @@ public function boot(): void
         return is_numeric($value) ? wp_get_attachment_url((int) $value) : $value;
     });
 
+    // WordPress only — applied by the WordPress host
     add_filter('sprout/editor/config', function (array $config) {
         return array_merge($config, [
             'icons' => [],
@@ -82,6 +96,19 @@ public function boot(): void
 ```
 
 Shared Tailwind class maps for `->includeCommon('cols')` live in `config/sprout/common.php`.
+
+Class composition defaults to Tailwind Merge. Switch to passthrough (concatenate + dedupe) with:
+
+```php
+// config/sprout.php
+'classes' => [
+    'strategy' => 'passthrough', // or 'tailwind'
+],
+```
+
+Mapped icon nodes that call `@svg()` require optional [`blade-ui-kit/blade-icons`](https://github.com/blade-ui-kit/blade-icons). Without it, Sprout still renders the mapped dynamic component and skips the SVG child.
+
+Force a host with `SPROUT_HOST=laravel` or `SPROUT_HOST=wordpress` (default: auto-detect).
 
 ## Author a component
 
@@ -154,6 +181,7 @@ Sprout auto-enqueues the precompiled editor bundle and injects `window.sprout.co
 
 ```bash
 wp acorn sprout:make Button --ui
+wp acorn sprout:manifest
 wp acorn sprout:generate-editor-exports
 wp acorn sprout:safelist
 wp acorn sprout:cache
@@ -161,27 +189,29 @@ wp acorn sprout:clear
 wp acorn sprout:doctor
 ```
 
+On plain Laravel, use `php artisan` instead of `wp acorn`.
+
 ## Schema version
 
 Sprout uses schema version **1.0**. Every serialized component includes `schemaVersion: "1.0"`. The editor runtime warns when versions mismatch.
 
-See [docs/schema-v1.md](docs/schema-v1.md) for the full schema reference.
+See [docs/schema-v1.md](docs/schema-v1.md) for the full schema reference and [docs/editor.md](docs/editor.md) for Gutenberg/manifest details.
 
 ## Contributing / building the editor bundle
-
-Package maintainers build the precompiled editor runtime:
 
 ```bash
 npm install
 npm run build
+npm test
 composer test
+composer analyse
 ```
 
-The compiled bundle is written to `dist/sprout.js` and shipped with the Composer package. Tagged releases run the GitHub Actions release workflow, which rebuilds `dist/` before publishing.
+The compiled bundle is written to `dist/sprout.js` and shipped with the Composer package.
 
 ## Escape hatch
 
-For complex interactive components (accordions, tabs), register a hand-written React component under the same name via `window.sprout.registerComponent('accordion')` or theme-specific editor code.
+Prefer schema attributes (including Alpine helpers) for interactive markup. For exceptional cases only — register a hand-written React component via `window.sprout.registerComponent('name')`, or add a theme Blade shell override when the schema cannot express a dynamic loop.
 
 ## License
 

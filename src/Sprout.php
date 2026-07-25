@@ -4,7 +4,6 @@ namespace Sprout;
 
 use Illuminate\Contracts\Foundation\Application;
 use Sprout\Config\ConfigCollector;
-use Sprout\Editor\EditorAssets;
 use Sprout\Registries\ComponentRegistry;
 use Sprout\Registries\TransformRegistry;
 use Sprout\Render\SchemaRenderer;

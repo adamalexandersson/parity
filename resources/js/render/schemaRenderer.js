@@ -1,8 +1,12 @@
 import { ClassFactory, InlineStyleFactory } from '../support/factories.js';
+import { InstanceIds, interpolateIds, shouldInterpolateIds } from '../support/instanceIds.js';
 import { assertSchemaVersion } from '../schema/version.js';
 
 function getSproutConfig() {
-    return window.sprout?.config ?? {};
+    const root = typeof globalThis !== 'undefined' ? globalThis : {};
+    const sprout = root.window?.sprout ?? root.sprout;
+
+    return sprout?.config ?? {};
 }
 
 export class SchemaRenderer {
@@ -10,25 +14,28 @@ export class SchemaRenderer {
         this.componentName = componentName;
         this.config = config ?? getSproutConfig()[componentName] ?? {};
         this.props = props;
+        this.instanceIds = new InstanceIds(componentName, props);
+        this.predeclareIds(this.config);
 
         assertSchemaVersion(this.config);
     }
 
     renderComponentAttributes() {
         const classes = new ClassFactory();
+        const styles = new InlineStyleFactory();
+        const attributes = {};
+
         this.applyClassRules(this.config.classRules ?? [], classes);
-        this.applyMatches(this.config.matches ?? [], classes);
+        this.applyMatches(this.config.matches ?? [], classes, attributes, styles);
 
         if (this.props.className) {
             classes.apply(this.props.className);
         }
 
-        const styles = new InlineStyleFactory();
         this.applyStyles(this.config.styles ?? [], styles);
+        this.applyAttributes(this.config.attributes ?? [], attributes);
 
-        const attributes = {
-            className: classes.get(),
-        };
+        attributes.className = classes.get();
 
         const styleObject = styles.get();
 
@@ -39,8 +46,6 @@ export class SchemaRenderer {
         if (this.componentName) {
             attributes['data-component'] = this.componentName;
         }
-
-        this.applyAttributes(this.config.attributes ?? [], attributes);
 
         return attributes;
     }
@@ -60,19 +65,17 @@ export class SchemaRenderer {
     renderNode(schema, key, parentPath = null) {
         const path = parentPath ? `${parentPath}.${key}` : key;
         const classes = new ClassFactory();
-        this.applyClassRules(schema.classRules ?? [], classes);
-        this.applyMatches(schema.matches ?? [], classes);
-
+        const styles = new InlineStyleFactory();
         const attributes = {};
+
+        this.applyClassRules(schema.classRules ?? [], classes);
+        this.applyMatches(schema.matches ?? [], classes, attributes, styles);
+        this.applyAttributes(schema.attributes ?? [], attributes);
+        this.applyStyles(schema.styles ?? [], styles);
 
         if (classes.get()) {
             attributes.className = classes.get();
         }
-
-        this.applyAttributes(schema.attributes ?? [], attributes);
-
-        const styles = new InlineStyleFactory();
-        this.applyStyles(schema.styles ?? [], styles);
 
         if (Object.keys(styles.get()).length > 0) {
             attributes.style = styles.get();
@@ -121,7 +124,9 @@ export class SchemaRenderer {
                 return;
             }
 
-            if (rule.mode === 'token') {
+            const mode = rule.mode ?? null;
+
+            if (mode === 'token') {
                 const tokenClasses = getSproutConfig().tokens?.[rule.tokenGroup]?.[rule.token];
 
                 if (tokenClasses) {
@@ -131,13 +136,18 @@ export class SchemaRenderer {
                 return;
             }
 
+            // Reserved / unknown modes (e.g. element, modifier) are no-ops until implemented.
+            if (mode !== null) {
+                return;
+            }
+
             if (rule.classes) {
                 classes.apply(rule.classes);
             }
         });
     }
 
-    applyMatches(matches, classes) {
+    applyMatches(matches, classes, attributes = {}, styles = null) {
         matches.forEach((match) => {
             if (match.common) {
                 this.applyCommonMatch(match, classes);
@@ -150,7 +160,7 @@ export class SchemaRenderer {
 
             const values = (match.props ?? []).map((prop) => this.lookupValue(prop));
             const outcomes = this.findMatchCase(match.cases ?? [], values) ?? (match.default ?? []);
-            this.applyOutcomes(outcomes, classes);
+            this.applyOutcomes(outcomes, classes, attributes, styles);
         });
     }
 
@@ -238,11 +248,85 @@ export class SchemaRenderer {
         return false;
     }
 
-    applyOutcomes(outcomes, classes) {
+    applyOutcomes(outcomes, classes, attributes = {}, styles = null) {
         outcomes.forEach((outcome) => {
             if (outcome.type === 'classes') {
                 classes.apply(outcome.value ?? '');
+                return;
             }
+
+            if (outcome.type === 'attr' && outcome.name) {
+                const value = outcome.value;
+
+                if (value === null || value === undefined || value === false || value === '') {
+                    return;
+                }
+
+                attributes[outcome.name] = this.resolveAttributeValue(value, {
+                    interpolateIds: outcome.interpolateIds ?? null,
+                });
+                return;
+            }
+
+            if (outcome.type === 'style' && outcome.property && styles) {
+                const value = outcome.value;
+
+                if (value === null || value === undefined || value === false || value === '') {
+                    return;
+                }
+
+                styles.add(outcome.property, String(value));
+                return;
+            }
+
+            if (outcome.type && !['classes', 'attr', 'style'].includes(outcome.type)) {
+                this.failLoud(`Unknown match outcome type "${outcome.type}".`);
+            }
+        });
+    }
+
+    failLoud(message, path = null) {
+        const debug = getSproutConfig().debug === true
+            || (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production');
+
+        if (! debug) {
+            return;
+        }
+
+        const error = new Error(message);
+        error.path = path;
+        throw error;
+    }
+
+    predeclareIds(schema) {
+        (schema.attributes ?? []).forEach((definition) => {
+            if (definition.uniqueId) {
+                this.instanceIds.declare(String(definition.uniqueId));
+            }
+
+            if (definition.idRef) {
+                this.instanceIds.declare(String(definition.idRef));
+            }
+        });
+
+        Object.values(schema.children ?? {}).forEach((child) => {
+            if (child && typeof child === 'object') {
+                this.predeclareIds(child);
+            }
+        });
+    }
+
+    resolveAttributeValue(value, definition = {}) {
+        if (! shouldInterpolateIds(value, definition.interpolateIds ?? null)) {
+            return value;
+        }
+
+        const debug = getSproutConfig().debug === true
+            || (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production');
+
+        return interpolateIds(value, this.instanceIds, {
+            debug,
+            component: this.componentName,
         });
     }
 
@@ -252,9 +336,19 @@ export class SchemaRenderer {
                 return;
             }
 
+            if (definition.uniqueId) {
+                target[definition.name ?? 'id'] = this.instanceIds.declare(String(definition.uniqueId));
+                return;
+            }
+
+            if (definition.idRef) {
+                target[definition.name] = this.instanceIds.declare(String(definition.idRef));
+                return;
+            }
+
             if (!definition.source) {
                 if (definition.value !== null && definition.value !== undefined && definition.value !== false) {
-                    target[definition.name] = definition.value;
+                    target[definition.name] = this.resolveAttributeValue(definition.value, definition);
                 }
 
                 return;
@@ -270,7 +364,10 @@ export class SchemaRenderer {
                 return;
             }
 
-            target[definition.name] = this.cast(definition.cast ?? 'string', value);
+            target[definition.name] = this.resolveAttributeValue(
+                this.cast(definition.cast ?? 'string', value),
+                definition,
+            );
         });
     }
 
@@ -325,9 +422,23 @@ export class SchemaRenderer {
             return value !== null && value !== undefined && value !== false && value !== '';
         }
 
-        const prop = condition.prop;
         const operator = condition.operator ?? 'truthy';
+
+        if (operator === 'any') {
+            return (condition.conditions ?? []).some((sub) => this.evaluateCondition(sub));
+        }
+
+        if (operator === 'all') {
+            return (condition.conditions ?? []).every((sub) => this.evaluateCondition(sub));
+        }
+
+        const prop = condition.prop;
         const expected = condition.value;
+
+        if (!prop) {
+            return false;
+        }
+
         const value = this.lookupValue(prop);
 
         switch (operator) {
@@ -341,9 +452,71 @@ export class SchemaRenderer {
             case 'notEquals':
             case '!=':
                 return value !== expected;
+            case 'in':
+                return Array.isArray(expected) && expected.includes(value);
+            case 'notIn':
+                return Array.isArray(expected) && !expected.includes(value);
+            case 'gt':
+            case 'gte':
+            case 'lt':
+            case 'lte':
+                return this.compareNumeric(operator, value, expected);
+            case 'contains':
+                return this.evaluateContains(value, expected);
+            case 'empty':
+                return this.isEmptyValue(value);
+            case 'notEmpty':
+                return !this.isEmptyValue(value);
             default:
                 return false;
         }
+    }
+
+    compareNumeric(operator, value, expected) {
+        if (value === null || value === undefined || expected === null || expected === undefined) {
+            return false;
+        }
+
+        const left = Number(value);
+        const right = Number(expected);
+
+        if (!Number.isFinite(left) || !Number.isFinite(right)) {
+            return false;
+        }
+
+        switch (operator) {
+            case 'gt':
+                return left > right;
+            case 'gte':
+                return left >= right;
+            case 'lt':
+                return left < right;
+            case 'lte':
+                return left <= right;
+            default:
+                return false;
+        }
+    }
+
+    evaluateContains(value, expected) {
+        if (Array.isArray(value)) {
+            return value.includes(expected);
+        }
+
+        if (typeof value === 'string' && (typeof expected === 'string' || typeof expected === 'number')) {
+            return value.includes(String(expected));
+        }
+
+        return false;
+    }
+
+    isEmptyValue(value) {
+        return value === null
+            || value === undefined
+            || value === false
+            || value === ''
+            || (Array.isArray(value) && value.length === 0)
+            || (typeof value === 'string' && value.trim() === '');
     }
 
     lookupValue(key) {

@@ -2,8 +2,6 @@
 
 namespace Sprout\Builders;
 
-use Sprout\Node;
-
 final class OutcomeContext
 {
     /** @var list<array<string, mixed>> */

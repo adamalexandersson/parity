@@ -1,13 +1,15 @@
 <?php
 
-namespace Sprout\Editor;
+namespace Sprout\WordPress;
 
-use Sprout\Config\ConfigCollector;
+use Sprout\Contracts\Host;
+use Sprout\Editor\EditorConfigBuilder;
 
 class EditorAssets
 {
     public function __construct(
-        protected ConfigCollector $collector,
+        protected EditorConfigBuilder $configBuilder,
+        protected Host $host,
     ) {}
 
     public function register(): void
@@ -41,18 +43,20 @@ class EditorAssets
 
         wp_add_inline_script(
             $handle,
-            sprintf('window.sprout=window.sprout||{};window.sprout.config=%s;', wp_json_encode($this->buildConfig())),
+            sprintf(
+                'window.sprout=window.sprout||{};window.sprout.config=%s;',
+                $this->configBuilder->encode($this->configBuilder->build())
+            ),
             'before'
         );
     }
 
-    /** @param array<string, mixed> $settings */
+    /** @param  array<string, mixed>  $settings */
     public function injectIframeConfig(array $settings): array
     {
-        $configJson = wp_json_encode($this->buildConfig());
         $inlineScript = sprintf(
             '<script>window.sprout=window.sprout||{};window.sprout.config=%s;</script>',
-            $configJson
+            $this->configBuilder->encode($this->configBuilder->build())
         );
 
         if (isset($settings['__unstableResolvedAssets']['scripts'])) {
@@ -62,22 +66,13 @@ class EditorAssets
         return $settings;
     }
 
-    /** @return array<string, mixed> */
-    public function buildConfig(): array
-    {
-        $config = array_merge([
-            'schemaVersion' => config('sprout.schema_version', '1.0'),
-            'common' => config('sprout.common', []),
-        ], $this->collector->all());
-
-        return apply_filters('sprout/editor/config', $config);
-    }
-
     protected function scriptPath(): string
     {
         $relative = config('sprout.editor.script_path', 'dist/sprout.js');
+        $vendorRelative = 'vendor/adamalexandersson/sprout/'.$relative;
+        $themePath = $this->host->path($vendorRelative);
 
-        if ($themePath = $this->themeVendorPath($relative)) {
+        if (file_exists($themePath)) {
             return $themePath;
         }
 
@@ -86,35 +81,11 @@ class EditorAssets
 
     protected function scriptUrl(): string
     {
-        return apply_filters(
-            'sprout/editor/script_url',
-            $this->defaultScriptUrl()
-        );
-    }
-
-    protected function defaultScriptUrl(): string
-    {
         $relative = config('sprout.editor.script_path', 'dist/sprout.js');
 
-        if (function_exists('get_theme_file_uri')) {
-            $vendorRelative = 'vendor/adamalexandersson/sprout/'.$relative;
-
-            if (file_exists(get_theme_file_path($vendorRelative))) {
-                return get_theme_file_uri($vendorRelative);
-            }
-        }
-
-        return plugins_url($relative, dirname(__DIR__, 2).'/composer.json');
-    }
-
-    protected function themeVendorPath(string $relative): ?string
-    {
-        if (! function_exists('get_theme_file_path')) {
-            return null;
-        }
-
-        $path = get_theme_file_path('vendor/adamalexandersson/sprout/'.$relative);
-
-        return file_exists($path) ? $path : null;
+        return $this->host->filter(
+            'sprout/editor/script_url',
+            $this->host->url($relative)
+        );
     }
 }

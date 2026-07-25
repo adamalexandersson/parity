@@ -17,7 +17,7 @@ final class SlotCollector
     }
 
     /**
-     * @param list<string> $names
+     * @param  list<string>  $names
      */
     private static function walk(array $schema, array &$names): void
     {

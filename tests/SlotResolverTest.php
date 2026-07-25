@@ -1,46 +1,28 @@
 <?php
 
-namespace Sprout\Tests;
-
-use PHPUnit\Framework\TestCase;
+use Sprout\Registries\TransformRegistry;
 use Sprout\Render\SchemaRenderer;
 use Sprout\Render\SlotResolver;
-use Sprout\Registries\TransformRegistry;
 
-class SlotResolverTest extends TestCase
-{
-    /** @return array<string, array<string, mixed>> */
-    protected function cases(): array
-    {
-        return require __DIR__.'/fixtures/structure-cases.php';
+it('collects expected default slot targets', function () {
+    $cases = require __DIR__.'/fixtures/structure-cases.php';
+    $renderer = new SchemaRenderer(new TransformRegistry);
+
+    foreach ($cases as $name => $case) {
+        $structure = $renderer->renderStructure($case['schema'], $case['props'] ?? []);
+        $defaultSlot = $case['schema']['defaultSlot'] ?? null;
+
+        expect(SlotResolver::collectDefaultSlotTargets($structure, $defaultSlot))
+            ->toBe($case['slotTargets'], "Slot targets mismatch for case {$name}");
     }
+});
 
-    public function test_collects_expected_default_slot_targets(): void
-    {
-        $renderer = new SchemaRenderer(new TransformRegistry);
+it('does not treat empty structure children as present', function () {
+    $element = [
+        'slot' => ['default' => true, 'name' => null],
+        'children' => [],
+    ];
 
-        foreach ($this->cases() as $name => $case) {
-            $structure = $renderer->renderStructure($case['schema'], $case['props'] ?? []);
-            $defaultSlot = $case['schema']['defaultSlot'] ?? null;
-
-            $this->assertSame(
-                $case['slotTargets'],
-                SlotResolver::collectDefaultSlotTargets($structure, $defaultSlot),
-                "Slot targets mismatch for case {$name}"
-            );
-        }
-    }
-
-    public function test_empty_structure_children_are_not_treated_as_present(): void
-    {
-        $element = [
-            'slot' => ['default' => true, 'name' => null],
-            'children' => [],
-        ];
-
-        $this->assertFalse(SlotResolver::hasStructureChildren($element['children']));
-        $this->assertTrue(
-            SlotResolver::shouldRenderDefaultSlot($element, 'content', 'content', 'content')
-        );
-    }
-}
+    expect(SlotResolver::hasStructureChildren($element['children']))->toBeFalse()
+        ->and(SlotResolver::shouldRenderDefaultSlot($element, 'content', 'content', 'content'))->toBeTrue();
+});

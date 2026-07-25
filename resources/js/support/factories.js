@@ -11,6 +11,32 @@ function toReactStyleProperty(property) {
         .replace(/-([a-z])/g, (_, char) => char.toUpperCase());
 }
 
+function resolveClassStrategy() {
+    const root = typeof globalThis !== 'undefined' ? globalThis : {};
+    const sprout = root.window?.sprout ?? root.sprout;
+
+    return sprout?.config?.classes?.strategy ?? 'tailwind';
+}
+
+function mergeClasses(existing, value) {
+    const next = String(value);
+
+    if (resolveClassStrategy() === 'passthrough') {
+        const parts = `${existing} ${next}`.split(/\s+/).filter(Boolean);
+        const unique = [];
+
+        parts.forEach((part) => {
+            if (!unique.includes(part)) {
+                unique.push(part);
+            }
+        });
+
+        return unique.join(' ');
+    }
+
+    return twMerge(existing, next);
+}
+
 export class ClassFactory {
     constructor() {
         this.classString = '';
@@ -21,7 +47,7 @@ export class ClassFactory {
             return this;
         }
 
-        this.classString = twMerge(this.classString, String(value));
+        this.classString = mergeClasses(this.classString, value);
 
         return this;
     }

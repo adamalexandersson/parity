@@ -134,6 +134,53 @@ class Node
         return new AttrBuilder($this, $name, $value);
     }
 
+    public function uniqueId(string $name): static
+    {
+        $this->pushAttribute([
+            'name' => 'id',
+            'value' => null,
+            'source' => null,
+            'cast' => 'string',
+            'default' => null,
+            'uniqueId' => $name,
+            'idRef' => null,
+            'interpolateIds' => null,
+            'condition' => null,
+        ]);
+
+        return $this;
+    }
+
+    public function xData(string $expression): static
+    {
+        return $this->alpineAttr('x-data', $expression);
+    }
+
+    public function xInit(string $expression): static
+    {
+        return $this->alpineAttr('x-init', $expression);
+    }
+
+    public function xShow(string $expression): static
+    {
+        return $this->alpineAttr('x-show', $expression);
+    }
+
+    public function xCloak(): static
+    {
+        return $this->alpineAttr('x-cloak', true);
+    }
+
+    public function xOn(string $event, string $expression): static
+    {
+        return $this->alpineAttr('x-on:'.$event, $expression);
+    }
+
+    public function xBind(string $attribute, string $expression): static
+    {
+        return $this->alpineAttr('x-bind:'.$attribute, $expression);
+    }
+
     public function attrs(array $attributes): static
     {
         foreach ($attributes as $name => $value) {
@@ -143,9 +190,29 @@ class Node
                 'source' => null,
                 'cast' => 'string',
                 'default' => null,
+                'uniqueId' => null,
+                'idRef' => null,
+                'interpolateIds' => null,
                 'condition' => null,
             ]);
         }
+
+        return $this;
+    }
+
+    protected function alpineAttr(string $name, mixed $value): static
+    {
+        $this->pushAttribute([
+            'name' => $name,
+            'value' => $value,
+            'source' => null,
+            'cast' => 'string',
+            'default' => null,
+            'uniqueId' => null,
+            'idRef' => null,
+            'interpolateIds' => is_string($value) ? null : false,
+            'condition' => null,
+        ]);
 
         return $this;
     }

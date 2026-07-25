@@ -1,18 +1,22 @@
 import { createComponent, registerComponent } from './render/createComponent.jsx';
 import { SchemaRenderer } from './render/schemaRenderer.js';
 import { SCHEMA_VERSION } from './schema/version.js';
+import { missingComponentFallback } from './support/getComponentHelpers.js';
 
 const registry = {};
 
 function getSproutConfig() {
-    return window.sprout?.config ?? {};
+    const root = typeof globalThis !== 'undefined' ? globalThis : {};
+    const sprout = root.window?.sprout ?? root.sprout;
+
+    return sprout?.config ?? {};
 }
 
 function bootstrapComponents() {
     const configs = getSproutConfig();
 
     Object.keys(configs).forEach((name) => {
-        if (['common', 'schemaVersion', 'tokens'].includes(name)) {
+        if (['common', 'schemaVersion', 'tokens', 'classes', 'debug'].includes(name)) {
             return;
         }
 
@@ -37,13 +41,14 @@ function getComponent(name) {
         return registerComponent(name, registry);
     }
 
-    return function SproutComponentFallback() {
-        return null;
-    };
+    return missingComponentFallback(name, Object.keys(registry));
 }
 
-window.sprout = {
-    ...(typeof window.sprout === 'object' ? window.sprout : {}),
+const root = typeof globalThis !== 'undefined' ? globalThis : {};
+const previous = root.sprout && typeof root.sprout === 'object' ? root.sprout : {};
+
+root.sprout = {
+    ...previous,
     version: SCHEMA_VERSION,
     config,
     components: registry,
@@ -53,4 +58,8 @@ window.sprout = {
     SchemaRenderer,
 };
 
-export default window.sprout;
+if (typeof window !== 'undefined') {
+    window.sprout = root.sprout;
+}
+
+export default root.sprout;

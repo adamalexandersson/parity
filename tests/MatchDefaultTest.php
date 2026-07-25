@@ -1,102 +1,91 @@
 <?php
 
-namespace Sprout\Tests;
-
-use PHPUnit\Framework\TestCase;
 use Sprout\Component;
-use Sprout\Render\SchemaRenderer;
 use Sprout\Registries\TransformRegistry;
+use Sprout\Render\SchemaRenderer;
 
-class MatchDefaultTest extends TestCase
-{
-    public function test_null_theme_color_matches_explicit_default_case(): void
-    {
-        $schema = Component::make('card', tag: 'div')
-            ->match('boxed', 'themeColor')
-                ->case(true, 'default')->classes('bg-gray-100')->end()
-                ->end()
-            ->toSchema();
+it('matches null theme color to an explicit default case', function () {
+    $schema = Component::make('card', tag: 'div')
+        ->match('boxed', 'themeColor')
+        ->case(true, 'default')->classes('bg-gray-100')->end()
+        ->end()
+        ->toSchema();
 
-        $renderer = new SchemaRenderer(new TransformRegistry);
+    $renderer = new SchemaRenderer(new TransformRegistry);
 
-        $attributes = $renderer->renderComponentAttributes($schema, [
-            'boxed' => true,
-            'themeColor' => null,
-        ]);
+    $attributes = $renderer->renderComponentAttributes($schema, [
+        'boxed' => true,
+        'themeColor' => null,
+    ]);
 
-        $this->assertStringContainsString('bg-gray-100', $attributes['class'] ?? '');
-    }
+    expect($attributes['class'] ?? '')->toContain('bg-gray-100');
+});
 
-    public function test_bool_prop_matches_bool_case(): void
-    {
-        $schema = Component::make('card', tag: 'div')
-            ->match('boxed', 'size')
-                ->case(true, 'md')->classes('p-3 md:p-4')->end()
-                ->end()
-            ->toSchema();
+it('matches a bool prop to a bool case', function () {
+    $schema = Component::make('card', tag: 'div')
+        ->match('boxed', 'size')
+        ->case(true, 'md')->classes('p-3 md:p-4')->end()
+        ->end()
+        ->toSchema();
 
-        $renderer = new SchemaRenderer(new TransformRegistry);
+    $renderer = new SchemaRenderer(new TransformRegistry);
 
-        $attributes = $renderer->renderComponentAttributes($schema, [
-            'boxed' => true,
-            'size' => 'md',
-        ]);
+    $attributes = $renderer->renderComponentAttributes($schema, [
+        'boxed' => true,
+        'size' => 'md',
+    ]);
 
-        $this->assertStringContainsString('p-3 md:p-4', $attributes['class'] ?? '');
-    }
+    expect($attributes['class'] ?? '')->toContain('p-3 md:p-4');
+});
 
-    public function test_string_true_from_blade_matches_bool_case(): void
-    {
-        $schema = Component::make('card', tag: 'div')
-            ->match('stretch')
-                ->case(true)->classes('h-full')->end()
-                ->end()
-            ->toSchema();
+it('matches string true from blade to a bool case', function () {
+    $schema = Component::make('card', tag: 'div')
+        ->match('stretch')
+        ->case(true)->classes('h-full')->end()
+        ->end()
+        ->toSchema();
 
-        $renderer = new SchemaRenderer(new TransformRegistry);
+    $renderer = new SchemaRenderer(new TransformRegistry);
 
-        $attributes = $renderer->renderComponentAttributes($schema, [
-            'stretch' => 'true',
-        ]);
+    $attributes = $renderer->renderComponentAttributes($schema, [
+        'stretch' => 'true',
+    ]);
 
-        $this->assertStringContainsString('h-full', $attributes['class'] ?? '');
-    }
+    expect($attributes['class'] ?? '')->toContain('h-full');
+});
 
-    public function test_integer_match_value_does_not_coerce_to_boolean(): void
-    {
-        $schema = Component::make('heading', tag: 'div')
-            ->match('level')
-                ->unlessProp('size')
-                ->case(1)->classes('text-6xl')->end()
-                ->case(2)->classes('text-4xl')->end()
-                ->end()
-            ->toSchema();
+it('does not coerce an integer match value to boolean', function () {
+    $schema = Component::make('heading', tag: 'div')
+        ->match('level')
+        ->unlessProp('size')
+        ->case(1)->classes('text-6xl')->end()
+        ->case(2)->classes('text-4xl')->end()
+        ->end()
+        ->toSchema();
 
-        $renderer = new SchemaRenderer(new TransformRegistry);
+    $renderer = new SchemaRenderer(new TransformRegistry);
 
-        $attributes = $renderer->renderComponentAttributes($schema, [
-            'level' => 1,
-            'size' => false,
-        ]);
+    $attributes = $renderer->renderComponentAttributes($schema, [
+        'level' => 1,
+        'size' => false,
+    ]);
 
-        $this->assertStringContainsString('text-6xl', $attributes['class'] ?? '');
-        $this->assertStringNotContainsString('text-4xl', $attributes['class'] ?? '');
-    }
+    expect($attributes['class'] ?? '')->toContain('text-6xl')
+        ->and($attributes['class'] ?? '')->not->toContain('text-4xl');
+});
 
-    public function test_blade_string_one_matches_bool_case(): void
-    {
-        $schema = Component::make('card', tag: 'div')
-            ->match('stretch')
-                ->case(true)->classes('h-full')->end()
-                ->end()
-            ->toSchema();
+it('matches blade string one to a bool case', function () {
+    $schema = Component::make('card', tag: 'div')
+        ->match('stretch')
+        ->case(true)->classes('h-full')->end()
+        ->end()
+        ->toSchema();
 
-        $renderer = new SchemaRenderer(new TransformRegistry);
+    $renderer = new SchemaRenderer(new TransformRegistry);
 
-        $attributes = $renderer->renderComponentAttributes($schema, [
-            'stretch' => '1',
-        ]);
+    $attributes = $renderer->renderComponentAttributes($schema, [
+        'stretch' => '1',
+    ]);
 
-        $this->assertStringContainsString('h-full', $attributes['class'] ?? '');
-    }
-}
+    expect($attributes['class'] ?? '')->toContain('h-full');
+});

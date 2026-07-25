@@ -1,5 +1,6 @@
 @php
     use Sprout\Render\SlotResolver;
+    use Sprout\Support\Html;
 
     $namedSlots = $namedSlots ?? [];
     $props = $props ?? [];
@@ -15,11 +16,13 @@
             $children = $element['children'] ?? [];
             $renderDefaultSlot = SlotResolver::shouldRenderDefaultSlot($element, $nodePath, $key, $slotElement);
             $isFragment = $element['fragment'] ?? false;
+            $tag = $element['tag'] ?? 'div';
+            $isVoid = ! $isFragment && Html::isVoid($tag);
             $attributes = $element['attributes'] ?? [];
             $attrString = '';
 
             foreach ($attributes as $attrKey => $attrValue) {
-                if (is_bool($attrValue)) {
+                if (is_bool($attrValue) || Html::isBooleanAttribute((string) $attrKey)) {
                     if ($attrValue) {
                         $attrString .= ' '.$attrKey;
                     }
@@ -36,25 +39,39 @@
                 'props' => $props,
                 'shouldRenderElement' => $shouldRenderElement,
             ];
+
+            $bladeIconsAvailable = class_exists(\BladeUI\Icons\Factory::class);
         @endphp
 
         @if (SlotResolver::shouldSkipNamedSlotNode($element, $namedSlots))
             {{-- Named slot without content --}}
         @elseif ($slotName && $propSlotContent)
-            @if (! $isFragment)
-                <{{ $element['tag'] ?? 'div' }}{!! $attrString !!}>
+            @if ($isVoid)
+                <{{ $tag }}{!! $attrString !!}>
+            @elseif (! $isFragment)
+                <{{ $tag }}{!! $attrString !!}>
+                {!! $propSlotContent !!}
+                </{{ $tag }}>
+            @else
+                {!! $propSlotContent !!}
             @endif
-            {!! $propSlotContent !!}
-            @if (! $isFragment)
-                </{{ $element['tag'] ?? 'div' }}>
-            @endif
+        @elseif ($isVoid)
+            <{{ $tag }}{!! $attrString !!}>
         @else
             @if (! $isFragment)
-                <{{ $element['tag'] ?? 'div' }}{!! $attrString !!}>
+                <{{ $tag }}{!! $attrString !!}>
             @endif
 
             @if (! empty($element['richText']))
-                {!! $slot ?? '' !!}
+                @php
+                    $rtProp = $element['richText']['prop'] ?? null;
+                    $hasRichTextProp = is_string($rtProp) && array_key_exists($rtProp, $props);
+                @endphp
+                @if ($hasRichTextProp)
+                    {!! $props[$rtProp] ?? '' !!}
+                @else
+                    {!! $slot ?? '' !!}
+                @endif
             @elseif ($renderDefaultSlot)
                 {!! $slot ?? '' !!}
             @elseif (! empty($element['componentRef']) && ! empty($element['componentMapping']))
@@ -66,7 +83,9 @@
 
                 @if ($mappedValue)
                     <x-dynamic-component :component="$element['componentRef']" :class="$element['componentClass'] ?? null">
-                        @svg($mappedValue)
+                        @if ($bladeIconsAvailable)
+                            @svg($mappedValue)
+                        @endif
                     </x-dynamic-component>
                 @endif
             @elseif (! empty($element['componentRef']))
@@ -78,7 +97,7 @@
             @endif
 
             @if (! $isFragment)
-                </{{ $element['tag'] ?? 'div' }}>
+                </{{ $tag }}>
             @endif
         @endif
     @endif

@@ -25,6 +25,51 @@ final class ConditionBuilder
         return new self($prop, 'notEquals', $value);
     }
 
+    public static function in(string $prop, array $value): self
+    {
+        return new self($prop, 'in', $value);
+    }
+
+    public static function notIn(string $prop, array $value): self
+    {
+        return new self($prop, 'notIn', $value);
+    }
+
+    public static function gt(string $prop, mixed $value): self
+    {
+        return new self($prop, 'gt', $value);
+    }
+
+    public static function gte(string $prop, mixed $value): self
+    {
+        return new self($prop, 'gte', $value);
+    }
+
+    public static function lt(string $prop, mixed $value): self
+    {
+        return new self($prop, 'lt', $value);
+    }
+
+    public static function lte(string $prop, mixed $value): self
+    {
+        return new self($prop, 'lte', $value);
+    }
+
+    public static function contains(string $prop, mixed $value): self
+    {
+        return new self($prop, 'contains', $value);
+    }
+
+    public static function empty(string $prop): self
+    {
+        return new self($prop, 'empty');
+    }
+
+    public static function notEmpty(string $prop): self
+    {
+        return new self($prop, 'notEmpty');
+    }
+
     public function toArray(): array
     {
         $condition = [

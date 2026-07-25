@@ -12,6 +12,12 @@ final class AttrBuilder
 
     private mixed $default = null;
 
+    private ?string $uniqueId = null;
+
+    private ?string $idRef = null;
+
+    private ?bool $interpolateIds = null;
+
     private ?array $condition = null;
 
     public function __construct(
@@ -37,6 +43,27 @@ final class AttrBuilder
     public function default(mixed $default): self
     {
         $this->default = $default;
+
+        return $this;
+    }
+
+    public function uniqueId(string $name): self
+    {
+        $this->uniqueId = $name;
+
+        return $this;
+    }
+
+    public function idRef(string $name): self
+    {
+        $this->idRef = $name;
+
+        return $this;
+    }
+
+    public function interpolateIds(bool $enabled = true): self
+    {
+        $this->interpolateIds = $enabled;
 
         return $this;
     }
@@ -67,6 +94,9 @@ final class AttrBuilder
             'source' => $this->source,
             'cast' => $this->cast ?? 'string',
             'default' => $this->default,
+            'uniqueId' => $this->uniqueId,
+            'idRef' => $this->idRef,
+            'interpolateIds' => $this->interpolateIds,
             'condition' => $this->condition,
         ]);
 

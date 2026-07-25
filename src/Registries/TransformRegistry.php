@@ -2,18 +2,36 @@
 
 namespace Sprout\Registries;
 
+use Sprout\Contracts\Host;
+
 class TransformRegistry
 {
     /** @var array<string, callable> */
     protected array $casts = [];
 
-    public function __construct()
+    public function __construct(?Host $host = null)
     {
         $this->casts = [
             'string' => fn ($value) => (string) $value,
             'boolean' => fn ($value) => (bool) $value,
             'integer' => fn ($value) => (int) $value,
-            'url' => fn ($value) => esc_url((string) $value),
+            'url' => function ($value) use ($host) {
+                $string = (string) $value;
+
+                try {
+                    if (function_exists('app') && app()->bound(Host::class)) {
+                        return app(Host::class)->escUrl($string);
+                    }
+                } catch (\Throwable) {
+                    //
+                }
+
+                if ($host) {
+                    return $host->escUrl($string);
+                }
+
+                return $string;
+            },
             'cssUrl' => function ($value) {
                 $clean = preg_replace('/^url\(|\)$/i', '', (string) $value);
 
