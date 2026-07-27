@@ -1,0 +1,43 @@
+{
+    "generatedAt": "2026-07-27T00:00:00+00:00",
+    "schemaVersion": "1.0",
+    "components": {
+        "alert": {
+            "exportName": "Alert",
+            "class": "App\\View\\Components\\Ui\\Alert",
+            "props": [
+                {
+                    "name": "type",
+                    "type": "string",
+                    "default": "info",
+                    "required": false
+                }
+            ]
+        },
+        "button": {
+            "exportName": "Button",
+            "class": "App\\View\\Components\\Ui\\Button",
+            "props": [
+                {
+                    "name": "size",
+                    "type": "string",
+                    "default": "md",
+                    "required": false
+                },
+                {
+                    "name": "arrow",
+                    "type": "bool",
+                    "default": false,
+                    "required": false
+                },
+                {
+                    "name": "label",
+                    "type": "string",
+                    "default": null,
+                    "required": true
+                }
+            ]
+        },
+        "grid-column": "GridColumn"
+    }
+}

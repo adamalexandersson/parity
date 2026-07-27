@@ -67,6 +67,17 @@ it('fails doctor when the manifest drifts from discovered schemas', function () 
         ->assertFailed();
 });
 
+it('warns when discovered schemas reference undefined presets', function () {
+    config([
+        'parity.presets' => [],
+        'parity.editor.manifest_path' => $this->outputRelative.'/missing-manifest.json',
+    ]);
+
+    $this->artisan('parity:doctor')
+        ->expectsOutputToContain('undefined preset "cols"')
+        ->assertFailed();
+});
+
 it('resolves safelist output through the laravel host base path', function () {
     expect(app(Host::class))->toBeInstanceOf(LaravelHost::class);
 

@@ -48,6 +48,7 @@ class DoctorCommand extends Command
 
         $issues += $this->checkManifestDrift($collector, $host);
         $issues += $this->checkCacheStaleness($collector);
+        $issues += $this->checkUndefinedPresets($collector);
         $issues += $this->checkLegacyAuthoringApi($collector);
         $issues += $this->checkLegacySchemaKeys($collector);
 
@@ -172,6 +173,54 @@ class DoctorCommand extends Command
         foreach ($node['children'] ?? [] as $child) {
             if (is_array($child)) {
                 $this->walkLegacySchemaKeys($child, $found);
+            }
+        }
+    }
+
+    protected function checkUndefinedPresets(ConfigCollector $collector): int
+    {
+        $configured = config('parity.presets', []);
+        $configured = is_array($configured) ? $configured : [];
+        $issues = 0;
+
+        foreach ($collector->all() as $name => $schema) {
+            if (! is_array($schema)) {
+                continue;
+            }
+
+            $referenced = [];
+            $this->collectPresetKeys($schema, $referenced);
+
+            foreach (array_unique($referenced) as $preset) {
+                if (array_key_exists($preset, $configured)) {
+                    continue;
+                }
+
+                $this->components->warn(
+                    "[{$name}] references undefined preset \"{$preset}\". Publish presets with `vendor:publish --tag=parity-presets` or add the map to config('parity.presets')."
+                );
+                $issues++;
+            }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @param  array<string, mixed>  $node
+     * @param  list<string>  $found
+     */
+    protected function collectPresetKeys(array $node, array &$found): void
+    {
+        foreach ($node['matches'] ?? [] as $match) {
+            if (is_array($match) && ! empty($match['preset']) && is_string($match['preset'])) {
+                $found[] = $match['preset'];
+            }
+        }
+
+        foreach ($node['children'] ?? [] as $child) {
+            if (is_array($child)) {
+                $this->collectPresetKeys($child, $found);
             }
         }
     }

@@ -87,9 +87,7 @@ return [
         'script_handle' => 'parity',
         'script_path' => 'dist/parity.js',
         'runtime_global' => 'parity',
-        'exports_path' => 'resources/js/parity/components.js',
         'manifest_path' => 'resources/js/parity/manifest.json',
-        'types_path' => 'resources/js/parity/components.d.ts',
         /*
         | "suppress" (default) — strip Alpine x-* / :bind attrs in Gutenberg.
         | "emit" — leave Alpine attrs on the canvas (requires Alpine in the editor).

@@ -16,11 +16,19 @@ afterEach(function () {
     }
 });
 
-it('publishes config files only for the parity tag', function () {
+it('publishes only the root config for the parity tag', function () {
     $this->artisan('vendor:publish', ['--tag' => 'parity'])
         ->assertExitCode(0);
 
     expect(config_path('parity.php'))->toBeFile()
-        ->and(config_path('parity/presets.php'))->toBeFile()
+        ->and(config_path('parity/presets.php'))->not->toBeFile()
         ->and(app_path('Providers/ParityServiceProvider.php'))->not->toBeFile();
+});
+
+it('publishes the presets stub for the parity-presets tag', function () {
+    $this->artisan('vendor:publish', ['--tag' => 'parity-presets'])
+        ->assertExitCode(0);
+
+    expect(config_path('parity/presets.php'))->toBeFile()
+        ->and(config_path('parity.php'))->not->toBeFile();
 });

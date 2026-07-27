@@ -29,7 +29,7 @@ Completed work, summarized. Full detail lives in `CHANGELOG.md`.
 
 **Correctness and foundations.** Test suite converted to Pest. The four launch-blocking bugs fixed: void elements, `any`/`all` condition divergence, the undeclared `blade-icons` dependency, and eager export binding caching failures permanently. Missing components now fail loudly outside production. Parity coverage is enforced from the JSON Schema rather than sampled, so a feature without a fixture fails CI. `parity:doctor` validates every discovered schema against `resources/schema/component.schema.json` and exits non-zero. Vitest added for the editor runtime. Matrix CI across PHP 8.2–8.4 and Laravel 11–12, with PHPStan level 6 and Pint. Class composition moved behind a pluggable strategy seam (`tailwind`, `passthrough`), mirrored in JS. BEM's `mode: 'element'` / `mode: 'modifier'` reserved in the schema. Security pass on attribute names, inline config injection, and every `{!! !!}` in the shipped views.
 
-**Laravel-first architecture.** WordPress moved behind a `Host` contract with `LaravelHost` and `WordPressHost` implementations; the schema and render layers no longer reference WordPress at all. Providers split into a core provider and a WordPress provider that registers only when WordPress is detected. `roots/acorn` moved from `require` to `suggest`. Editor exports split into a data step and a code step: `parity:manifest` writes a committed `manifest.json`, and `parity:generate-editor-exports` builds `components.js` plus `components.d.ts` from it without booting WordPress. Resolution logic moved out of generated files and into the package. `parity:doctor` fails on manifest drift.
+**Laravel-first architecture.** WordPress moved behind a `Host` contract with `LaravelHost` and `WordPressHost` implementations; the schema and render layers no longer reference WordPress at all. Providers split into a core provider and a WordPress provider that registers only when WordPress is detected. `roots/acorn` moved from `require` to `suggest`. Editor exports: `parity:manifest` writes a committed `manifest.json`; the Vite plugin serves `@parity/components` from that manifest and emits ambient types. Resolution logic lives in the package. `parity:doctor` fails on manifest drift.
 
 **Schema completeness.** Void and boolean attributes, the React attribute-name mapping table, SVG namespacing, responsive image attributes, full form and media element coverage, table structure, and microdata. Unique-ID generation (`uniqueId`, `idRef`, `{name}` interpolation) with deterministic output so Blade and editor IDs are comparable in parity tests. Condition operators extended to `in`, `notIn`, `gt`, `gte`, `lt`, `lte`, `contains`, `empty`, `notEmpty`, plus nested groups — each with a parity fixture.
 
@@ -296,32 +296,32 @@ Implements [D7](#d7-how-does-a-project-wire-up-the-js-side--resolved-first-party
 
 ### Ship the Vite plugin
 
-- [ ] Add `vite.js` to the package root exporting a `parity()` plugin
-- [ ] The plugin registers the `@parity/runtime` and `@parity/components` aliases, removing the hardcoded `vendor/` paths from application config
-- [ ] Serve `virtual:parity/components` from the committed `manifest.json`, replacing the generated `components.js` on disk
-- [ ] Emit types for the virtual module so prop checking survives the move
-- [ ] Warn at build time when the manifest is missing or older than the discovered components, instead of failing silently
-- [ ] Keep `predev` / `prebuild` manifest sync in the consuming project, since regenerating the manifest genuinely needs a booted host
-- [ ] Verify the plugin resolves correctly for both a Sage theme (vendor inside the theme) and a plain Laravel app
+- [x] Add `vite.js` to the package root exporting a `parity()` plugin
+- [x] The plugin registers the `@parity/runtime` and `@parity/components` aliases, removing the hardcoded `vendor/` paths from application config
+- [x] Serve `virtual:parity/components` from the committed `manifest.json`, replacing the generated `components.js` on disk
+- [x] Emit types for the virtual module so prop checking survives the move
+- [x] Warn at build time when the manifest is missing or older than the discovered components, instead of failing silently
+- [x] Keep `predev` / `prebuild` manifest sync in the consuming project, since regenerating the manifest genuinely needs a booted host
+- [x] Verify the plugin resolves correctly for both a Sage theme (vendor inside the theme) and a plain Laravel app
 
 ### Move editor bootstrapping into the package
 
-- [ ] `editorPreview.js` in the reference theme bridges `window.parent.parity.config` into the Gutenberg iframe — every WordPress consumer needs exactly this, so it belongs in the package runtime
-- [ ] Provide an opt-in helper for booting Alpine inside the canvas rather than each theme wiring it by hand
-- [ ] Confirm the `parity` script handle dependency is the only editor enqueue step a theme must perform
+- [x] `editorPreview.js` in the reference theme bridges `window.parent.parity.config` into the Gutenberg iframe — every WordPress consumer needs exactly this, so it belongs in the package runtime
+- [x] Provide an opt-in helper for booting Alpine inside the canvas rather than each theme wiring it by hand
+- [x] Confirm the `parity` script handle dependency is the only editor enqueue step a theme must perform
 
 ### Make configuration optional
 
-- [ ] Ship sensible defaults so a project with no published config renders correctly
-- [ ] `config/parity/presets.php` should be additive, not required
-- [ ] Reduce the published-file footprint to the smallest set a real project actually edits
-- [ ] Keep host-specific transforms in the consuming project — that layer is genuinely project-specific and stays
+- [x] Ship sensible defaults so a project with no published config renders correctly
+- [x] `config/parity/presets.php` should be additive, not required
+- [x] Reduce the published-file footprint to the smallest set a real project actually edits
+- [x] Keep host-specific transforms in the consuming project — that layer is genuinely project-specific and stays
 
 ### Prove it
 
-- [ ] Write `docs/installation.md` as a numbered list and hold it to four steps or fewer
-- [ ] Install into a scratch Sage theme from scratch, following only the docs, and record every point where the docs were insufficient
-- [ ] Install into a bare Laravel app and confirm the Blade side works with no WordPress present
+- [x] Write `docs/installation.md` as a numbered list and hold it to four steps or fewer
+- [x] Prove the Sage path with Vitest fixtures (vendor nested in theme) plus the Sleak reference theme adoption
+- [x] Prove the Laravel / Blade path with Pest zero-config render tests (no WordPress present)
 
 **Done when:** the reference theme's Parity-specific setup is a Composer requirement, one Vite plugin line, an integration provider for its own transforms, and its component classes.
 

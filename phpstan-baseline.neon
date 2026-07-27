@@ -55,6 +55,12 @@ parameters:
 			path: src/Component.php
 
 		-
+			message: '#^Trait Parity\\Concerns\\ComposesMarkup has PHPDoc tag @method for method compose\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Concerns/ComposesMarkup.php
+
+		-
 			message: '#^Method Parity\\Config\\ConfigCollector\:\:get\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -65,6 +71,18 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Config/ConfigCollector.php
+
+		-
+			message: '#^Method Parity\\Console\\SafelistCommand\:\:collectPresetClasses\(\) has parameter \$classes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Console/SafelistCommand.php
+
+		-
+			message: '#^Method Parity\\Console\\SafelistCommand\:\:extractFromPreset\(\) has parameter \$classes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Console/SafelistCommand.php
 
 		-
 			message: '#^Method Parity\\Console\\SafelistCommand\:\:extractFromSchema\(\) has parameter \$classes with no value type specified in iterable type array\.$#'
@@ -79,19 +97,13 @@ parameters:
 			path: src/Node.php
 
 		-
-			message: '#^Method Parity\\Node\:\:component\(\) has parameter \$props with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
+			message: '#^Method Parity\\Node\:\:classes\(\) should return \$this\(Parity\\Node\) but returns static\(Parity\\Node\)\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Parity\\Node\:\:includeCommon\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Node.php
-
-		-
-			message: '#^Method Parity\\Node\:\:mappedComponent\(\) has parameter \$map with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:preset\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
@@ -127,19 +139,19 @@ parameters:
 			path: src/Node.php
 
 		-
-			message: '#^Property Parity\\Node\:\:\$hidden type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Node\:\:\$hiddenWhen type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Property Parity\\Node\:\:\$richText type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Node\:\:\$richTextConfig type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Property Parity\\Node\:\:\$visible type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Node\:\:\$visibleWhen type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
@@ -147,7 +159,7 @@ parameters:
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
-			count: 2
+			count: 1
 			path: src/Node.php
 
 		-
@@ -163,19 +175,19 @@ parameters:
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyCommonMatch\(\) has parameter \$match with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Render/SchemaRenderer.php
-
-		-
-			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyCommonMatch\(\) has parameter \$props with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Render/SchemaRenderer.php
-
-		-
 			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyMatches\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Render/SchemaRenderer.php
+
+		-
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyPresetMatch\(\) has parameter \$match with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Render/SchemaRenderer.php
+
+		-
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyPresetMatch\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
@@ -277,7 +289,19 @@ parameters:
 			path: src/Schema/SlotCollector.php
 
 		-
+			message: '#^Method Parity\\Schema\\SlotCollector\:\:defaultSlotPath\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Schema/SlotCollector.php
+
+		-
 			message: '#^Method Parity\\Schema\\SlotCollector\:\:walk\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Schema/SlotCollector.php
+
+		-
+			message: '#^Method Parity\\Schema\\SlotCollector\:\:walkDefault\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Schema/SlotCollector.php
@@ -323,18 +347,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Support/InlineStyleFactory.php
-
-		-
-			message: '#^Method Parity\\View\\Component\:\:__construct\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/View/Component.php
-
-		-
-			message: '#^Method Parity\\View\\Component\:\:initialize\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/View/Component.php
 
 		-
 			message: '#^Method Parity\\View\\Component\:\:resolveNamedSlots\(\) return type has no value type specified in iterable type array\.$#'

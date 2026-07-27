@@ -19,6 +19,7 @@ pest()->extend(TestCase::class)->in(
     'ManifestAndDoctorTest.php',
     'SchemaExceptionTest.php',
     'SchemaCacheTest.php',
+    'ZeroConfigTest.php',
 );
 
 /*

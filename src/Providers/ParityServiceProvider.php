@@ -7,7 +7,6 @@ use Parity\Config\ConfigCollector;
 use Parity\Console\CacheCommand;
 use Parity\Console\ClearCommand;
 use Parity\Console\DoctorCommand;
-use Parity\Console\GenerateEditorExportsCommand;
 use Parity\Console\MakeCommand;
 use Parity\Console\ManifestCommand;
 use Parity\Console\SafelistCommand;
@@ -52,8 +51,11 @@ class ParityServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__.'/../../config/parity.php' => $this->app->configPath('parity.php'),
-            __DIR__.'/../../stubs/presets.php.stub' => config_path('parity/presets.php'),
         ], 'parity');
+
+        $this->publishes([
+            __DIR__.'/../../stubs/presets.php.stub' => config_path('parity/presets.php'),
+        ], 'parity-presets');
 
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'Parity');
 
@@ -67,7 +69,6 @@ class ParityServiceProvider extends ServiceProvider
                 ClearCommand::class,
                 DoctorCommand::class,
                 ManifestCommand::class,
-                GenerateEditorExportsCommand::class,
             ]);
         }
     }

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 4 — Zero-config install (breaking)
+
+- First-party Vite plugin at `vite.js` (`parity()`): resolves `@parity/runtime`, `@parity/components` / `virtual:parity/components`, and `@parity/canvas`; serves components from the committed manifest; writes ambient types; warns on missing/stale/unparseable manifests
+- Removed `parity:generate-editor-exports` and `editor.exports_path` / `editor.types_path` — the plugin owns the module and declarations
+- Canvas helpers `@parity/canvas`: `bridgeCanvasConfig()`, opt-in `bootAlpine(Alpine, options)`
+- Split publish tags: `parity` (root config only), `parity-presets` (optional stub)
+- `parity:doctor` warns on schemas that reference undefined preset keys
+- New `docs/installation.md` (four steps)
+
 ### Phase 3 — Rename to Parity (breaking)
 
 Hard cutover from Sprout to Parity. No backwards-compatibility aliases.

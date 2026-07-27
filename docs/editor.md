@@ -2,6 +2,8 @@
 
 Gutenberg integration is **WordPress-only**. Plain Laravel applications use Parity for Blade/schema rendering; they do not enqueue `dist/parity.js`.
 
+Install steps live in [installation.md](installation.md). This document covers the editor runtime once Vite is wired with `parity()`.
+
 ## Globals
 
 | Global | Owner | Contents |
@@ -9,51 +11,51 @@ Gutenberg integration is **WordPress-only**. Plain Laravel applications use Pari
 | `window.parity` | Parity package | Runtime API + `config` (schemas, `presets`, `tokens`, `classes`, `debug`) |
 | `window.sleak` | Theme (optional) | Icons and AJAX helpers only — not part of Parity. Interactive UI belongs on `@parity/components`. |
 
-Config is injected with `wp_add_inline_script` before the Parity bundle when the WordPress host is active (`SCRIPT_DEBUG` maps to `config.debug`).
+Config is injected with `wp_add_inline_script` before the Parity bundle when the WordPress host is active (`SCRIPT_DEBUG` maps to `config.debug`). The package also injects the same config into the Gutenberg iframe assets; `@parity/canvas` bridges from `window.parent` as a fallback.
+
+## Vite plugin
+
+```js
+import parity from './vendor/adamalexandersson/parity/vite.js';
+
+export default defineConfig({
+    plugins: [parity()],
+});
+```
+
+The plugin:
+
+- Resolves `@parity/runtime` to the package's `createExport` helper
+- Resolves `@parity/components` / `virtual:parity/components` from the committed manifest
+- Resolves `@parity/canvas` to iframe bootstrap helpers
+- Writes ambient `components.d.ts` (gitignored) for prop checking
+- Warns when the manifest is missing, unparseable, or older than component PHP files
+
+Options: `manifest`, `types` (path or `false`), `componentsDir`.
 
 ## Manifest workflow
 
-Editor named imports are generated from a committed manifest so the JS build does not need WordPress:
-
 ```bash
 wp acorn parity:manifest
-wp acorn parity:generate-editor-exports
 ```
 
-Or in a theme `package.json`:
+Theme `package.json`:
 
 ```json
 {
   "scripts": {
     "parity:manifest": "wp acorn parity:manifest",
-    "parity:exports": "wp acorn parity:generate-editor-exports",
-    "parity:sync": "npm run parity:manifest && npm run parity:exports",
-    "predev": "npm run parity:sync",
-    "prebuild": "npm run parity:sync"
+    "predev": "npm run parity:manifest",
+    "prebuild": "npm run parity:manifest"
   }
 }
 ```
 
-Paths (configurable in `config/parity.php`):
-
-- `editor.manifest_path` → `resources/js/parity/manifest.json`
-- `editor.exports_path` → `resources/js/parity/components.js`
-- `editor.types_path` → `resources/js/parity/components.d.ts`
+Default path: `editor.manifest_path` → `resources/js/parity/manifest.json`.
 
 `parity:doctor` fails when the manifest drifts from discovered schemas.
 
-## Vite aliases
-
-```js
-resolve: {
-    alias: {
-        '@parity/runtime': path.resolve(__dirname, 'vendor/adamalexandersson/parity/resources/js/editor/runtime.js'),
-        '@parity/components': '/resources/js/parity/components.js',
-    },
-}
-```
-
-Generated exports are thin:
+Generated imports are thin:
 
 ```js
 import { createExport } from '@parity/runtime';
@@ -62,9 +64,29 @@ export const Card = createExport('card');
 
 `createExport` resolves lazily through `window.parity.getComponent` on render (never at module evaluation time).
 
+## Canvas helpers
+
+```js
+import { bridgeCanvasConfig, bootAlpine } from '@parity/canvas';
+
+bridgeCanvasConfig();
+
+bootAlpine(Alpine, {
+    data: { accordion, tabs },
+    plugins: [focus, collapse],
+});
+```
+
+- `bridgeCanvasConfig()` — inside the iframe, copies `window.parent.parity.config` when needed
+- `bootAlpine(Alpine, options)` — opt-in; Alpine is injected by the theme so the package stays free of an `alpinejs` dependency
+
+Keep canvas modules free of `@wordpress/*` imports. Register WordPress-dependent helpers (icon resolvers, etc.) from the parent editor bundle.
+
+The only required enqueue step for a theme is depending on the `parity` script handle when loading the block editor bundle.
+
 ## TypeScript
 
-`components.d.ts` is generated alongside the JS module. Point your TS/JSX config at it, or keep the file next to `components.js` so editors pick up prop types automatically.
+The plugin writes an ambient `declare module '@parity/components'` file on build start. No `jsconfig.json` / `tsconfig.json` is required for editors to pick up prop types.
 
 ## Attributes in the editor
 
@@ -87,8 +109,6 @@ Recipe for interactive organizers in a host theme:
 2. Drive visibility and ARIA from those values in `editor.jsx` (`blockProps`, editor CSS, or React props).
 3. Wire controls with React `onClick` or event delegation — never Alpine.
 4. Leave full Alpine bindings in the PHP `compose()` schema for the published frontend.
-
-**Host rule:** never import `@wordpress/*` into the editor iframe bootstrap. Register WordPress-dependent helpers (icon resolvers, etc.) from the parent editor bundle so the canvas script stays Alpine/DOM-only.
 
 ### Alpine in the canvas
 

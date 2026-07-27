@@ -13,61 +13,57 @@ Define a component once in PHP. Parity renders it identically on the front end (
 
 ## Install
 
-### Laravel
+Full guide: [docs/installation.md](docs/installation.md) (four steps).
 
 ```bash
 composer require adamalexandersson/parity
-php artisan vendor:publish --tag=parity
 ```
 
-Register the provider if your app does not auto-discover packages:
+Optional config:
+
+```bash
+# Laravel
+php artisan vendor:publish --tag=parity
+php artisan vendor:publish --tag=parity-presets
+
+# Sage / Acorn
+wp acorn vendor:publish --tag=parity
+wp acorn vendor:publish --tag=parity-presets
+```
+
+Register the provider if your Laravel app does not auto-discover packages:
 
 ```php
 Parity\Providers\ParityServiceProvider::class,
 ```
 
-### Sage / Acorn (WordPress)
+Acorn auto-registers via `extra.acorn`. The WordPress host activates when `add_action` exists and boots Gutenberg assets.
 
-```bash
-composer require adamalexandersson/parity
-wp acorn vendor:publish --tag=parity
+### Gutenberg editor (WordPress / Sage)
+
+One Vite plugin line:
+
+```js
+import parity from './vendor/adamalexandersson/parity/vite.js';
+
+export default defineConfig({
+    plugins: [parity()],
+});
 ```
 
-Acorn auto-registers the provider via `extra.acorn`. The WordPress host activates when `add_action` exists and boots Gutenberg assets.
-
-Publish config and common maps stub:
-
-```bash
-wp acorn vendor:publish --tag=parity
-```
-
-### Gutenberg editor exports (WordPress themes)
-
-```bash
-wp acorn parity:manifest
-wp acorn parity:generate-editor-exports
-```
-
-Theme `package.json`:
+Regenerate the committed manifest before builds (needs a booted host):
 
 ```json
 {
   "scripts": {
     "parity:manifest": "wp acorn parity:manifest",
-    "parity:exports": "wp acorn parity:generate-editor-exports",
-    "parity:sync": "npm run parity:manifest && npm run parity:exports",
-    "predev": "npm run parity:sync",
-    "prebuild": "npm run parity:sync"
+    "predev": "npm run parity:manifest",
+    "prebuild": "npm run parity:manifest"
   }
 }
 ```
 
-Vite aliases (see [docs/editor.md](docs/editor.md)):
-
-```js
-'@parity/runtime': path.resolve(__dirname, 'vendor/adamalexandersson/parity/resources/js/editor/runtime.js'),
-'@parity/components': '/resources/js/parity/components.js',
-```
+Import components with `import { Card } from '@parity/components'`. See [docs/editor.md](docs/editor.md).
 
 ## Theme integration
 
@@ -182,7 +178,6 @@ Parity auto-enqueues the precompiled editor bundle and injects `window.parity.co
 ```bash
 wp acorn parity:make Button --ui
 wp acorn parity:manifest
-wp acorn parity:generate-editor-exports
 wp acorn parity:safelist
 wp acorn parity:cache
 wp acorn parity:clear

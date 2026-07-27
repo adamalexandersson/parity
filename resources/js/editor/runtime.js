@@ -1,6 +1,6 @@
 /**
  * Parity editor export helpers.
- * Theme Vite alias: '@parity/runtime' -> this file.
+ * Resolved by the Vite plugin as '@parity/runtime'.
  */
 
 function isProduction() {
