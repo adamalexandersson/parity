@@ -132,9 +132,9 @@ add_filter('parity/editor/config', function (array $config): array {
 Blade Icons are PHP-only. Schema nodes serialize nested components as `"component": { "ref", "from", "map", "class", "props" }` (from `->component('x')->from()->map()->class()->props()->end()`). In the editor those nodes resolve through a host-supplied icon resolver:
 
 ```js
-window.parity.registerIconResolver(({ name, componentRef, className, props }) => {
+window.parity.registerIconResolver(({ name, ref, className, props }) => {
     // return a React element for `name`, or null
 });
 ```
 
-The resolver callback still receives `componentRef` as the resolved `component.ref` string for host convenience. Resolution order: registered Parity component → icon resolver → labelled debug placeholder (or nothing in production). Missing mapped values render nothing, matching Blade.
+The resolver callback receives `ref` as the resolved `component.ref` string. Resolution order: registered Parity component → icon resolver → labelled debug placeholder (or nothing in production). Missing mapped values render nothing, matching Blade.

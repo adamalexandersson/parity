@@ -82,7 +82,7 @@ class Button extends ParityComponent
 | `prepare()` | Optional instance hook after schema load, before attributes/structure build |
 | `ComposesMarkup` / `Composable` | Lazy boot from `data()` / `render()` — no `parent::__construct(...func_get_args())` |
 
-Discovery finds classes that implement `Composable` under `config('parity.components')`. Call `parity:doctor` to flag pre-Phase-2 names (`schema()`, `initialize()`, `includeCommon()`, …).
+Discovery finds classes that implement `Composable` under `config('parity.components')`. Run `parity:doctor` to validate schemas, catch manifest drift, and flag undefined presets.
 
 ### Boot lifecycle
 

@@ -9,6 +9,8 @@ npm run build
 composer test
 ```
 
+The compiled editor bundle is written to `dist/parity.js` and shipped with the Composer package (committed — see Phase 5 distribution rationale).
+
 ## Architecture
 
 - **PHP authoring** — `src/Component.php`, `src/Node.php`, builders in `src/Builders/`
@@ -21,8 +23,12 @@ Golden fixtures live in `tests/fixtures/`. PHPUnit compares PHP renderer output 
 
 ```bash
 composer test:parity
+npm test
+composer analyse
 ```
+
+See [testing.md](testing.md) for adding fixtures.
 
 ## Release
 
-Tag with `v*` to trigger `.github/workflows/release.yml`, which builds `dist/` and attaches a release archive.
+Tag with `v*` to trigger `.github/workflows/release.yml`, which builds `dist/`, runs the full suite, and attaches `parity.zip` plus `dist/parity.js` to the GitHub release.

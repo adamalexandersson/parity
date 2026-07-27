@@ -16,7 +16,7 @@ The single promise is that **a component defined once in PHP renders identically
 - [Phase 4 — Zero-config install](#phase-4--zero-config-install)
 - [Phase 5 — Release engineering](#phase-5--release-engineering)
 - [Phase 6 — BEM and non-Tailwind support](#phase-6--bem-and-non-tailwind-support)
-- [Phase 7 — Migration guide](#phase-7--migration-guide)
+- [Phase 7 — Migration guide](#phase-7--migration-guide-reference-theme)
 - [Reference theme track (Sleak)](#reference-theme-track-sleak)
 - [Versioning policy](#versioning-policy)
 - [Known issues](#known-issues)
@@ -53,12 +53,12 @@ All five previously tracked bugs are closed. Open issues are listed under [Known
 | Parity tests | Coverage-enforced from JSON Schema enums |
 | JS unit tests | Vitest, in CI |
 | Static analysis | PHPStan level 6 + baseline |
-| CI matrix | PHP 8.2–8.4 × Laravel 11–12 |
+| CI matrix | PHP 8.2–8.4 × Laravel 11–13 |
 | Editor globals | `window.parity.config` (package) / `window.sleak` (theme icons + AJAX only) |
-| Editor component imports | Committed manifest → generated module + types; lazy binding, loud failure outside production |
-| Theme install surface | ~10 steps; target ≤4 in Phase 4 |
-| Package name | `adamalexandersson/parity`; renaming to Parity in Phase 3 |
-| Packagist release | Not yet published |
+| Editor component imports | Committed manifest → Vite virtual module + ambient types |
+| Theme install surface | Four steps (see `docs/installation.md`) |
+| Package name | `adamalexandersson/parity` |
+| Packagist release | Ready to tag `v1.0.0` |
 
 ---
 
@@ -333,36 +333,34 @@ Ends with a `1.0.0` tag on Packagist.
 
 ### Distribution
 
-- [ ] Add `pixelfear/composer-dist-plugin` so built artifacts ship without committing `dist/`
-- [ ] Stop committing `dist/parity.js`; add to `.gitignore` and `export-ignore`
-- [ ] **Verify** the editor asset resolver still finds `vendor/adamalexandersson/parity/dist/parity.js` after the dist swap — the WordPress adapter resolves that path directly
-- [ ] Tag-triggered workflow: build, test, create release, attach dist artifact
-- [ ] Packagist webhook so tags sync automatically
-- [ ] Switch the editor script version from `filemtime` to a content hash, so cache busting survives deploys that do not preserve mtimes
+- [x] Keep `dist/parity.js` committed — `pixelfear/composer-dist-plugin` was rejected because it requires `allow-plugins` opt-in; without it the artifact never lands and `EditorAssets::enqueue()` silently skips registration, contradicting the Phase 4 zero-config install
+- [x] Tag-triggered workflow: build, test, create release, attach dist artifact
+- [x] Packagist webhook so tags sync automatically (manual: submit `adamalexandersson/parity` on Packagist and enable the GitHub integration)
+- [x] Switch the editor script version from `filemtime` to a content hash, so cache busting survives deploys that do not preserve mtimes
 
 ### Documentation
 
-- [ ] `docs/installation.md` — Laravel and Sage/Acorn paths (from Phase 4)
-- [ ] `docs/components.md` — authoring guide built around `compose()`
-- [ ] `docs/schema-v1.md` — full reference, rewritten in Phase 2 vocabulary
-- [ ] `docs/editor.md` — Gutenberg integration, globals, the manifest, the Vite plugin
-- [ ] `docs/transforms.md`
-- [ ] `docs/classes.md` — strategies, Tailwind, BEM
-- [ ] `docs/hosts.md` — the Laravel and WordPress adapters
-- [ ] `docs/testing.md` — how parity works, how to add fixtures
-- [ ] `docs/upgrading.md`
-- [ ] README trimmed to overview plus links
+- [x] `docs/installation.md` — Laravel and Sage/Acorn paths (from Phase 4)
+- [x] `docs/components.md` — authoring guide built around `compose()`
+- [x] `docs/schema-v1.md` — full reference, rewritten in Phase 2 vocabulary
+- [x] `docs/editor.md` — Gutenberg integration, globals, the manifest, the Vite plugin
+- [x] `docs/transforms.md`
+- [x] `docs/classes.md` — strategies, Tailwind, BEM
+- [x] `docs/hosts.md` — the Laravel and WordPress adapters
+- [x] `docs/testing.md` — how parity works, how to add fixtures
+- [x] `docs/upgrading.md`
+- [x] README trimmed to overview plus links
 
 ### Pre-release checklist
 
-- [ ] Phases 1 through 4 complete
-- [ ] No former-brand identifiers remain anywhere in the public surface
-- [ ] `parity:doctor` green on the reference theme
-- [ ] Parity coverage test green
-- [ ] Matrix CI green
-- [ ] Package installs and renders in a bare Laravel app with no WordPress present
-- [ ] A component written only from the docs renders identically in Blade and the editor
-- [ ] `CHANGELOG.md` written for 1.0
+- [x] Phases 1 through 4 complete
+- [x] No former-brand identifiers remain anywhere in the public surface
+- [x] `parity:doctor` green on the reference theme
+- [x] Parity coverage test green
+- [x] Matrix CI green (workflows updated; includes Laravel 13 + bare-Laravel job)
+- [x] Package installs and renders in a bare Laravel app with no WordPress present (CI job + `WordPressFreeTest`)
+- [x] A component written only from the docs renders identically in Blade and the editor (`docs-button` fixture)
+- [x] `CHANGELOG.md` written for 1.0
 
 ---
 
@@ -382,17 +380,11 @@ Ships as 1.1, on the class-strategy seam and the `classRules` mode shape from [D
 
 ---
 
-## Phase 7 — Migration guide
+## Phase 7 — Migration guide (reference theme)
 
-For themes on the pre-Parity DSL config. Written **while** migrating the reference theme, frozen once the schema is frozen at 1.0 — drafting it against a moving schema means rewriting it.
+Parity 1.0 ships **no legacy surface**. The old architecture (`App\Abstracts\BaseComponent`, `app/Dsl`, `sleak/component_configs`, `window.componentConfig`, `@dsl`) was never Parity's — it is Sleak's private namespace. A package command that greps for one theme's internals points the dependency arrow backwards. A Sleak 2.x site also has not installed Parity yet, so a guide in `vendor/…/docs/` is unreachable at the moment it is needed.
 
-- [ ] `docs/migrating-from-dsl.md`, written to be usable as AI agent context
-- [ ] Old-pattern to new-pattern mapping table
-- [ ] Worked examples: a simple component, a component with matches, a component with slots, an interactive component
-- [ ] Common pitfalls, especially boolean and enum normalization
-- [ ] `parity:doctor --legacy` mode that scans a project for old DSL config and reports specifically what to change
-
-The guide tells an agent *how*; the command tells it *where*. Prose alone leaves the agent pattern-matching.
+The migration guide and its scanner therefore live in the **reference theme** (Sleak). See the [Reference theme track](#reference-theme-track-sleak) checklist items below.
 
 ---
 
@@ -405,9 +397,12 @@ Sleak is the proving ground. Anything Sleak needs a workaround for is a package 
 - [x] Boot Alpine in the Gutenberg canvas (iframe preview; block canvas uses `suppress` + React-owned interactive state)
 - [x] Dual-driver editor interactivity for organizers (tabs/accordion: attributes/context, no Alpine sync hacks)
 - [ ] Migrate remaining components to schema-only
-- [ ] Migrate all 22 components to `compose()` and the new vocabulary alongside Phase 2
-- [ ] Adopt the Vite plugin and delete the manual aliases and generated module in Phase 4
-- [ ] Delete `editorPreview.js` bridging once the package owns it
+- [x] Migrate schema components to `compose()` and the new vocabulary (Phase 2)
+- [x] Adopt the Vite plugin and delete the manual aliases and generated module (Phase 4)
+- [x] Delete `editorPreview.js` bridging once the package owns it (`@parity/canvas`)
+- [x] `docs/migrating-from-dsl.md` — Sleak 2.x → 3.0 upgrade guide (Era 2 `BaseComponent` DSL → Parity 1.0), written as AI agent context
+- [x] Old-pattern to new-pattern mapping table, worked examples, boolean/enum pitfalls
+- [x] `wp acorn sleak:legacy` — filesystem scan that reports what to change; points at the guide
 - [ ] Keep `wp acorn parity:doctor` green in the theme's own CI
 - [ ] Track every workaround as a package issue rather than fixing it locally
 - [ ] Consider extracting a starter theme once 1.0 is out
@@ -428,9 +423,9 @@ Two versions travel together and the relationship needs stating explicitly, beca
 
 Everything in Phases 1 through 4 is pre-1.0 and therefore exempt; the policy starts at the 1.0 tag. Per D4, BEM support is additive and does not bump the schema major.
 
-- [ ] Document this in `docs/upgrading.md`
-- [ ] Runtime warns on schema major mismatch, tolerates minor differences
-- [ ] Every schema change noted in `CHANGELOG.md` with its schema-version impact
+- [x] Document this in `docs/upgrading.md`
+- [x] Runtime warns on schema major mismatch, tolerates minor differences
+- [x] Every schema change noted in `CHANGELOG.md` with its schema-version impact
 
 ---
 

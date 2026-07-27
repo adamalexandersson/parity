@@ -16,6 +16,7 @@ function expectedClassSnapshots(): array
         'button-sm-primary' => 'bg-primary-500 font-semibold gap-x-2 inline-flex items-center px-4 py-2 rounded-full text-sm text-white',
         'button-lg-default' => 'bg-gray-900 font-semibold gap-x-1 inline-flex items-center px-8 py-4 rounded-lg text-lg text-white',
         'button-md-outline' => 'border border-primary-500 font-semibold gap-x-1 inline-flex items-center px-6 py-3 rounded-lg text-primary-600 text-sm',
+        'docs-button-lg-primary' => 'bg-primary-500 font-semibold gap-x-1 inline-flex items-center px-8 py-4 text-lg text-white',
         'badge-md-primary' => 'bg-primary-500 font-medium inline-flex items-center justify-center px-2.5 py-1 rounded-full text-sm text-white',
         'link-md-arrow' => 'font-bold gap-x-1.5 inline-flex items-center leading-6 text-primary-600',
         'conditions-any-affordance' => 'base gap-4 has-affordance text-sm',

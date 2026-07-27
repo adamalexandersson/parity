@@ -2,7 +2,7 @@
  * Host-supplied icon resolution for schema component nodes.
  *
  * Themes register a resolver via window.parity.registerIconResolver(fn).
- * The resolver receives { name, componentRef, className, props } and returns a
+ * The resolver receives { name, ref, className, props } and returns a
  * React element, or null when it cannot render the icon.
  */
 
@@ -11,7 +11,7 @@ let iconResolver = null;
 /**
  * @param {((ctx: {
  *     name: string,
- *     componentRef: string|null,
+ *     ref: string|null,
  *     className?: string,
  *     props?: Record<string, unknown>,
  * }) => unknown)|null} resolver
@@ -39,7 +39,7 @@ export function resolveIcon(name, element) {
     try {
         return iconResolver({
             name,
-            componentRef: comp.ref ?? null,
+            ref: comp.ref ?? null,
             className: comp.class ?? undefined,
             props: comp.props ?? {},
         }) ?? null;
