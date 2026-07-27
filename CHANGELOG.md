@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-07-27
+
+### Fixed
+
+- Regenerate `package-lock.json` with Node 22 so CI `npm ci` stays in sync
+
 ## [1.0.1] - 2026-07-27
 
 ### Fixed
