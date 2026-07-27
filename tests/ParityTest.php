@@ -7,7 +7,7 @@ use Parity\Render\SchemaRenderer;
 
 function parityCases(): array
 {
-    return require __DIR__.'/fixtures/parity-cases.php';
+    return require __DIR__.'/Fixtures/parity-cases.php';
 }
 
 function expectedClassSnapshots(): array

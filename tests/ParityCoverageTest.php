@@ -15,7 +15,7 @@ function collectFixtureFeatureCoverage(): array
         'slotKinds' => [],
     ];
 
-    $files = glob(__DIR__.'/fixtures/*.php') ?: [];
+    $files = glob(__DIR__.'/Fixtures/*.php') ?: [];
 
     foreach ($files as $file) {
         $basename = basename($file);

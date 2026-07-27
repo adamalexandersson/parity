@@ -410,7 +410,7 @@ Configure the fallback view via `config('parity.shell_view')` (default: `Parity:
 
 ## Ordinary HTML compositions
 
-Representative fixtures under `tests/fixtures/html-compositions.php` cover forms (`label`/`for`, `input`, `select`/`option`, `textarea`, `fieldset`/`legend`), `picture`/`source`/`img` (`srcset`, `sizes`, `loading`, `decoding`), `video`/`track`, tables (`thead`/`th`/`scope`/`colgroup`/`col`), and FAQ-style microdata (`itemscope` / `itemtype` / `itemprop`).
+Representative fixtures under `tests/Fixtures/html-compositions.php` cover forms (`label`/`for`, `input`, `select`/`option`, `textarea`, `fieldset`/`legend`), `picture`/`source`/`img` (`srcset`, `sizes`, `loading`, `decoding`), `video`/`track`, tables (`thead`/`th`/`scope`/`colgroup`/`col`), and FAQ-style microdata (`itemscope` / `itemtype` / `itemprop`).
 
 ## Errors and debug DX
 

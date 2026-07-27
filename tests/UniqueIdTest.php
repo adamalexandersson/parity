@@ -5,7 +5,7 @@ use Parity\Render\SchemaRenderer;
 use Parity\Support\InstanceIds;
 
 it('generates deterministic unique ids and id refs', function () {
-    $schema = require __DIR__.'/fixtures/unique-id-a11y.php';
+    $schema = require __DIR__.'/Fixtures/unique-id-a11y.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
     $props = ['instanceId' => 'demo'];
 

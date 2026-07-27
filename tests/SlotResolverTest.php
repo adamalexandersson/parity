@@ -5,7 +5,7 @@ use Parity\Render\SchemaRenderer;
 use Parity\Render\SlotResolver;
 
 it('collects expected default slot targets', function () {
-    $cases = require __DIR__.'/fixtures/structure-cases.php';
+    $cases = require __DIR__.'/Fixtures/structure-cases.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
 
     foreach ($cases as $name => $case) {

@@ -25,7 +25,7 @@ Helpers live in `tests/Pest.php` (`normalizeClassString`, `runNodeParityScript`,
 ## Fixture format
 
 ```php
-// tests/fixtures/parity-cases.php
+// tests/Fixtures/parity-cases.php
 'button-sm-primary' => [
     'schema' => require __DIR__.'/button.php',
     'props' => [
@@ -46,7 +46,7 @@ Schema files return `Component::make(...)->toSchema()`.
 
 ## Adding a fixture
 
-1. Add a schema file under `tests/fixtures/` that returns a serialized schema.
+1. Add a schema file under `tests/Fixtures/` that returns a serialized schema.
 2. Register a case in `parity-cases.php` and/or `structure-cases.php`.
 3. Add the expected snapshot in the test's `expectedClassSnapshots()` / `expectedStructures()` map.
 4. Run `composer test:parity`. Coverage picks up new casts, operators, and modes automatically — missing features fail `ParityCoverageTest`.

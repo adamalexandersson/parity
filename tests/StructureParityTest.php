@@ -5,7 +5,7 @@ use Parity\Render\SchemaRenderer;
 
 function structureCases(): array
 {
-    return require __DIR__.'/fixtures/structure-cases.php';
+    return require __DIR__.'/Fixtures/structure-cases.php';
 }
 
 /**

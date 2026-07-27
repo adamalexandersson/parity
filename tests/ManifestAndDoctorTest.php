@@ -11,7 +11,7 @@ beforeEach(function () {
     File::ensureDirectoryExists(base_path($this->outputRelative));
 
     config([
-        'parity.components.path' => __DIR__.'/fixtures',
+        'parity.components.path' => __DIR__.'/Fixtures',
         'parity.components.namespace' => 'Parity\\Tests\\Fixtures',
         'parity.editor.manifest_path' => $this->outputRelative.'/manifest.json',
     ]);

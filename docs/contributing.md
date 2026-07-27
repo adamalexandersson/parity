@@ -19,7 +19,7 @@ The compiled editor bundle is written to `dist/parity.js` and shipped with the C
 
 ## Parity tests
 
-Golden fixtures live in `tests/fixtures/`. PHPUnit compares PHP renderer output with the bundled JS renderer via `scripts/render-parity.mjs`:
+Golden fixtures live in `tests/Fixtures/`. PHPUnit compares PHP renderer output with the bundled JS renderer via `scripts/render-parity.mjs`:
 
 ```bash
 composer test:parity

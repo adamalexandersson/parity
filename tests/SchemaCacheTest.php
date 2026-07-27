@@ -8,7 +8,7 @@ beforeEach(function () {
     ConfigCollector::forgetCache();
 
     config([
-        'parity.components.path' => __DIR__.'/fixtures',
+        'parity.components.path' => __DIR__.'/Fixtures',
         'parity.components.namespace' => 'Parity\\Tests\\Fixtures',
     ]);
 });

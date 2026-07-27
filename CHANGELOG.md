@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-07-27
+
+### Fixed
+
+- Rename `tests/fixtures` to `tests/Fixtures` so PSR-4 class fixtures load on Linux CI
+- Correct bare-Laravel smoke import to `Parity\Component`
+- Disable Composer advisory blocking in CI so matrix installs can resolve Laravel versions with published advisories
+
 ## [1.0.2] - 2026-07-27
 
 ### Fixed

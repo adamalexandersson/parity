@@ -4,7 +4,7 @@ use Parity\Schema\SchemaValidator;
 
 it('accepts a valid component schema', function () {
     $validator = new SchemaValidator;
-    $schema = require __DIR__.'/fixtures/button.php';
+    $schema = require __DIR__.'/Fixtures/button.php';
 
     expect($validator->validate($schema))->toBe([]);
 });

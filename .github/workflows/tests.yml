@@ -5,6 +5,9 @@ on:
         branches: [main, develop]
     pull_request:
 
+env:
+    COMPOSER_POLICY_ADVISORIES_BLOCK: '0'
+
 jobs:
     tests:
         runs-on: ubuntu-latest
@@ -102,7 +105,7 @@ jobs:
 
                   namespace App\View\Components;
 
-                  use Parity\Builders\Component;
+                  use Parity\Component;
                   use Parity\View\Component as ParityComponent;
 
                   class ParitySmoke extends ParityComponent

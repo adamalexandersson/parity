@@ -4,7 +4,7 @@ use Parity\Registries\TransformRegistry;
 use Parity\Render\SchemaRenderer;
 
 it('renders button classes from schema', function () {
-    $schema = require __DIR__.'/fixtures/button.php';
+    $schema = require __DIR__.'/Fixtures/button.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
 
     $attributes = $renderer->renderComponentAttributes($schema, [

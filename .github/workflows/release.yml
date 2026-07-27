@@ -5,6 +5,9 @@ on:
         tags:
             - 'v*'
 
+env:
+    COMPOSER_POLICY_ADVISORIES_BLOCK: '0'
+
 jobs:
     build:
         runs-on: ubuntu-latest

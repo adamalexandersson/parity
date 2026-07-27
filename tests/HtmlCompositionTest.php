@@ -5,7 +5,7 @@ use Parity\Render\SchemaRenderer;
 use Parity\Support\Html;
 
 it('renders form media table and microdata structure attributes', function () {
-    $compositions = require __DIR__.'/fixtures/html-compositions.php';
+    $compositions = require __DIR__.'/Fixtures/html-compositions.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
 
     $form = $renderer->renderStructure($compositions['form'], ['instanceId' => 'form1'], 'form-demo');
