@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Sprout\Config\ConfigCollector;
 use Sprout\Contracts\Host;
+use Sprout\Editor\EditorConfigBuilder;
 use Sprout\Schema\Version;
 use Sprout\Support\ComponentReflector;
 
@@ -15,26 +16,15 @@ class ManifestCommand extends Command
 
     protected $description = 'Write a committed Sprout editor component manifest from discovered schemas';
 
-    /** @var list<string> */
-    protected array $reservedConfigKeys = [
-        'common',
-        'schemaVersion',
-        'icons',
-        'iconAjaxUrl',
-        'iconAjaxNonce',
-        'tokens',
-        'classes',
-        'debug',
-    ];
-
     public function handle(ConfigCollector $collector, Host $host): int
     {
-        app('sprout')->discoverComponents();
+        app('sprout')->rediscoverComponents();
 
         $exportNames = [];
+        $reserved = EditorConfigBuilder::reservedConfigKeys();
 
         foreach ($collector->all() as $slug => $schema) {
-            if (in_array($slug, $this->reservedConfigKeys, true)) {
+            if (in_array($slug, $reserved, true)) {
                 continue;
             }
 

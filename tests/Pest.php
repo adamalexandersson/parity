@@ -18,6 +18,7 @@ pest()->extend(TestCase::class)->in(
     'ProviderHostTest.php',
     'ManifestAndDoctorTest.php',
     'SchemaExceptionTest.php',
+    'SchemaCacheTest.php',
 );
 
 /*
@@ -69,6 +70,7 @@ function normalizeStructure(array $structure, bool $preserveAttributes = false):
             'tag' => $node['tag'] ?? null,
             'fragment' => (bool) ($node['fragment'] ?? false),
             'slot' => $node['slot'] ?? null,
+            'component' => $node['component'] ?? null,
             'attributes' => $normalizedAttributes,
             'children' => normalizeStructure(is_array($children) ? $children : [], $preserveAttributes),
         ];

@@ -9,13 +9,12 @@ use Sprout\View\Component as SproutComponent;
 class ShellStructureTestComponent extends SproutComponent
 {
     /** @return array<string, mixed> */
-    public static function schema(): array
+    public static function compose(): array
     {
         return Component::make('shell-structure-test', tag: 'section')
             ->classes('structure-test')
-            ->slot('content')
             ->children([
-                Node::make('content')->fragment()->holdsDefaultSlot(),
+                Node::make('content')->fragment()->slot(),
             ])
             ->toSchema();
     }

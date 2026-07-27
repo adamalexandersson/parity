@@ -19,7 +19,9 @@ final class StyleBuilder
     public function __construct(
         private readonly Node $node,
         private readonly string $property,
-    ) {}
+    ) {
+        $node->registerOpenBuilder('style');
+    }
 
     public function from(string $source): self
     {
@@ -81,6 +83,7 @@ final class StyleBuilder
             $style['cssUrl'] = true;
         }
 
+        $this->node->clearOpenBuilder('style');
         $this->node->pushStyle($style);
 
         return $this->node;

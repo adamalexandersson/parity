@@ -15,7 +15,7 @@ beforeEach(function () {
     }
 
     config([
-        'sprout.common' => [
+        'sprout.presets' => [
             'verticalSpacing' => [
                 4 => 'space-y-4',
             ],
@@ -26,20 +26,20 @@ beforeEach(function () {
     ]);
 });
 
-it('applies nested companion map via includeCommon', function () {
+it('applies nested companion map via preset', function () {
     $schema = Component::make('container', tag: 'div')
-        ->includeCommon('verticalSpacing')
+        ->preset('verticalSpacing')
         ->toSchema();
 
     $renderer = new SchemaRenderer(new TransformRegistry);
     $classes = new ClassFactory;
 
     $reflection = new ReflectionClass($renderer);
-    $method = $reflection->getMethod('applyCommonMatch');
+    $method = $reflection->getMethod('applyPresetMatch');
     $method->setAccessible(true);
 
     $method->invoke($renderer, [
-        'common' => 'verticalSpacing',
+        'preset' => 'verticalSpacing',
         'props' => ['verticalSpacing'],
         'condition' => null,
     ], ['verticalSpacing' => 4], $classes);

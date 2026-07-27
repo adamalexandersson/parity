@@ -27,7 +27,6 @@ return [
             'source' => null,
             'value' => "init('{root}')",
             'cast' => 'string',
-            'interpolateIds' => true,
             'condition' => null,
         ],
     ],

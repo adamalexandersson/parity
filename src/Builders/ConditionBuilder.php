@@ -70,6 +70,36 @@ final class ConditionBuilder
         return new self($prop, 'notEmpty');
     }
 
+    /**
+     * @param  list<self|array<string, mixed>>  $conditions
+     * @return array{operator: string, conditions: list<array<string, mixed>>}
+     */
+    public static function any(array $conditions): array
+    {
+        return [
+            'operator' => 'any',
+            'conditions' => array_map(
+                fn ($c) => $c instanceof self ? $c->toArray() : $c,
+                $conditions
+            ),
+        ];
+    }
+
+    /**
+     * @param  list<self|array<string, mixed>>  $conditions
+     * @return array{operator: string, conditions: list<array<string, mixed>>}
+     */
+    public static function all(array $conditions): array
+    {
+        return [
+            'operator' => 'all',
+            'conditions' => array_map(
+                fn ($c) => $c instanceof self ? $c->toArray() : $c,
+                $conditions
+            ),
+        ];
+    }
+
     public function toArray(): array
     {
         $condition = [

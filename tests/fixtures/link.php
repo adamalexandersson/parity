@@ -4,7 +4,6 @@ use Sprout\Component;
 use Sprout\Node;
 
 return Component::make('link', tag: 'a')
-    ->slot('content')
     ->linkable('link')
     ->classes('inline-flex items-center font-bold')
     ->match('themeColor')
@@ -16,6 +15,6 @@ return Component::make('link', tag: 'a')
     ->case('md', 'false')->classes('leading-6')->end()
     ->end()
     ->children([
-        Node::make('content')->fragment()->holdsDefaultSlot(),
+        Node::make('content')->fragment()->slot(),
     ])
     ->toSchema();

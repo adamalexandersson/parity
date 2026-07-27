@@ -50,11 +50,9 @@ class {$name} extends SproutComponent
 {
     public function __construct(
         public string \$size = 'md',
-    ) {
-        parent::__construct(...func_get_args());
-    }
+    ) {}
 
-    public static function schema(): array
+    public static function compose(): array
     {
         return Component::make('{$kebab}')
             ->classes('inline-flex items-center')
@@ -63,9 +61,8 @@ class {$name} extends SproutComponent
                 ->case('lg')->classes('text-lg')
                 ->default()->classes('text-base')
                 ->end()
-            ->slot('content')
             ->children([
-                Node::make('content')->fragment()->holdsDefaultSlot(),
+                Node::make('content')->fragment()->slot(),
             ])
             ->toSchema();
     }

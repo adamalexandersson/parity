@@ -2,13 +2,17 @@
 
 namespace Sprout\Config;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
+use Sprout\Contracts\Composable;
 use Sprout\Contracts\Host;
-use Sprout\View\Component as SproutComponent;
+use Sprout\Schema\Version;
 
 class ConfigCollector
 {
+    public const CACHE_KEY = 'sprout.schemas';
+
     /** @var array<string, array<string, mixed>> */
     protected array $configs = [];
 
@@ -62,7 +66,11 @@ class ConfigCollector
             return;
         }
 
-        $this->discover();
+        if ($this->hydrateFromCache()) {
+            return;
+        }
+
+        $this->discoverFromFilesystem();
     }
 
     protected function shouldDiscover(): bool
@@ -82,12 +90,104 @@ class ConfigCollector
         return function_exists('did_action') && did_action('init');
     }
 
+    /**
+     * Discover from the filesystem (used by console commands). Skips the cache
+     * read path. No-ops when already discovered unless {@see rediscover()}.
+     */
     public function discover(?string $path = null, ?string $namespace = null): void
     {
         if ($this->discovered) {
             return;
         }
 
+        $this->discoverFromFilesystem($path, $namespace);
+    }
+
+    /**
+     * Clear in-memory state and rediscover from the filesystem, ignoring cache.
+     */
+    public function rediscover(?string $path = null, ?string $namespace = null): void
+    {
+        $this->configs = [];
+        $this->classes = [];
+        $this->discovered = false;
+        $this->discoverFromFilesystem($path, $namespace);
+    }
+
+    /**
+     * @return array{schemaVersion: string, schemas: array<string, array<string, mixed>>, classes: array<string, class-string>}
+     */
+    public function cachePayload(): array
+    {
+        return [
+            'schemaVersion' => Version::CURRENT,
+            'schemas' => $this->configs,
+            'classes' => $this->classes,
+        ];
+    }
+
+    public function writeCache(): void
+    {
+        Cache::forever(self::CACHE_KEY, $this->cachePayload());
+    }
+
+    public static function forgetCache(): void
+    {
+        try {
+            Cache::forget(self::CACHE_KEY);
+        } catch (\Throwable) {
+            //
+        }
+    }
+
+    /**
+     * @return array{schemaVersion: string, schemas: array<string, array<string, mixed>>, classes: array<string, class-string>}|null
+     */
+    public static function readCache(): ?array
+    {
+        try {
+            $payload = Cache::get(self::CACHE_KEY);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if (! is_array($payload)) {
+            return null;
+        }
+
+        if (($payload['schemaVersion'] ?? null) !== Version::CURRENT) {
+            return null;
+        }
+
+        if (! isset($payload['schemas']) || ! is_array($payload['schemas'])) {
+            return null;
+        }
+
+        /** @var array{schemaVersion: string, schemas: array<string, array<string, mixed>>, classes?: array<string, class-string>} $payload */
+        return [
+            'schemaVersion' => $payload['schemaVersion'],
+            'schemas' => $payload['schemas'],
+            'classes' => is_array($payload['classes'] ?? null) ? $payload['classes'] : [],
+        ];
+    }
+
+    protected function hydrateFromCache(): bool
+    {
+        $payload = self::readCache();
+
+        if ($payload === null) {
+            return false;
+        }
+
+        $this->configs = $payload['schemas'];
+        $this->classes = $payload['classes'];
+        $this->discovered = true;
+
+        return true;
+    }
+
+    protected function discoverFromFilesystem(?string $path = null, ?string $namespace = null): void
+    {
         $this->discovered = true;
         $path = $path ?? config('sprout.components.path') ?? app_path('View/Components');
         $namespace = $namespace ?? config('sprout.components.namespace') ?? 'App\\View\\Components';
@@ -106,15 +206,15 @@ class ConfigCollector
 
             $reflection = new ReflectionClass($class);
 
-            if (! $reflection->isSubclassOf(SproutComponent::class) || $reflection->isAbstract()) {
+            if (! $reflection->implementsInterface(Composable::class) || $reflection->isAbstract()) {
                 continue;
             }
 
-            if (! $reflection->hasMethod('schema') || ! $reflection->getMethod('schema')->isStatic()) {
+            if (! $reflection->hasMethod('compose') || ! $reflection->getMethod('compose')->isStatic()) {
                 continue;
             }
 
-            $schema = $class::schema();
+            $schema = $class::compose();
 
             if (! is_array($schema)) {
                 continue;

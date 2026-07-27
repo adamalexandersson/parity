@@ -97,11 +97,7 @@ export class SchemaRenderer {
             attributes,
             slot: schema.slot ?? null,
             richText: schema.richText ?? null,
-            componentRef: schema.componentRef ?? null,
-            componentProps: schema.componentProps ?? {},
-            componentMapping: schema.componentMapping ?? null,
-            componentMappingKey: schema.componentMappingKey ?? null,
-            componentClass: schema.componentClass ?? null,
+            component: schema.component ?? null,
             children,
         };
     }
@@ -149,8 +145,8 @@ export class SchemaRenderer {
 
     applyMatches(matches, classes, attributes = {}, styles = null) {
         matches.forEach((match) => {
-            if (match.common) {
-                this.applyCommonMatch(match, classes);
+            if (match.preset) {
+                this.applyPresetMatch(match, classes);
                 return;
             }
 
@@ -164,14 +160,14 @@ export class SchemaRenderer {
         });
     }
 
-    applyCommonMatch(match, classes) {
+    applyPresetMatch(match, classes) {
         if (!this.evaluateCondition(match.condition ?? null)) {
             return;
         }
 
-        const prop = match.props?.[0] ?? match.common;
+        const prop = match.props?.[0] ?? match.preset;
         const value = this.normalizeLookupValue(this.lookupValue(prop));
-        const map = getSproutConfig().common?.[match.common] ?? {};
+        const map = getSproutConfig().presets?.[match.preset] ?? {};
 
         if (map.base && map.responsive) {
             if (map.base[value]) {
@@ -189,18 +185,18 @@ export class SchemaRenderer {
             return;
         }
 
-        this.applyCommonMapEntry(match.common, value, classes);
+        this.applyPresetMapEntry(match.preset, value, classes);
     }
 
-    applyCommonMapEntry(commonKey, normalizedValue, classes) {
-        const common = getSproutConfig().common ?? {};
-        const map = common[commonKey] ?? {};
+    applyPresetMapEntry(presetKey, normalizedValue, classes) {
+        const presets = getSproutConfig().presets ?? {};
+        const map = presets[presetKey] ?? {};
 
         if (map[normalizedValue]) {
             classes.apply(map[normalizedValue]);
         }
 
-        const nestedMap = common[`${commonKey}Nested`] ?? {};
+        const nestedMap = presets[`${presetKey}Nested`] ?? {};
 
         if (nestedMap[normalizedValue]) {
             classes.apply(nestedMap[normalizedValue]);
@@ -262,9 +258,7 @@ export class SchemaRenderer {
                     return;
                 }
 
-                attributes[outcome.name] = this.resolveAttributeValue(value, {
-                    interpolateIds: outcome.interpolateIds ?? null,
-                });
+                attributes[outcome.name] = this.resolveAttributeValue(value);
                 return;
             }
 
@@ -316,8 +310,8 @@ export class SchemaRenderer {
         });
     }
 
-    resolveAttributeValue(value, definition = {}) {
-        if (! shouldInterpolateIds(value, definition.interpolateIds ?? null)) {
+    resolveAttributeValue(value) {
+        if (! shouldInterpolateIds(value)) {
             return value;
         }
 
@@ -348,7 +342,7 @@ export class SchemaRenderer {
 
             if (!definition.source) {
                 if (definition.value !== null && definition.value !== undefined && definition.value !== false) {
-                    target[definition.name] = this.resolveAttributeValue(definition.value, definition);
+                    target[definition.name] = this.resolveAttributeValue(definition.value);
                 }
 
                 return;
@@ -366,7 +360,6 @@ export class SchemaRenderer {
 
             target[definition.name] = this.resolveAttributeValue(
                 this.cast(definition.cast ?? 'string', value),
-                definition,
             );
         });
     }

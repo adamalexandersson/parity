@@ -20,6 +20,7 @@ function normalizeNode(node) {
         tag: node.tag ?? null,
         fragment: Boolean(node.fragment),
         slot: node.slot ?? null,
+        component: node.component ?? null,
         attributes: normalizeAttributes(node.attributes ?? {}),
         children: normalizeStructure(children),
     };

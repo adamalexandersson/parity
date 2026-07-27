@@ -19,6 +19,7 @@
             $tag = $element['tag'] ?? 'div';
             $isVoid = ! $isFragment && Html::isVoid($tag);
             $attributes = $element['attributes'] ?? [];
+            $component = $element['component'] ?? null;
             $attrString = '';
 
             foreach ($attributes as $attrKey => $attrValue) {
@@ -74,22 +75,47 @@
                 @endif
             @elseif ($renderDefaultSlot)
                 {!! $slot ?? '' !!}
-            @elseif (! empty($element['componentRef']) && ! empty($element['componentMapping']))
+            @elseif (! empty($component['ref']) && ! empty($component['map']))
                 @php
-                    $mappingKey = $element['componentMappingKey'] ?? null;
+                    $mappingKey = $component['from'] ?? null;
                     $attrValue = $mappingKey ? ($props[$mappingKey] ?? null) : null;
-                    $mappedValue = $attrValue !== null ? ($element['componentMapping'][$attrValue] ?? null) : null;
+                    $mappedValue = $attrValue !== null ? ($component['map'][$attrValue] ?? null) : null;
                 @endphp
 
                 @if ($mappedValue)
-                    <x-dynamic-component :component="$element['componentRef']" :class="$element['componentClass'] ?? null">
+                    @php
+                        $dynAttrs = new \Illuminate\View\ComponentAttributeBag(array_filter(
+                            array_merge(
+                                ['class' => $component['class'] ?? null],
+                                $component['props'] ?? [],
+                            ),
+                            static fn ($value) => $value !== null && $value !== false,
+                        ));
+                    @endphp
+                    <x-dynamic-component :component="$component['ref']" :attributes="$dynAttrs">
                         @if ($bladeIconsAvailable)
                             @svg($mappedValue)
+                        @elseif (! app()->isProduction())
+                            @php
+                                throw new \RuntimeException(
+                                    'Mapped component icon "'.$mappedValue.'" requires blade-ui-kit/blade-icons. '
+                                    .'Run `composer require blade-ui-kit/blade-icons` or remove the mapped SVG path.'
+                                );
+                            @endphp
                         @endif
                     </x-dynamic-component>
                 @endif
-            @elseif (! empty($element['componentRef']))
-                <x-dynamic-component :component="$element['componentRef']" :class="$element['componentClass'] ?? null" />
+            @elseif (! empty($component['ref']))
+                @php
+                    $dynAttrs = new \Illuminate\View\ComponentAttributeBag(array_filter(
+                        array_merge(
+                            ['class' => $component['class'] ?? null],
+                            $component['props'] ?? [],
+                        ),
+                        static fn ($value) => $value !== null && $value !== false,
+                    ));
+                @endphp
+                <x-dynamic-component :component="$component['ref']" :attributes="$dynAttrs" />
             @endif
 
             @if (! empty($children))

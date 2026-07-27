@@ -4,17 +4,24 @@ namespace Sprout;
 
 use Sprout\Builders\AttrBuilder;
 use Sprout\Builders\ConditionBuilder;
+use Sprout\Builders\EmbedBuilder;
 use Sprout\Builders\MatchBuilder;
 use Sprout\Builders\StyleBuilder;
+use Sprout\Exceptions\SchemaException;
 use Sprout\Schema\Version;
 
+/**
+ * Fluent schema node builder.
+ *
+ * @method static static make(string $key, ?string $tag = 'div')
+ */
 class Node
 {
     protected ?string $key = null;
 
     protected ?string $tag = 'div';
 
-    protected bool $fragment = false;
+    protected bool $isFragment = false;
 
     protected ?string $slotName = null;
 
@@ -32,26 +39,20 @@ class Node
     /** @var list<array<string, mixed>> */
     protected array $styles = [];
 
-    protected ?array $visible = null;
+    protected ?array $visibleWhen = null;
 
-    protected ?array $hidden = null;
+    protected ?array $hiddenWhen = null;
 
-    protected ?array $richText = null;
+    protected ?array $richTextConfig = null;
 
-    protected ?string $componentRef = null;
-
-    /** @var array<string, mixed> */
-    protected array $componentProps = [];
-
-    protected ?string $componentMappingKey = null;
-
-    /** @var array<string, string> */
-    protected array $componentMapping = [];
-
-    protected ?string $componentClass = null;
+    /** @var array<string, mixed>|null */
+    protected ?array $componentConfig = null;
 
     /** @var list<Node> */
     protected array $childrenNodes = [];
+
+    /** @var list<string> */
+    protected array $openBuilders = [];
 
     public static function make(string $key, ?string $tag = 'div'): static
     {
@@ -62,20 +63,26 @@ class Node
         return $node;
     }
 
-    public static function namedSlot(string $name): static
+    public function registerOpenBuilder(string $name): void
     {
-        $node = new static;
-        $node->key = $name;
-        $node->slotName = $name;
-        $node->isDefaultSlot = false;
-        $node->fragment = true;
-
-        return $node;
+        $this->openBuilders[] = $name;
     }
 
+    public function clearOpenBuilder(string $name): void
+    {
+        $index = array_search($name, $this->openBuilders, true);
+
+        if ($index !== false) {
+            array_splice($this->openBuilders, $index, 1);
+        }
+    }
+
+    /**
+     * @return $this
+     */
     public function fragment(bool $enabled = true): static
     {
-        $this->fragment = $enabled;
+        $this->isFragment = $enabled;
 
         if ($enabled) {
             $this->tag = null;
@@ -84,6 +91,9 @@ class Node
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function classes(string $classes): static
     {
         return $this->pushClassRule($classes);
@@ -119,9 +129,9 @@ class Node
         return $this;
     }
 
-    public function apply(string $tokenGroup, string $token): static
+    public function token(string $group, string $name): static
     {
-        return $this->pushClassRule('', mode: 'token', tokenGroup: $tokenGroup, token: $token);
+        return $this->pushClassRule('', mode: 'token', tokenGroup: $group, token: $name);
     }
 
     public function match(string ...$props): MatchBuilder
@@ -144,7 +154,6 @@ class Node
             'default' => null,
             'uniqueId' => $name,
             'idRef' => null,
-            'interpolateIds' => null,
             'condition' => null,
         ]);
 
@@ -192,7 +201,6 @@ class Node
                 'default' => null,
                 'uniqueId' => null,
                 'idRef' => null,
-                'interpolateIds' => null,
                 'condition' => null,
             ]);
         }
@@ -210,7 +218,6 @@ class Node
             'default' => null,
             'uniqueId' => null,
             'idRef' => null,
-            'interpolateIds' => is_string($value) ? null : false,
             'condition' => null,
         ]);
 
@@ -224,21 +231,21 @@ class Node
 
     public function visible(string $prop): static
     {
-        $this->visible = ConditionBuilder::truthy($prop)->toArray();
+        $this->visibleWhen = ConditionBuilder::truthy($prop)->toArray();
 
         return $this;
     }
 
     public function hidden(string $prop): static
     {
-        $this->hidden = ConditionBuilder::truthy($prop)->toArray();
+        $this->hiddenWhen = ConditionBuilder::truthy($prop)->toArray();
 
         return $this;
     }
 
     public function richText(string $prop, ?string $placeholder = null, array $allowedFormats = []): static
     {
-        $this->richText = [
+        $this->richTextConfig = [
             'prop' => $prop,
             'placeholder' => $placeholder,
             'allowedFormats' => $allowedFormats,
@@ -247,38 +254,39 @@ class Node
         return $this;
     }
 
-    public function component(string $name, array $props = []): static
+    /**
+     * Mark this node as a slot holder.
+     *
+     * @param  string|null  $name  Null for the default slot; a string for a named slot.
+     * @return $this
+     */
+    public function slot(?string $name = null): static
     {
-        $this->componentRef = $name;
-        $this->componentProps = $props;
+        if ($name === null) {
+            $this->isDefaultSlot = true;
+            $this->slotName = null;
+        } else {
+            $this->slotName = $name;
+            $this->isDefaultSlot = false;
+        }
 
         return $this;
     }
 
-    public function mappedComponent(string $component, string $prop, array $map, ?string $class = null): static
+    /**
+     * Embed a nested component (static ref or prop-mapped).
+     */
+    public function component(?string $ref = null): EmbedBuilder
     {
-        $this->componentRef = $component;
-        $this->componentMappingKey = $prop;
-        $this->componentMapping = $map;
-        $this->componentClass = $class;
-
-        return $this;
+        return new EmbedBuilder($this, $ref);
     }
 
-    public function holdsDefaultSlot(): static
+    /**
+     * @param  array<string, mixed>  $component
+     */
+    public function setComponent(array $component): void
     {
-        $this->isDefaultSlot = true;
-        $this->slotName = null;
-
-        return $this;
-    }
-
-    public function holdsNamedSlot(string $name): static
-    {
-        $this->slotName = $name;
-        $this->isDefaultSlot = false;
-
-        return $this;
+        $this->componentConfig = $component;
     }
 
     /** @param list<Node> $children */
@@ -289,11 +297,11 @@ class Node
         return $this;
     }
 
-    public function includeCommon(string $commonKey, ?string $as = null, ?array $condition = null): static
+    public function preset(string $name, ?string $as = null, ?array $condition = null): static
     {
         $this->matches[] = [
-            'props' => [$as ?? $commonKey],
-            'common' => $commonKey,
+            'props' => [$as ?? $name],
+            'preset' => $name,
             'condition' => $condition,
         ];
 
@@ -302,10 +310,16 @@ class Node
 
     public function toSchema(): array
     {
+        if ($this->openBuilders !== []) {
+            throw new SchemaException(
+                'Unclosed builder(s): '.implode(', ', array_unique($this->openBuilders)).'. Call end() before toSchema().'
+            );
+        }
+
         $schema = [
             'schemaVersion' => Version::CURRENT,
             'key' => $this->key,
-            'fragment' => $this->fragment,
+            'fragment' => $this->isFragment,
             'tag' => $this->tag,
             'classRules' => $this->classRules,
             'matches' => $this->matches,
@@ -320,29 +334,40 @@ class Node
             ];
         }
 
-        if ($this->visible !== null) {
-            $schema['visible'] = $this->visible;
+        if ($this->visibleWhen !== null) {
+            $schema['visible'] = $this->visibleWhen;
         }
 
-        if ($this->hidden !== null) {
-            $schema['hidden'] = $this->hidden;
+        if ($this->hiddenWhen !== null) {
+            $schema['hidden'] = $this->hiddenWhen;
         }
 
-        if ($this->richText !== null) {
-            $schema['richText'] = $this->richText;
+        if ($this->richTextConfig !== null) {
+            $schema['richText'] = $this->richTextConfig;
         }
 
-        if ($this->componentRef !== null) {
-            $schema['componentRef'] = $this->componentRef;
-            $schema['componentProps'] = $this->componentProps;
+        if ($this->componentConfig !== null) {
+            $component = [];
 
-            if ($this->componentMappingKey !== null) {
-                $schema['componentMappingKey'] = $this->componentMappingKey;
-                $schema['componentMapping'] = $this->componentMapping;
+            if ($this->componentConfig['ref'] !== null) {
+                $component['ref'] = $this->componentConfig['ref'];
             }
 
-            if ($this->componentClass !== null) {
-                $schema['componentClass'] = $this->componentClass;
+            if ($this->componentConfig['from'] !== null) {
+                $component['from'] = $this->componentConfig['from'];
+                $component['map'] = $this->componentConfig['map'];
+            }
+
+            if ($this->componentConfig['class'] !== null) {
+                $component['class'] = $this->componentConfig['class'];
+            }
+
+            if ($this->componentConfig['props'] !== []) {
+                $component['props'] = $this->componentConfig['props'];
+            }
+
+            if ($component !== []) {
+                $schema['component'] = $component;
             }
         }
 

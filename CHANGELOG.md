@@ -7,7 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 2 — Authoring API (breaking)
+
+Full vocabulary rename; no deprecation aliases. Serialized schema keys stay stable where noted (`defaultSlot`, `namedSlots`, `matches[].preset`, nested `component`).
+
+| Old | New |
+|-----|-----|
+| `schema()` | `compose()` |
+| `initialize()` | `prepare()` |
+| `parent::__construct(...func_get_args())` | Removed — lazy boot via `ComposesMarkup` / `Composable` |
+| `holdsDefaultSlot()` / `holdsNamedSlot()` / `Node::namedSlot()` | `->slot()` / `->slot('name')` (`defaultSlot` derived automatically) |
+| `includeCommon()` / `sprout.common` | `preset()` / `sprout.presets` |
+| `->apply()` | `->token()` |
+| `mappedComponent()` + flat `componentRef*` keys | `->component('x')->from()->map()->class()->props()->end()` → nested `"component": { ref, from, map, class, props }` |
+| `MatchBuilder::onlyWhen()` / `unlessProp()` | `when()` / `unless()` |
+| `interpolateIds` opt-out | Removed — `{name}` always interpolates; escape with `{{name}}` |
+
+Also: open-builder guard throws on missing `->end()` before `toSchema()`; `sprout:doctor` reports legacy authoring names with replacements.
+
 ### Added
+
+- Working `sprout:cache` / `sprout:clear` with schema + class-map payload; `ConfigCollector` hydrates from cache; `sprout:doctor` fails on stale cache
+- `window.sprout.registerIconResolver()` host contract for editor nested `component` / mapped icons
+- `window.sprout.registerComponent(name, component?)` accepts an optional hand-written React component
+- `EditorConfigBuilder::reservedConfigKeys()` as the single source for doctor/manifest denylists
+- `sprout.editor.debug` config key (mirrors PHP SchemaRenderer debug checks)
+- `Sprout\Concerns\ComposesMarkup` trait and `Sprout\Contracts\Composable` interface
+- Open-builder guard on `toSchema()` for unclosed `attr` / `style` / `match` / `component` builders
+
+### Changed
+
+- `gehrisandro/tailwind-merge-php` moved from `require` to `suggest` (+ `require-dev`); Tailwind strategy throws a clear exception when missing
+- Mapped `@svg()` without blade-icons throws outside production instead of silently skipping
+- Publish surface reduced to a single `--tag=sprout`
+- Structure parity normalizer retains nested `component` fields
+- Component discovery resolves `Composable` instead of subclass-only scans
+- Docs rewritten around Phase 2 vocabulary (`docs/schema-v1.md`, `README.md`, `docs/editor.md`)
+
+### Removed
+
+- Dead `ComponentRegistry` and `Sprout::components()`
+- Hardcoded editor chevron SVG (`componentRefIcons.js`)
+- Legacy reserved keys `icons` / `iconAjaxUrl` / `iconAjaxNonce` from doctor/manifest denylists
+- Granular publish tags `sprout-config` and `sprout-common`
+- Public `interpolateIds` opt-out and flat `componentRef` / `componentMapping*` / `componentClass` / `componentProps` schema keys
+
+### Fixed
 
 - Pest test suite with Orchestra Testbench for application tests
 - Vitest unit tests for the editor runtime helpers and schema renderer

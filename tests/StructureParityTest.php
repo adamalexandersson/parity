@@ -8,123 +8,124 @@ function structureCases(): array
     return require __DIR__.'/fixtures/structure-cases.php';
 }
 
+/**
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function structureNode(
+    string $path,
+    ?string $tag,
+    bool $fragment,
+    ?array $slot,
+    array $attributes,
+    array $children = [],
+    array $overrides = [],
+): array {
+    return array_merge([
+        'path' => $path,
+        'tag' => $tag,
+        'fragment' => $fragment,
+        'slot' => $slot,
+        'component' => null,
+        'attributes' => $attributes,
+        'children' => $children,
+    ], $overrides);
+}
+
 function expectedStructures(): array
 {
     return [
         'section-default-slot' => [
-            'content' => [
-                'path' => 'content',
-                'tag' => null,
-                'fragment' => true,
-                'slot' => ['name' => null, 'default' => true],
-                'attributes' => ['class' => ''],
-                'children' => [],
-            ],
+            'content' => structureNode('content', null, true, ['name' => null, 'default' => true], ['class' => '']),
         ],
         'alert-nested-default-slot' => [
-            'wrapper' => [
-                'path' => 'wrapper',
-                'tag' => 'div',
-                'fragment' => false,
-                'slot' => null,
-                'attributes' => ['class' => 'flex items-start gap-x-3'],
-                'children' => [
-                    'content' => [
-                        'path' => 'wrapper.content',
-                        'tag' => 'div',
-                        'fragment' => false,
-                        'slot' => ['name' => null, 'default' => true],
-                        'attributes' => ['class' => 'flex-1'],
-                        'children' => [],
+            'wrapper' => structureNode('wrapper', 'div', false, null, ['class' => 'flex items-start gap-x-3'], [
+                'content' => structureNode('wrapper.content', 'div', false, ['name' => null, 'default' => true], ['class' => 'flex-1']),
+                'icon' => structureNode('wrapper.icon', 'div', false, null, ['class' => 'leading-none'], [], [
+                    'component' => [
+                        'ref' => 'ui.icon',
+                        'from' => 'type',
+                        'map' => [
+                            'info' => 'heroicon-o-information-circle',
+                            'error' => 'heroicon-o-x-circle',
+                        ],
+                        'class' => 'size-7',
                     ],
-                    'icon' => [
-                        'path' => 'wrapper.icon',
-                        'tag' => 'div',
-                        'fragment' => false,
-                        'slot' => null,
-                        'attributes' => ['class' => 'leading-none'],
-                        'children' => [],
-                    ],
-                ],
-            ],
+                ]),
+            ]),
         ],
         'card-named-slots' => [
-            'body' => [
-                'path' => 'body',
-                'tag' => 'div',
-                'fragment' => false,
-                'slot' => null,
-                'attributes' => ['class' => ''],
-                'children' => [
-                    'inner' => [
-                        'path' => 'body.inner',
-                        'tag' => 'div',
-                        'fragment' => false,
-                        'slot' => null,
-                        'attributes' => ['class' => ''],
-                        'children' => [
-                            'content' => [
-                                'path' => 'body.inner.content',
-                                'tag' => 'div',
-                                'fragment' => false,
-                                'slot' => ['name' => null, 'default' => true],
-                                'attributes' => ['class' => ''],
-                                'children' => [],
-                            ],
-                            'footer' => [
-                                'path' => 'body.inner.footer',
-                                'tag' => 'div',
-                                'fragment' => false,
-                                'slot' => ['name' => 'footer', 'default' => false],
-                                'attributes' => ['class' => ''],
-                                'children' => [],
-                            ],
-                            'header' => [
-                                'path' => 'body.inner.header',
-                                'tag' => 'div',
-                                'fragment' => false,
-                                'slot' => ['name' => 'header', 'default' => false],
-                                'attributes' => ['class' => ''],
-                                'children' => [],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'image' => [
-                'path' => 'image',
-                'tag' => 'div',
-                'fragment' => false,
-                'slot' => ['name' => 'image', 'default' => false],
-                'attributes' => ['class' => ''],
-                'children' => [],
-            ],
+            'body' => structureNode('body', 'div', false, null, ['class' => ''], [
+                'inner' => structureNode('body.inner', 'div', false, null, ['class' => ''], [
+                    'content' => structureNode('body.inner.content', 'div', false, ['name' => null, 'default' => true], ['class' => '']),
+                    'footer' => structureNode('body.inner.footer', 'div', false, ['name' => 'footer', 'default' => false], ['class' => '']),
+                    'header' => structureNode('body.inner.header', 'div', false, ['name' => 'header', 'default' => false], ['class' => '']),
+                ]),
+            ]),
+            'image' => structureNode('image', 'div', false, ['name' => 'image', 'default' => false], ['class' => '']),
         ],
         'void-media' => [
-            'break' => [
-                'path' => 'break',
-                'tag' => 'br',
-                'fragment' => false,
-                'slot' => null,
-                'attributes' => ['class' => ''],
-                'children' => [],
-            ],
-            'image' => [
-                'path' => 'image',
-                'tag' => 'img',
-                'fragment' => false,
-                'slot' => null,
-                'attributes' => ['class' => 'block w-full'],
-                'children' => [],
-            ],
-            'input' => [
-                'path' => 'input',
-                'tag' => 'input',
-                'fragment' => false,
-                'slot' => null,
-                'attributes' => ['class' => ''],
-                'children' => [],
-            ],
+            'break' => structureNode('break', 'br', false, null, ['class' => '']),
+            'image' => structureNode('image', 'img', false, null, ['class' => 'block w-full']),
+            'input' => structureNode('input', 'input', false, null, ['class' => '']),
+        ],
+        'component-ref-resolving' => [
+            'mapped' => structureNode('mapped', 'div', false, null, ['class' => ''], [], [
+                'component' => [
+                    'ref' => 'ui.icon',
+                    'from' => 'type',
+                    'map' => [
+                        'info' => 'heroicon-o-information-circle',
+                        'error' => 'heroicon-o-x-circle',
+                    ],
+                    'class' => 'size-7',
+                ],
+            ]),
+            'plain' => structureNode('plain', 'span', false, null, ['class' => ''], [], [
+                'component' => [
+                    'ref' => 'heroicon-o-chevron-down',
+                    'props' => ['aria-hidden' => true],
+                ],
+            ]),
+            'unmapped' => structureNode('unmapped', 'div', false, null, ['class' => ''], [], [
+                'component' => [
+                    'ref' => 'ui.icon',
+                    'from' => 'type',
+                    'map' => [
+                        'info' => 'heroicon-o-information-circle',
+                    ],
+                    'class' => 'size-7',
+                ],
+            ]),
+        ],
+        'component-ref-missing-mapping' => [
+            'mapped' => structureNode('mapped', 'div', false, null, ['class' => ''], [], [
+                'component' => [
+                    'ref' => 'ui.icon',
+                    'from' => 'type',
+                    'map' => [
+                        'info' => 'heroicon-o-information-circle',
+                        'error' => 'heroicon-o-x-circle',
+                    ],
+                    'class' => 'size-7',
+                ],
+            ]),
+            'plain' => structureNode('plain', 'span', false, null, ['class' => ''], [], [
+                'component' => [
+                    'ref' => 'heroicon-o-chevron-down',
+                    'props' => ['aria-hidden' => true],
+                ],
+            ]),
+            'unmapped' => structureNode('unmapped', 'div', false, null, ['class' => ''], [], [
+                'component' => [
+                    'ref' => 'ui.icon',
+                    'from' => 'type',
+                    'map' => [
+                        'info' => 'heroicon-o-information-circle',
+                    ],
+                    'class' => 'size-7',
+                ],
+            ]),
         ],
     ];
 }

@@ -11,13 +11,20 @@ describe('react attribute map', () => {
         expect(mapAttributeName('for')).toBe('htmlFor');
     });
 
-    it('passes data aria item and alpine attrs through', () => {
+    it('passes data aria and alpine attrs through', () => {
         expect(mapAttributeName('data-test')).toBe('data-test');
         expect(mapAttributeName('aria-label')).toBe('aria-label');
-        expect(mapAttributeName('itemprop')).toBe('itemprop');
         expect(mapAttributeName('x-on:click')).toBe('x-on:click');
         expect(mapAttributeName('x-bind:class')).toBe('x-bind:class');
         expect(mapAttributeName(':class')).toBe(':class');
+    });
+
+    it('maps microdata attrs to React camelCase', () => {
+        expect(mapAttributeName('itemprop')).toBe('itemProp');
+        expect(mapAttributeName('itemscope')).toBe('itemScope');
+        expect(mapAttributeName('itemtype')).toBe('itemType');
+        expect(mapAttributeName('itemid')).toBe('itemID');
+        expect(mapAttributeName('itemref')).toBe('itemRef');
     });
 
     it('keeps alpine attrs when editor.alpine is emit', () => {
@@ -26,11 +33,15 @@ describe('react attribute map', () => {
         const attrs = normalizeDomAttributes({
             'x-data': 'accordion({ single: false })',
             'x-on:click': "toggle('panel')",
+            'x-cloak': true,
+            'x-collapse': true,
             id: 'trigger',
         });
 
         expect(attrs['x-data']).toBe('accordion({ single: false })');
         expect(attrs['x-on:click']).toBe("toggle('panel')");
+        expect(attrs['x-cloak']).toBe('');
+        expect(attrs['x-collapse']).toBe('');
         expect(attrs.id).toBe('trigger');
     });
 
@@ -56,12 +67,14 @@ describe('boolean attributes', () => {
         const attrs = normalizeDomAttributes({
             disabled: false,
             required: true,
+            itemscope: true,
             class: 'btn',
             for: 'field',
         });
 
         expect(attrs.disabled).toBeUndefined();
         expect(attrs.required).toBe(true);
+        expect(attrs.itemScope).toBe(true);
         expect(attrs.className).toBe('btn');
         expect(attrs.htmlFor).toBe('field');
     });

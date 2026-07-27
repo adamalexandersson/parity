@@ -139,7 +139,7 @@
                     "type": "array",
                     "items": { "type": "string" }
                 },
-                "common": { "type": "string" },
+                "preset": { "type": "string" },
                 "condition": { "$ref": "#/$defs/condition" },
                 "cases": {
                     "type": "array",
@@ -166,8 +166,7 @@
                 "value": true,
                 "default": true,
                 "uniqueId": { "type": ["string", "null"] },
-                "idRef": { "type": ["string", "null"] },
-                "interpolateIds": { "type": ["boolean", "null"] }
+                "idRef": { "type": ["string", "null"] }
             },
             "additionalProperties": true
         },
@@ -181,6 +180,17 @@
                 "cssUrl": { "type": "boolean" },
                 "condition": { "$ref": "#/$defs/condition" },
                 "default": true
+            },
+            "additionalProperties": true
+        },
+        "component": {
+            "type": "object",
+            "properties": {
+                "ref": { "type": ["string", "null"] },
+                "from": { "type": ["string", "null"] },
+                "map": { "type": ["object", "null"] },
+                "class": { "type": ["string", "null"] },
+                "props": { "type": "object" }
             },
             "additionalProperties": true
         },
@@ -215,10 +225,12 @@
                     "additionalProperties": true
                 },
                 "richText": { "type": ["object", "null"] },
-                "componentRef": { "type": ["string", "null"] },
-                "componentMappingKey": { "type": ["string", "null"] },
-                "componentMapping": { "type": ["object", "null"] },
-                "componentClass": { "type": ["string", "null"] },
+                "component": {
+                    "oneOf": [
+                        { "type": "null" },
+                        { "$ref": "#/$defs/component" }
+                    ]
+                },
                 "visible": { "$ref": "#/$defs/condition" },
                 "hidden": { "$ref": "#/$defs/condition" },
                 "children": {

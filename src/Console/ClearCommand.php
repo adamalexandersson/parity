@@ -3,7 +3,7 @@
 namespace Sprout\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
+use Sprout\Config\ConfigCollector;
 
 class ClearCommand extends Command
 {
@@ -13,7 +13,7 @@ class ClearCommand extends Command
 
     public function handle(): int
     {
-        Cache::forget('sprout.schemas');
+        ConfigCollector::forgetCache();
         $this->components->info('Sprout schema cache cleared.');
 
         return self::SUCCESS;

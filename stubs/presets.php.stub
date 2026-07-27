@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Shared Sprout class maps for ->includeCommon('key').
+ * Shared Sprout class maps for ->preset('key').
  *
  * @see https://github.com/adamalexandersson/sprout/blob/main/docs/schema-v1.md
  */

@@ -27,6 +27,14 @@ export function normalizeDomAttributes(attributes = {}, {
             return;
         }
 
+        // Alpine presence attrs (x-cloak, x-collapse, …) serialize as boolean
+        // true in PHP; React rejects boolean values on unknown attributes.
+        if (isAlpineAttribute(name) && value === true) {
+            prepared[name] = '';
+
+            return;
+        }
+
         prepared[name] = value;
     });
 

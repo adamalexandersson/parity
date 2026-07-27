@@ -8,8 +8,6 @@ final class Component extends Node
 {
     protected ?string $name = null;
 
-    protected ?string $defaultSlot = null;
-
     protected ?array $linkable = null;
 
     public static function make(string $name, ?string $tag = 'div'): static
@@ -32,24 +30,19 @@ final class Component extends Node
         return $this;
     }
 
-    public function slot(string $name): self
-    {
-        $this->defaultSlot = $name;
-
-        return $this;
-    }
-
     public function toSchema(): array
     {
         $schema = parent::toSchema();
         $schema['name'] = $this->name;
 
-        if ($this->defaultSlot !== null) {
-            $schema['defaultSlot'] = $this->defaultSlot;
-        }
-
         if ($this->linkable !== null) {
             $schema['linkable'] = $this->linkable;
+        }
+
+        $defaultSlot = SlotCollector::defaultSlotPath($schema);
+
+        if ($defaultSlot !== null) {
+            $schema['defaultSlot'] = $defaultSlot;
         }
 
         $schema['namedSlots'] = SlotCollector::collect($schema);

@@ -10,7 +10,7 @@ class ShellSlotTestComponent extends SproutComponent
     public ?string $element = 'h2';
 
     /** @return array<string, mixed> */
-    public static function schema(): array
+    public static function compose(): array
     {
         return Component::make('shell-slot-test', tag: 'div')
             ->classes('slot-test')

@@ -6,7 +6,7 @@
     "authors": [
         {
             "name": "Adam Alexandersson",
-            "email": "adam@example.com"
+            "email": "adam@alexandersson.email"
         }
     ],
     "autoload": {
@@ -21,7 +21,6 @@
     },
     "require": {
         "php": "^8.2",
-        "gehrisandro/tailwind-merge-php": "^1.0",
         "illuminate/console": "^11.0|^12.0|^13.0",
         "illuminate/filesystem": "^11.0|^12.0|^13.0",
         "illuminate/support": "^11.0|^12.0|^13.0",
@@ -47,6 +46,7 @@
         }
     },
     "require-dev": {
+        "gehrisandro/tailwind-merge-php": "^1.0",
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.29",
         "orchestra/testbench": "^10.0",
@@ -54,7 +54,8 @@
         "pestphp/pest-plugin-laravel": "^3.0"
     },
     "suggest": {
-        "blade-ui-kit/blade-icons": "Required for mappedComponent nodes that render SVG icons via @svg().",
+        "blade-ui-kit/blade-icons": "Required for component() nodes that render SVG icons via @svg().",
+        "gehrisandro/tailwind-merge-php": "Required when sprout.classes.strategy is \"tailwind\" (the default). Use \"passthrough\" otherwise.",
         "roots/acorn": "Required for Sage/WordPress themes that use the Gutenberg editor adapter."
     },
     "scripts": {

@@ -33,7 +33,7 @@ function bindParityConfig(?array $caseConfig = null): void
 
     config([
         'sprout.tokens' => $caseConfig['tokens'] ?? [],
-        'sprout.common' => $caseConfig['common'] ?? [],
+        'sprout.presets' => $caseConfig['presets'] ?? $caseConfig['common'] ?? [],
         'sprout.classes.strategy' => $caseConfig['classes']['strategy'] ?? 'tailwind',
     ]);
 }

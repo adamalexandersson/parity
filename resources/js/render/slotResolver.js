@@ -6,7 +6,7 @@ export function hasStructureChildren(children) {
     return Boolean(children && Object.keys(children).length > 0);
 }
 
-export function isSlotNode(element, path, key, slotElement) {
+function isSlotNode(element, path, key, slotElement) {
     const slot = element.slot ?? null;
     const isDefaultSlot = Boolean(slot?.default);
 

@@ -35,12 +35,10 @@ wp acorn vendor:publish --tag=sprout
 
 Acorn auto-registers the provider via `extra.acorn`. The WordPress host activates when `add_action` exists and boots Gutenberg assets.
 
-Publish tags:
+Publish config and common maps stub:
 
 ```bash
 wp acorn vendor:publish --tag=sprout
-wp acorn vendor:publish --tag=sprout-config
-wp acorn vendor:publish --tag=sprout-common
 ```
 
 ### Gutenberg editor exports (WordPress themes)
@@ -73,7 +71,7 @@ Vite aliases (see [docs/editor.md](docs/editor.md)):
 
 ## Theme integration
 
-Sprout auto-discovers components from `app/View/Components` with a static `schema()` method. No theme Blade shell is required for schema-only components — Sprout provides a default wrapper. Override by adding `resources/views/components/{namespace}/{name}.blade.php` when needed.
+Sprout auto-discovers components from `app/View/Components` that implement `Sprout\Contracts\Composable` (a static `compose()` method). No theme Blade shell is required for schema-only components — Sprout provides a default wrapper. Override by adding `resources/views/components/{namespace}/{name}.blade.php` when needed.
 
 Extend Sprout from any service provider that boots with your theme — for example an integration `Init.php` or `AppServiceProvider`:
 
@@ -95,9 +93,9 @@ public function boot(): void
 }
 ```
 
-Shared Tailwind class maps for `->includeCommon('cols')` live in `config/sprout/common.php`.
+Shared Tailwind class maps for `->preset('cols')` live in `config/sprout/presets.php` (`config('sprout.presets')`).
 
-Class composition defaults to Tailwind Merge. Switch to passthrough (concatenate + dedupe) with:
+Class composition defaults to Tailwind Merge (`gehrisandro/tailwind-merge-php`, suggested). Install that package when using the default strategy, or switch to passthrough (concatenate + dedupe):
 
 ```php
 // config/sprout.php
@@ -106,11 +104,15 @@ Class composition defaults to Tailwind Merge. Switch to passthrough (concatenate
 ],
 ```
 
-Mapped icon nodes that call `@svg()` require optional [`blade-ui-kit/blade-icons`](https://github.com/blade-ui-kit/blade-icons). Without it, Sprout still renders the mapped dynamic component and skips the SVG child.
+The editor runtime bundles `tailwind-merge` into `dist/sprout.js`, so the JS side always has conflict resolution when strategy is `tailwind`.
+
+Mapped icon nodes that call `@svg()` require optional [`blade-ui-kit/blade-icons`](https://github.com/blade-ui-kit/blade-icons). Without it, Sprout still renders the mapped dynamic component; outside production it throws naming the missing package, and in production it skips the SVG child.
 
 Force a host with `SPROUT_HOST=laravel` or `SPROUT_HOST=wordpress` (default: auto-detect).
 
 ## Author a component
+
+Extend `Sprout\View\Component` (or use `ComposesMarkup` and implement `Composable`). Composition boots lazily — no `parent::__construct(...func_get_args())`.
 
 ```php
 namespace App\View\Components\Ui;
@@ -126,29 +128,26 @@ class Button extends SproutComponent
         public string $themeColor = 'default',
         public string $themeType = 'solid',
         public array|string|null $link = null,
-    ) {
-        parent::__construct(...func_get_args());
-    }
+    ) {}
 
-    public static function schema(): array
+    public static function compose(): array
     {
         return Component::make('button', tag: 'button')
             ->linkable('link')
             ->classes('inline-flex items-center gap-x-1 font-semibold')
             ->match('size')
-                ->case('sm')->classes('px-4 py-2 text-sm')
-                ->case('lg')->classes('px-8 py-4 text-lg')
-                ->default()->classes('px-6 py-3 text-sm')
+                ->case('sm')->classes('px-4 py-2 text-sm')->end()
+                ->case('lg')->classes('px-8 py-4 text-lg')->end()
+                ->default()->classes('px-6 py-3 text-sm')->end()
                 ->end()
             ->match('themeColor', 'themeType')
-                ->case('primary', 'solid')->classes('bg-primary-500 text-white')
-                ->default()->classes('bg-gray-900 text-white')
+                ->case('primary', 'solid')->classes('bg-primary-500 text-white')->end()
+                ->default()->classes('bg-gray-900 text-white')->end()
                 ->end()
-            ->slot('content')
             ->children([
-                Node::namedSlot('icon'),
+                Node::make('icon')->fragment()->slot('icon'),
                 Node::make('label')->fragment()->richText('label', __('Button text…', 'sage')),
-                Node::make('content')->fragment()->holdsDefaultSlot(),
+                Node::make('content')->fragment()->slot(),
             ])
             ->toSchema();
     }
@@ -161,6 +160,7 @@ Front end:
 <x-ui.button size="lg" theme-color="primary">Read more</x-ui.button>
 ```
 
+See [docs/schema-v1.md](docs/schema-v1.md) for `preset()`, `token()`, nested `component()`, `when`/`unless` vs `visible`/`hidden`, and always-on `{name}` ID interpolation.
 ## Use in a Gutenberg block
 
 Declare `sprout` as a script dependency:
@@ -211,7 +211,7 @@ The compiled bundle is written to `dist/sprout.js` and shipped with the Composer
 
 ## Escape hatch
 
-Prefer schema attributes (including Alpine helpers) for interactive markup. For exceptional cases only — register a hand-written React component via `window.sprout.registerComponent('name')`, or add a theme Blade shell override when the schema cannot express a dynamic loop.
+Prefer schema attributes (including Alpine helpers) for interactive markup. For exceptional cases only — register a hand-written React component via `window.sprout.registerComponent('name', MyComponent)`, or add a theme Blade shell override when the schema cannot express a dynamic loop. Called with only a name, `registerComponent` builds the usual schema-driven wrapper.
 
 ## License
 

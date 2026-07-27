@@ -4,7 +4,7 @@
  * @param {Record<string, unknown>} schema
  * @returns {string[]}
  */
-export function collectNamedSlots(schema) {
+function collectNamedSlots(schema) {
     const names = new Set();
 
     walk(schema, names);

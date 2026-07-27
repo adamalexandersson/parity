@@ -15,7 +15,7 @@ class ShellLinkableTestComponent extends SproutComponent
     ];
 
     /** @return array<string, mixed> */
-    public static function schema(): array
+    public static function compose(): array
     {
         return Component::make('shell-linkable-test', tag: 'button')
             ->linkable('link')

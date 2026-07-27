@@ -6,43 +6,102 @@ import { isVoidElement } from '../support/voidElements.js';
 import { isSvgTag } from '../support/reactAttributeMap.js';
 import { normalizeDomAttributes } from '../support/domAttributes.js';
 import { isDebugMode, schemaErrorPanelProps } from '../support/schemaError.js';
-import { CHEVRON_DOWN_PATH, chevronDownSvgProps } from '../support/componentRefIcons.js';
+import { resolveIcon } from '../support/iconResolver.js';
 import {
     hasStructureChildren,
     shouldRenderDefaultSlot,
     shouldSkipNamedSlotNode,
 } from './slotResolver.js';
 
-function renderComponentRef(element, props = {}) {
-    if (! element.componentRef) {
+/**
+ * Mirror PHP structure.blade.php nested `component` semantics.
+ *
+ * @param {Record<string, unknown>} element
+ * @param {Record<string, unknown>} props
+ * @param {Record<string, unknown>} registry
+ * @returns {unknown|null}
+ */
+function renderComponentRef(element, props = {}, registry = {}) {
+    const comp = element.component;
+
+    if (! comp?.ref) {
         return null;
     }
 
-    const mappedIcon = element.componentMapping && element.componentMappingKey
-        ? element.componentMapping[props[element.componentMappingKey]] ?? null
-        : null;
+    const ref = comp.ref;
+    const mappingKey = comp.from;
+    const mapping = comp.map;
+    const className = comp.class;
+    const nestedProps = {
+        ...(comp.props ?? {}),
+    };
 
-    if (element.componentRef.includes('chevron-down')) {
-        return createElement(
-            'svg',
-            {
-                ...chevronDownSvgProps(),
-                'data-sprout-component': element.componentRef,
-                'data-sprout-icon': mappedIcon || undefined,
-            },
-            createElement('path', CHEVRON_DOWN_PATH),
-        );
+    if (className) {
+        nestedProps.className = [nestedProps.className, className]
+            .filter(Boolean)
+            .join(' ');
     }
 
-    return createElement('span', {
-        'data-sprout-component': element.componentRef,
-        'data-sprout-icon': mappedIcon || undefined,
-        className: element.componentClass || undefined,
-        'aria-hidden': true,
-    });
+    const hasMapping = Boolean(mapping && mappingKey);
+
+    if (hasMapping) {
+        const mappedValue = mapping[props[mappingKey]] ?? null;
+
+        if (mappedValue == null || mappedValue === '') {
+            return null;
+        }
+
+        const icon = resolveIcon(String(mappedValue), element);
+
+        if (icon) {
+            return icon;
+        }
+
+        const Nested = registry[ref];
+
+        if (Nested) {
+            return createElement(Nested, nestedProps);
+        }
+
+        return componentRefFallback(element, mappedValue);
+    }
+
+    const Nested = registry[ref];
+
+    if (Nested) {
+        return createElement(Nested, nestedProps);
+    }
+
+    const icon = resolveIcon(String(ref), element);
+
+    if (icon) {
+        return icon;
+    }
+
+    return componentRefFallback(element, null);
 }
 
-export function renderStructure({
+function componentRefFallback(element, mappedValue) {
+    if (! isDebugMode()) {
+        return null;
+    }
+
+    const comp = element.component ?? {};
+    const ref = comp.ref;
+    const label = mappedValue
+        ? `${ref} → ${mappedValue}`
+        : String(ref);
+
+    return createElement('span', {
+        'data-sprout-component': ref,
+        'data-sprout-icon': mappedValue || undefined,
+        className: comp.class || undefined,
+        'aria-hidden': true,
+        title: `[Sprout] Unresolved component: ${label}`,
+    }, `▾ ${label}`);
+}
+
+function renderStructure({
     structure,
     slotElement,
     slotConfig = {},
@@ -70,28 +129,31 @@ export function renderStructure({
             svgParent: svg,
         });
 
-        const componentPlaceholder = renderComponentRef(element, props);
+        const showComponentRef = ! element.richText && ! renderDefaultSlot && ! slotContent;
+        const componentNode = showComponentRef
+            ? renderComponentRef(element, props, registry)
+            : null;
+
+        const primaryContent = element.richText && setAttributes ? (
+            <RichText
+                value={props[element.richText.prop] ?? ''}
+                onChange={(value) => setAttributes({ [element.richText.prop]: value })}
+                placeholder={element.richText.placeholder ?? ''}
+                allowedFormats={element.richText.allowedFormats ?? []}
+            />
+        ) : renderDefaultSlot ? (
+            slotConfig.renderSlot ? slotConfig.renderSlot() : (
+                <InnerBlocks
+                    template={slotConfig.template ?? []}
+                    allowedBlocks={slotConfig.allowedBlocks ?? null}
+                    templateLock={slotConfig.templateLock ?? null}
+                />
+            )
+        ) : slotContent ? slotContent : componentNode;
 
         const inner = (
             <>
-                {element.richText && setAttributes ? (
-                    <RichText
-                        value={props[element.richText.prop] ?? ''}
-                        onChange={(value) => setAttributes({ [element.richText.prop]: value })}
-                        placeholder={element.richText.placeholder ?? ''}
-                        allowedFormats={element.richText.allowedFormats ?? []}
-                    />
-                ) : renderDefaultSlot ? (
-                    slotConfig.renderSlot ? slotConfig.renderSlot() : (
-                        <InnerBlocks
-                            template={slotConfig.template ?? []}
-                            allowedBlocks={slotConfig.allowedBlocks ?? null}
-                            templateLock={slotConfig.templateLock ?? null}
-                        />
-                    )
-                ) : slotContent}
-
-                {componentPlaceholder}
+                {primaryContent}
 
                 {hasStructureChildren(children) && Object.keys(children).map((childKey) => renderElement(
                     children[childKey],
@@ -214,7 +276,13 @@ export function createComponent(componentName, registry = {}) {
     return SproutComponent;
 }
 
-export function registerComponent(name, registry = {}) {
-    registry[name] = createComponent(name, registry);
+export function registerComponent(name, component = null, registry = {}) {
+    // Allow registerComponent(name, registry) for the previous two-arg shape.
+    if (component !== null && typeof component === 'object' && ! component.$$typeof && ! component.prototype && typeof component !== 'function') {
+        registry = component;
+        component = null;
+    }
+
+    registry[name] = component ?? createComponent(name, registry);
     return registry[name];
 }

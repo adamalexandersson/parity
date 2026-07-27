@@ -110,11 +110,7 @@ class SchemaRenderer
             'attributes' => $attributes,
             'slot' => $schema['slot'] ?? null,
             'richText' => $schema['richText'] ?? null,
-            'componentRef' => $schema['componentRef'] ?? null,
-            'componentProps' => $schema['componentProps'] ?? [],
-            'componentMapping' => $schema['componentMapping'] ?? null,
-            'componentMappingKey' => $schema['componentMappingKey'] ?? null,
-            'componentClass' => $schema['componentClass'] ?? null,
+            'component' => $schema['component'] ?? null,
             'children' => [],
         ];
 
@@ -185,8 +181,8 @@ class SchemaRenderer
         ?array $componentSchema = null,
     ): void {
         foreach ($matches as $match) {
-            if (isset($match['common'])) {
-                $this->applyCommonMatch($match, $props, $classes);
+            if (isset($match['preset'])) {
+                $this->applyPresetMatch($match, $props, $classes);
 
                 continue;
             }
@@ -241,9 +237,7 @@ class SchemaRenderer
 
         $attr->add(
             $outcome['name'],
-            $this->resolveAttributeValue($value, [
-                'interpolateIds' => $outcome['interpolateIds'] ?? null,
-            ])
+            $this->resolveAttributeValue($value)
         );
     }
 
@@ -334,15 +328,15 @@ class SchemaRenderer
         return false;
     }
 
-    protected function applyCommonMatch(array $match, array $props, ClassFactory $classes): void
+    protected function applyPresetMatch(array $match, array $props, ClassFactory $classes): void
     {
         if (! $this->evaluateCondition($match['condition'] ?? null)) {
             return;
         }
 
-        $prop = $match['props'][0] ?? $match['common'];
+        $prop = $match['props'][0] ?? $match['preset'];
         $value = $this->lookupValue($props, $prop);
-        $map = config("sprout.common.{$match['common']}", []);
+        $map = config("sprout.presets.{$match['preset']}", []);
 
         if (! is_array($map)) {
             return;
@@ -368,12 +362,12 @@ class SchemaRenderer
 
         $normalized = $this->normalizeLookupValue($value);
 
-        $this->applyCommonMapEntry($match['common'], $normalized, $classes);
+        $this->applyPresetMapEntry($match['preset'], $normalized, $classes);
     }
 
-    protected function applyCommonMapEntry(string $commonKey, string $normalized, ClassFactory $classes): void
+    protected function applyPresetMapEntry(string $presetKey, string $normalized, ClassFactory $classes): void
     {
-        $map = config("sprout.common.{$commonKey}", []);
+        $map = config("sprout.presets.{$presetKey}", []);
 
         if (! is_array($map)) {
             return;
@@ -383,8 +377,8 @@ class SchemaRenderer
             $classes->apply($map[$normalized]);
         }
 
-        $nestedKey = "{$commonKey}Nested";
-        $nestedMap = config("sprout.common.{$nestedKey}", []);
+        $nestedKey = "{$presetKey}Nested";
+        $nestedMap = config("sprout.presets.{$nestedKey}", []);
 
         if (is_array($nestedMap) && isset($nestedMap[$normalized])) {
             $classes->apply($nestedMap[$normalized]);
@@ -415,7 +409,7 @@ class SchemaRenderer
                 if (($definition['value'] ?? null) !== null && $definition['value'] !== false) {
                     $attr->add(
                         $definition['name'],
-                        $this->resolveAttributeValue($definition['value'], $definition)
+                        $this->resolveAttributeValue($definition['value'])
                     );
                 }
 
@@ -436,15 +430,14 @@ class SchemaRenderer
 
             $attr->add(
                 $definition['name'],
-                $this->resolveAttributeValue($casted, $definition)
+                $this->resolveAttributeValue($casted)
             );
         }
     }
 
-    /** @param array<string, mixed> $definition */
-    protected function resolveAttributeValue(mixed $value, array $definition): mixed
+    protected function resolveAttributeValue(mixed $value): mixed
     {
-        if (! IdInterpolator::shouldInterpolate($value, $definition['interpolateIds'] ?? null)) {
+        if (! IdInterpolator::shouldInterpolate($value)) {
             return $value;
         }
 

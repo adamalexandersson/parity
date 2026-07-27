@@ -16,15 +16,15 @@ final class AttrBuilder
 
     private ?string $idRef = null;
 
-    private ?bool $interpolateIds = null;
-
     private ?array $condition = null;
 
     public function __construct(
         private readonly Node $node,
         private readonly string $name,
         private readonly mixed $staticValue = null,
-    ) {}
+    ) {
+        $node->registerOpenBuilder('attr');
+    }
 
     public function from(string $source): self
     {
@@ -61,13 +61,6 @@ final class AttrBuilder
         return $this;
     }
 
-    public function interpolateIds(bool $enabled = true): self
-    {
-        $this->interpolateIds = $enabled;
-
-        return $this;
-    }
-
     public function when(string $prop, mixed $value = null): self
     {
         $this->condition = $value === null
@@ -88,6 +81,7 @@ final class AttrBuilder
 
     public function end(): Node
     {
+        $this->node->clearOpenBuilder('attr');
         $this->node->pushAttribute([
             'name' => $this->name,
             'value' => $this->staticValue,
@@ -96,7 +90,6 @@ final class AttrBuilder
             'default' => $this->default,
             'uniqueId' => $this->uniqueId,
             'idRef' => $this->idRef,
-            'interpolateIds' => $this->interpolateIds,
             'condition' => $this->condition,
         ]);
 

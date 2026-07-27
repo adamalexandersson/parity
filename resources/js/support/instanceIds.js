@@ -56,20 +56,29 @@ export class InstanceIds {
     }
 }
 
-export function shouldInterpolateIds(value, flag = null) {
-    if (flag === false) {
-        return false;
-    }
-
-    if (flag === true) {
-        return typeof value === 'string';
-    }
-
+/**
+ * True when a string contains `{name}` placeholders (including escaped `{{name}}`).
+ */
+export function shouldInterpolateIds(value) {
     return typeof value === 'string' && /\{[a-zA-Z_][\w-]*\}/.test(value);
 }
 
+/**
+ * Replace `{name}` placeholders with generated instance IDs.
+ * Escape: `{{name}}` becomes a literal `{name}`.
+ */
 export function interpolateIds(value, ids, { debug = false, component = null } = {}) {
-    return String(value).replace(/\{([a-zA-Z_][\w-]*)\}/g, (match, name) => {
+    const escapes = [];
+    const ESC = '\u0000';
+
+    let result = String(value).replace(/\{\{([a-zA-Z_][\w-]*)\}\}/g, (_, name) => {
+        const index = escapes.length;
+        escapes.push(`{${name}}`);
+
+        return `${ESC}${index}${ESC}`;
+    });
+
+    result = result.replace(/\{([a-zA-Z_][\w-]*)\}/g, (match, name) => {
         if (! ids.has(name)) {
             if (debug) {
                 const error = new Error(
@@ -84,4 +93,6 @@ export function interpolateIds(value, ids, { debug = false, component = null } =
 
         return ids.get(name);
     });
+
+    return result.replace(new RegExp(`${ESC}(\\d+)${ESC}`, 'g'), (_, index) => escapes[Number(index)]);
 }

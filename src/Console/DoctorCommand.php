@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Sprout\Config\ConfigCollector;
 use Sprout\Contracts\Host;
+use Sprout\Editor\EditorConfigBuilder;
 use Sprout\Schema\SchemaValidator;
 use Sprout\Schema\Version;
 
@@ -15,21 +16,9 @@ class DoctorCommand extends Command
 
     protected $description = 'Validate Sprout schemas and report issues';
 
-    /** @var list<string> */
-    protected array $reservedConfigKeys = [
-        'common',
-        'schemaVersion',
-        'icons',
-        'iconAjaxUrl',
-        'iconAjaxNonce',
-        'tokens',
-        'classes',
-        'debug',
-    ];
-
     public function handle(ConfigCollector $collector, Host $host): int
     {
-        app('sprout')->discoverComponents();
+        app('sprout')->rediscoverComponents();
         $issues = 0;
         $validator = new SchemaValidator;
 
@@ -58,6 +47,9 @@ class DoctorCommand extends Command
         }
 
         $issues += $this->checkManifestDrift($collector, $host);
+        $issues += $this->checkCacheStaleness($collector);
+        $issues += $this->checkLegacyAuthoringApi($collector);
+        $issues += $this->checkLegacySchemaKeys($collector);
 
         if ($issues === 0) {
             $this->components->info('All Sprout schemas look good.');
@@ -66,6 +58,122 @@ class DoctorCommand extends Command
         }
 
         return $issues === 0 ? self::SUCCESS : self::FAILURE;
+    }
+
+    /**
+     * Scan discovered component sources for pre-Phase-2 method names.
+     *
+     * @return int Number of issues found
+     */
+    protected function checkLegacyAuthoringApi(ConfigCollector $collector): int
+    {
+        $replacements = [
+            'function schema(' => 'function compose()',
+            'function initialize(' => 'function prepare()',
+            'holdsDefaultSlot(' => 'slot()',
+            'holdsNamedSlot(' => "slot('name')",
+            'Node::namedSlot(' => "Node::make(...)->slot('name')",
+            'includeCommon(' => 'preset(',
+            '->apply(\'' => '->token(',
+            '->apply("' => '->token(',
+            'mappedComponent(' => 'component(...)->from()->map()->end()',
+            'onlyWhen(' => 'when(',
+            'unlessProp(' => 'unless(',
+            'interpolateIds(' => '(removed — interpolation is always on)',
+            'parent::__construct(...func_get_args())' => '(removed — lazy boot via ComposesMarkup)',
+        ];
+
+        $issues = 0;
+
+        foreach ($collector->classes() as $slug => $class) {
+            if (! is_string($class) || ! class_exists($class)) {
+                continue;
+            }
+
+            try {
+                $path = (new \ReflectionClass($class))->getFileName();
+            } catch (\ReflectionException) {
+                continue;
+            }
+
+            if ($path === false || ! is_readable($path)) {
+                continue;
+            }
+
+            $source = File::get($path);
+
+            foreach ($replacements as $legacy => $replacement) {
+                if (! str_contains($source, $legacy)) {
+                    continue;
+                }
+
+                $this->components->warn(
+                    "[{$slug}] legacy authoring API \"{$legacy}\" — use {$replacement}."
+                );
+                $issues++;
+            }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * Flag schemas still carrying pre-Phase-2 serialized keys.
+     *
+     * @return int Number of issues found
+     */
+    protected function checkLegacySchemaKeys(ConfigCollector $collector): int
+    {
+        $issues = 0;
+
+        foreach ($collector->all() as $name => $schema) {
+            if (! is_array($schema)) {
+                continue;
+            }
+
+            $found = [];
+            $this->walkLegacySchemaKeys($schema, $found);
+
+            foreach (array_unique($found) as $key) {
+                $this->components->warn(
+                    "[{$name}] legacy schema key \"{$key}\" — regenerate with the Phase 2 authoring API."
+                );
+                $issues++;
+            }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * @param  array<string, mixed>  $node
+     * @param  list<string>  $found
+     */
+    protected function walkLegacySchemaKeys(array $node, array &$found): void
+    {
+        foreach (['componentRef', 'componentProps', 'componentMapping', 'componentMappingKey', 'componentClass', 'interpolateIds'] as $key) {
+            if (array_key_exists($key, $node)) {
+                $found[] = $key;
+            }
+        }
+
+        foreach ($node['matches'] ?? [] as $match) {
+            if (is_array($match) && array_key_exists('common', $match)) {
+                $found[] = 'matches[].common';
+            }
+        }
+
+        foreach ($node['attributes'] ?? [] as $attribute) {
+            if (is_array($attribute) && array_key_exists('interpolateIds', $attribute)) {
+                $found[] = 'interpolateIds';
+            }
+        }
+
+        foreach ($node['children'] ?? [] as $child) {
+            if (is_array($child)) {
+                $this->walkLegacySchemaKeys($child, $found);
+            }
+        }
     }
 
     protected function checkManifestDrift(ConfigCollector $collector, Host $host): int
@@ -90,9 +198,10 @@ class DoctorCommand extends Command
         }
 
         $discovered = [];
+        $reserved = EditorConfigBuilder::reservedConfigKeys();
 
         foreach ($collector->all() as $slug => $schema) {
-            if (in_array($slug, $this->reservedConfigKeys, true)) {
+            if (in_array($slug, $reserved, true)) {
                 continue;
             }
 
@@ -116,5 +225,36 @@ class DoctorCommand extends Command
         }
 
         return $issues;
+    }
+
+    protected function checkCacheStaleness(ConfigCollector $collector): int
+    {
+        $cached = ConfigCollector::readCache();
+
+        if ($cached === null) {
+            return 0;
+        }
+
+        $freshSchemas = $collector->all();
+        $freshClasses = $collector->classes();
+
+        ksort($freshSchemas);
+        ksort($freshClasses);
+
+        $cachedSchemas = $cached['schemas'];
+        $cachedClasses = $cached['classes'];
+        ksort($cachedSchemas);
+        ksort($cachedClasses);
+
+        if (
+            json_encode($freshSchemas) !== json_encode($cachedSchemas)
+            || json_encode($freshClasses) !== json_encode($cachedClasses)
+        ) {
+            $this->components->warn('[cache] sprout.schemas is stale. Run sprout:cache or sprout:clear.');
+
+            return 1;
+        }
+
+        return 0;
     }
 }

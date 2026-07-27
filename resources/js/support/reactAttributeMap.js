@@ -23,13 +23,19 @@ const REACT_ATTRIBUTE_MAP = {
     frameborder: 'frameBorder',
     marginheight: 'marginHeight',
     marginwidth: 'marginWidth',
-    maxlength: 'maxLength',
     radiogroup: 'radioGroup',
     spellcheck: 'spellCheck',
     srcdoc: 'srcDoc',
     srcset: 'srcSet',
     usemap: 'useMap',
+    // Microdata (React camelCase)
+    itemprop: 'itemProp',
+    itemscope: 'itemScope',
+    itemtype: 'itemType',
+    itemid: 'itemID',
+    itemref: 'itemRef',
 };
+
 
 const SVG_ATTRIBUTE_MAP = {
     viewbox: 'viewBox',
@@ -87,18 +93,21 @@ export function mapAttributeName(name, { svg = false } = {}) {
     if (
         lower.startsWith('data-')
         || lower.startsWith('aria-')
-        || lower.startsWith('item')
         || lower.startsWith('x-')
-        || /^:[a-z]/.test(raw)
+        || /^:[a-zA-Z]/.test(raw)
     ) {
         return raw;
+    }
+
+    if (REACT_ATTRIBUTE_MAP[lower]) {
+        return REACT_ATTRIBUTE_MAP[lower];
     }
 
     if (svg && SVG_ATTRIBUTE_MAP[lower]) {
         return SVG_ATTRIBUTE_MAP[lower];
     }
 
-    return REACT_ATTRIBUTE_MAP[lower] ?? raw;
+    return raw;
 }
 
 export function mapAttributes(attributes = {}, { tag = null, svgParent = false } = {}) {

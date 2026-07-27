@@ -30,4 +30,16 @@ return [
         'defaultSlot' => null,
         'slotTargets' => [],
     ],
+    'component-ref-resolving' => [
+        'schema' => require __DIR__.'/component-ref.php',
+        'props' => ['type' => 'info'],
+        'defaultSlot' => null,
+        'slotTargets' => [],
+    ],
+    'component-ref-missing-mapping' => [
+        'schema' => require __DIR__.'/component-ref.php',
+        'props' => ['type' => 'unknown'],
+        'defaultSlot' => null,
+        'slotTargets' => [],
+    ],
 ];

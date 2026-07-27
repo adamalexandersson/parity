@@ -8,7 +8,7 @@ Boolean attributes are emitted as bare names only when truthy.
 
 ## Inline editor config
 
-`Sprout\Editor\EditorAssets::encodeConfig()` encodes JSON with `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT` so values containing `</script>` cannot break out of the inline `<script>` injection used for `window.sprout.config`.
+`Sprout\Editor\EditorConfigBuilder::encode()` delegates to `Host::jsonEncode()`. The WordPress host encodes with `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT` so values containing `</script>` cannot break out of the inline `<script>` injection used for `window.sprout.config` (see `Sprout\WordPress\EditorAssets`).
 
 ## Unescaped Blade (`{!! !!}`)
 

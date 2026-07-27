@@ -8,6 +8,7 @@ final class IdInterpolator
 {
     /**
      * Replace `{name}` placeholders with generated instance IDs.
+     * Escape `{{name}}` to a literal `{name}`.
      */
     public static function interpolate(
         string $value,
@@ -16,9 +17,17 @@ final class IdInterpolator
         ?string $component = null,
     ): string {
         return (string) preg_replace_callback(
-            '/\{([a-zA-Z_][\w-]*)\}/',
+            '/\{\{([a-zA-Z_][\w-]*)\}\}|\{([a-zA-Z_][\w-]*)\}/',
             function (array $matches) use ($ids, $debug, $component, $value) {
-                $name = $matches[1];
+                if (($matches[1] ?? '') !== '') {
+                    return '{'.$matches[1].'}';
+                }
+
+                $name = $matches[2] ?? '';
+
+                if ($name === '') {
+                    return $matches[0];
+                }
 
                 if (! $ids->has($name)) {
                     if ($debug) {
@@ -28,7 +37,7 @@ final class IdInterpolator
                         );
                     }
 
-                    return $matches[0];
+                    return '{'.$name.'}';
                 }
 
                 return $ids->get($name);
@@ -37,16 +46,8 @@ final class IdInterpolator
         );
     }
 
-    public static function shouldInterpolate(mixed $value, ?bool $flag = null): bool
+    public static function shouldInterpolate(mixed $value): bool
     {
-        if ($flag === false) {
-            return false;
-        }
-
-        if ($flag === true) {
-            return is_string($value);
-        }
-
-        return is_string($value) && preg_match('/\{[a-zA-Z_][\w-]*\}/', $value) === 1;
+        return is_string($value) && preg_match('/\{\{?[a-zA-Z_][\w-]*\}/', $value) === 1;
     }
 }

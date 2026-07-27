@@ -2,6 +2,7 @@ import { createComponent, registerComponent } from './render/createComponent.jsx
 import { SchemaRenderer } from './render/schemaRenderer.js';
 import { SCHEMA_VERSION } from './schema/version.js';
 import { missingComponentFallback } from './support/getComponentHelpers.js';
+import { registerIconResolver } from './support/iconResolver.js';
 
 const registry = {};
 
@@ -16,12 +17,12 @@ function bootstrapComponents() {
     const configs = getSproutConfig();
 
     Object.keys(configs).forEach((name) => {
-        if (['common', 'schemaVersion', 'tokens', 'classes', 'debug'].includes(name)) {
+        if (['presets', 'schemaVersion', 'tokens', 'classes', 'debug', 'editor'].includes(name)) {
             return;
         }
 
         if (typeof configs[name] === 'object' && configs[name]?.schemaVersion) {
-            registerComponent(name, registry);
+            registerComponent(name, null, registry);
         }
     });
 }
@@ -38,7 +39,7 @@ function getComponent(name) {
     const componentConfig = getSproutConfig()[name];
 
     if (componentConfig && typeof componentConfig === 'object' && componentConfig.schemaVersion) {
-        return registerComponent(name, registry);
+        return registerComponent(name, null, registry);
     }
 
     return missingComponentFallback(name, Object.keys(registry));
@@ -53,7 +54,8 @@ root.sprout = {
     config,
     components: registry,
     createComponent,
-    registerComponent: (name) => registerComponent(name, registry),
+    registerComponent: (name, component = null) => registerComponent(name, component, registry),
+    registerIconResolver,
     getComponent,
     SchemaRenderer,
 };

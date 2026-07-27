@@ -12,12 +12,31 @@ class EditorConfigBuilder
         protected Host $host,
     ) {}
 
+    /**
+     * Top-level keys always present in the editor config payload before
+     * discovered component schemas are merged in. Used by doctor/manifest
+     * so a component slug never collides with package config.
+     *
+     * @return list<string>
+     */
+    public static function reservedConfigKeys(): array
+    {
+        return [
+            'schemaVersion',
+            'presets',
+            'tokens',
+            'classes',
+            'debug',
+            'editor',
+        ];
+    }
+
     /** @return array<string, mixed> */
     public function build(): array
     {
         $config = array_merge([
             'schemaVersion' => config('sprout.schema_version', '1.0'),
-            'common' => config('sprout.common', []),
+            'presets' => config('sprout.presets', []),
             'tokens' => config('sprout.tokens', []),
             'classes' => [
                 'strategy' => config('sprout.classes.strategy', 'tailwind'),

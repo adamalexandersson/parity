@@ -20,9 +20,11 @@ final class MatchBuilder
     public function __construct(
         private readonly Node $node,
         private readonly array $props,
-    ) {}
+    ) {
+        $node->registerOpenBuilder('match');
+    }
 
-    public function onlyWhen(string $prop, mixed $value = null): self
+    public function when(string $prop, mixed $value = null): self
     {
         $this->condition = $value === null
             ? ConditionBuilder::truthy($prop)->toArray()
@@ -31,7 +33,7 @@ final class MatchBuilder
         return $this;
     }
 
-    public function unlessProp(string $prop, mixed $value = null): self
+    public function unless(string $prop, mixed $value = null): self
     {
         $this->condition = $value === null
             ? ['prop' => $prop, 'operator' => 'falsy']
@@ -66,6 +68,7 @@ final class MatchBuilder
             ];
         }
 
+        $this->node->clearOpenBuilder('match');
         $this->node->pushMatch([
             'props' => $this->props,
             'cases' => $cases,

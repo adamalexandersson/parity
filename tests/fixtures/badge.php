@@ -4,7 +4,6 @@ use Sprout\Component;
 use Sprout\Node;
 
 return Component::make('badge', tag: 'span')
-    ->slot('content')
     ->classes('inline-flex items-center justify-center font-medium')
     ->match('pill')
     ->case('true')->classes('rounded-full')->end()
@@ -18,6 +17,6 @@ return Component::make('badge', tag: 'span')
     ->case('default', 'light')->classes('bg-gray-100 text-black')->end()
     ->end()
     ->children([
-        Node::make('content')->fragment()->holdsDefaultSlot(),
+        Node::make('content')->fragment()->slot(),
     ])
     ->toSchema();

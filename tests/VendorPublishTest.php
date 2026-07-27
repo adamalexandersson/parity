@@ -7,8 +7,8 @@ afterEach(function () {
         File::delete(config_path('sprout.php'));
     }
 
-    if (File::exists(config_path('sprout/common.php'))) {
-        File::delete(config_path('sprout/common.php'));
+    if (File::exists(config_path('sprout/presets.php'))) {
+        File::delete(config_path('sprout/presets.php'));
     }
 
     if (File::isDirectory(config_path('sprout'))) {
@@ -21,6 +21,6 @@ it('publishes config files only for the sprout tag', function () {
         ->assertExitCode(0);
 
     expect(config_path('sprout.php'))->toBeFile()
-        ->and(config_path('sprout/common.php'))->toBeFile()
+        ->and(config_path('sprout/presets.php'))->toBeFile()
         ->and(app_path('Providers/SproutServiceProvider.php'))->not->toBeFile();
 });

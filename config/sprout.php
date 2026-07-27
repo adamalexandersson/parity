@@ -26,7 +26,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Namespace prefix and path for Sprout Blade components that expose a
-    | static schema() method.
+    | static compose() method.
     |
     */
     'components' => [
@@ -36,20 +36,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Common attribute maps
+    | Preset class maps
     |--------------------------------------------------------------------------
     |
-    | Shared value-to-class maps referenced via ->includeCommon('cols').
+    | Shared value-to-class maps referenced via ->preset('cols').
     |
     */
-    'common' => [],
+    'presets' => [],
 
     /*
     |--------------------------------------------------------------------------
     | Design tokens
     |--------------------------------------------------------------------------
     |
-    | Token tables for ->apply('p', 'md') style class resolution.
+    | Token tables for ->token('p', 'md') style class resolution.
     |
     */
     'tokens' => [],
@@ -95,6 +95,12 @@ return [
         | "emit" — leave Alpine attrs on the canvas (requires Alpine in the editor).
         */
         'alpine' => env('SPROUT_EDITOR_ALPINE', 'suppress'),
+
+        /*
+        | When true, PHP SchemaRenderer throws on unknown match outcomes even if
+        | app.debug is off. The editor still uses Host::isDebug() / window.sprout.config.debug.
+        */
+        'debug' => env('SPROUT_EDITOR_DEBUG', false),
     ],
 
 ];

@@ -2,6 +2,8 @@
 
 namespace Sprout\Schema;
 
+use Sprout\Exceptions\SchemaException;
+
 final class SlotCollector
 {
     /**
@@ -14,6 +16,20 @@ final class SlotCollector
         self::walk($schema, $names);
 
         return array_values(array_unique($names));
+    }
+
+    public static function defaultSlotPath(array $schema): ?string
+    {
+        $paths = [];
+        self::walkDefault($schema, '', $paths);
+
+        if (count($paths) > 1) {
+            throw new SchemaException(
+                'Multiple default slot holders found: '.implode(', ', $paths)
+            );
+        }
+
+        return $paths[0] ?? null;
     }
 
     /**
@@ -31,6 +47,29 @@ final class SlotCollector
             if (is_array($child)) {
                 self::walk($child, $names);
             }
+        }
+    }
+
+    /**
+     * @param  list<string>  $paths
+     */
+    private static function walkDefault(array $schema, string $parentPath, array &$paths): void
+    {
+        $slot = $schema['slot'] ?? null;
+
+        if (is_array($slot) && ($slot['default'] ?? false) === true) {
+            if ($parentPath !== '') {
+                $paths[] = $parentPath;
+            }
+        }
+
+        foreach ($schema['children'] ?? [] as $key => $child) {
+            if (! is_array($child)) {
+                continue;
+            }
+
+            $path = $parentPath === '' ? (string) $key : "{$parentPath}.{$key}";
+            self::walkDefault($child, $path, $paths);
         }
     }
 }

@@ -13,7 +13,6 @@ use Sprout\Console\ManifestCommand;
 use Sprout\Console\SafelistCommand;
 use Sprout\Contracts\Host;
 use Sprout\Editor\EditorConfigBuilder;
-use Sprout\Registries\ComponentRegistry;
 use Sprout\Registries\TransformRegistry;
 use Sprout\Render\SchemaRenderer;
 use Sprout\Sprout;
@@ -30,7 +29,6 @@ class SproutServiceProvider extends ServiceProvider
         $this->app->singleton(TransformRegistry::class, function ($app) {
             return new TransformRegistry($app->make(Host::class));
         });
-        $this->app->singleton(ComponentRegistry::class);
         $this->app->singleton(ConfigCollector::class);
         $this->app->singleton(SchemaRenderer::class, function ($app) {
             return new SchemaRenderer(
@@ -54,16 +52,8 @@ class SproutServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__.'/../../config/sprout.php' => $this->app->configPath('sprout.php'),
-            __DIR__.'/../../stubs/common.php.stub' => config_path('sprout/common.php'),
+            __DIR__.'/../../stubs/presets.php.stub' => config_path('sprout/presets.php'),
         ], 'sprout');
-
-        $this->publishes([
-            __DIR__.'/../../config/sprout.php' => $this->app->configPath('sprout.php'),
-        ], 'sprout-config');
-
-        $this->publishes([
-            __DIR__.'/../../stubs/common.php.stub' => config_path('sprout/common.php'),
-        ], 'sprout-common');
 
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'Sprout');
 

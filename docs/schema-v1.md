@@ -10,6 +10,7 @@ Every component schema includes:
   "name": "button",
   "tag": "button",
   "defaultSlot": "content",
+  "namedSlots": [],
   "linkable": { "prop": "link", "tag": "a" },
   "classRules": [
     { "classes": "inline-flex", "condition": null },
@@ -34,6 +35,67 @@ Every component schema includes:
   "children": {}
 }
 ```
+
+Serialized keys that stay stable across the authoring rename: `defaultSlot`, `namedSlots`, `matches[].preset`, nested `component` (`ref` / `from` / `map` / `class` / `props`). There is no `interpolateIds` key — `{name}` interpolation is always on.
+
+## Authoring API
+
+Components implement `Sprout\Contracts\Composable` (usually by extending `Sprout\View\Component`, which uses the `ComposesMarkup` trait):
+
+```php
+namespace App\View\Components\Ui;
+
+use Sprout\Component;
+use Sprout\Node;
+use Sprout\View\Component as SproutComponent;
+
+class Button extends SproutComponent
+{
+    public function __construct(
+        public string $size = 'md',
+        public string $themeColor = 'default',
+        public string $themeType = 'solid',
+        public array|string|null $link = null,
+    ) {}
+
+    public static function compose(): array
+    {
+        return Component::make('button', tag: 'button')
+            ->linkable('link')
+            ->classes('inline-flex items-center gap-x-1 font-semibold')
+            ->match('size')
+                ->case('sm')->classes('px-4 py-2 text-sm')->end()
+                ->case('lg')->classes('px-8 py-4 text-lg')->end()
+                ->default()->classes('px-6 py-3 text-sm')->end()
+                ->end()
+            ->children([
+                Node::make('content')->fragment()->slot(),
+            ])
+            ->toSchema();
+    }
+}
+```
+
+| Authoring | Role |
+|-----------|------|
+| `compose()` | Static entry point that returns the serialized schema |
+| `prepare()` | Optional instance hook after schema load, before attributes/structure build |
+| `ComposesMarkup` / `Composable` | Lazy boot from `data()` / `render()` — no `parent::__construct(...func_get_args())` |
+
+Discovery finds classes that implement `Composable` under `config('sprout.components')`. Call `sprout:doctor` to flag pre-Phase-2 names (`schema()`, `initialize()`, `includeCommon()`, …).
+
+### Boot lifecycle
+
+1. First `data()` or `render()` call runs `bootComposition()` once.
+2. `static::compose()` loads the schema.
+3. `prepare()` runs (override for prop normalization).
+4. Public props are collected, linkable tag resolution runs, then attributes and structure are built.
+
+Do not call `parent::__construct(...func_get_args())` — the trait does not depend on constructor cooperation.
+
+### Open-builder guard
+
+Builders opened with `attr()`, `style()`, `match()`, or `component()` must be closed with `->end()` before `toSchema()`. Leaving one open throws `SchemaException` listing the unclosed builder name(s).
 
 ## Condition object
 
@@ -75,9 +137,38 @@ Compound conditions (no `prop` required) use a nested `conditions` array:
 }
 ```
 
+## `when` / `unless` vs `visible` / `hidden`
+
+Two different scopes:
+
+| Verb | Where | Meaning |
+|------|-------|---------|
+| `when` / `unless` | Last class rule, attribute, style, or match group | Conditions the thing just declared |
+| `visible` / `hidden` | Node | Conditions whether the node renders at all |
+
+```php
+->classes('gap-x-2')->when('arrow')
+->attr('type')->from('type')->unless('link.href')->end()
+
+->match('layout')
+    ->when('featured')
+    ->case('grid')->classes('grid')->end()
+    ->end()
+
+Node::make('badge', tag: 'span')
+    ->visible('showBadge')
+    ->classes('inline-flex')
+```
+
+`MatchBuilder::when()` / `unless()` attach a `condition` object on the match group (same shape as attribute conditions).
+
 ## Class-rule modes
 
-Literal class rules omit `mode`. Token rules use `mode: "token"` with `tokenGroup` and `token` (from `->apply()`).
+Literal class rules omit `mode`. Token rules use `mode: "token"` with `tokenGroup` and `token` (from `->token()`):
+
+```php
+->token('padding', 'md')
+```
 
 Reserved for Phase 5 (BEM) — recognized by the schema and ignored by renderers until implemented:
 
@@ -86,9 +177,43 @@ Reserved for Phase 5 (BEM) — recognized by the schema and ignored by renderers
 { "mode": "modifier", "modifier": "type", "condition": null }
 ```
 
-## Mapped components and blade-icons
+## Nested components
 
-`Node::mappedComponent()` can render icon names via Blade Icons (`@svg()`). That path is optional: install `blade-ui-kit/blade-icons` when you need SVG mapping. Without it, Sprout still renders the mapped dynamic component wrapper and skips the `@svg()` child.
+Map a prop (or a fixed ref) to a nested Blade / editor component via the component builder:
+
+```php
+Node::make('icon', tag: 'div')
+    ->component('ui.icon')
+        ->from('type')
+        ->map([
+            'info' => 'heroicon-o-information-circle',
+            'error' => 'heroicon-o-x-circle',
+        ])
+        ->class('size-7')
+        ->props(['aria-hidden' => true])
+        ->end()
+```
+
+Serializes as a nested object (not flat `componentRef` keys):
+
+```json
+{
+  "component": {
+    "ref": "ui.icon",
+    "from": "type",
+    "map": {
+      "info": "heroicon-o-information-circle",
+      "error": "heroicon-o-x-circle"
+    },
+    "class": "size-7",
+    "props": { "aria-hidden": true }
+  }
+}
+```
+
+Omit `from` / `map` for a fixed ref; omit `class` / `props` when unused.
+
+Mapped icon names can render via Blade Icons (`@svg()`). That path is optional: install `blade-ui-kit/blade-icons` when you need SVG mapping. Without it, Sprout still renders the mapped dynamic component wrapper; outside production it throws a clear exception naming the missing package, and in production it skips the `@svg()` child.
 
 ## Style casts
 
@@ -107,41 +232,53 @@ For CSS properties that require `url(...)`, chain `->asCssUrl()` after the sourc
 
 Register theme-specific transforms (e.g. `imageUrl` for attachment IDs) via `Sprout::transforms()->register()`. Use `cssUrl` only for the final CSS wrapper — not inside custom transforms.
 
-## Nested default slots
+## Slots
 
-Set `defaultSlot` to a dotted path when the slot container is nested:
-
-```php
-Component::make('alert')->slot('wrapper.content')
-```
-
-Rendered structure nodes include a `path` key (e.g. `wrapper.content`) used for slot matching in Blade and the editor runtime.
-
-## Mapped child components
-
-Map a prop value to a nested Blade component (e.g. alert icon):
+Mark slot holders on nodes. The component-level `defaultSlot` path is derived automatically — do not declare it twice.
 
 ```php
-Node::make('icon', tag: 'div')
-    ->mappedComponent('ui.icon', 'type', [
-        'info' => 'heroicon-o-information-circle',
-    ], 'size-7')
+->children([
+    Node::make('image', tag: 'div')->slot('image'),
+    Node::make('body', tag: 'div')->children([
+        Node::make('content', tag: 'div')->slot(),
+        Node::make('footer', tag: 'div')->slot('footer'),
+    ]),
+])
 ```
 
-Serializes as `componentRef`, `componentMappingKey`, `componentMapping`, and optional `componentClass`.
+| Call | Meaning |
+|------|---------|
+| `->slot()` | Default slot holder |
+| `->slot('name')` | Named slot holder |
 
-## includeCommon with conditions
+Nested default slots produce a dotted `defaultSlot` path (e.g. `body.content`). Rendered structure nodes include a `path` key used for slot matching in Blade and the editor runtime.
 
-Reference theme maps from `config('sprout.common')`:
+Every component schema includes a `namedSlots` array auto-collected from the structure tree. The editor runtime uses this list to route slot props dynamically — no hardcoded slot names.
+
+## Presets
+
+Reference shared class maps from `config('sprout.presets')` (published as `config/sprout/presets.php`):
 
 ```php
 use Sprout\Builders\ConditionBuilder;
 
 Component::make('container')
-    ->includeCommon('verticalSpacing', condition: ConditionBuilder::notEquals('noVerticalSpacing', true)->toArray())
+    ->preset('verticalSpacing', condition: ConditionBuilder::notEquals('noVerticalSpacing', true)->toArray())
 ```
 
-When a map named `{key}Nested` exists (e.g. `verticalSpacingNested` alongside `verticalSpacing`), `includeCommon('{key}')` applies **both** class maps for the same prop value. Use this for Gutenberg editor spacing that must pierce `block-editor-inner-blocks` wrappers via `space-nested-y-*` while keeping `space-y-*` for frontend output.
+Serializes as a match entry with `preset`:
+
+```json
+{
+  "props": ["verticalSpacing"],
+  "preset": "verticalSpacing",
+  "condition": { "prop": "noVerticalSpacing", "operator": "notEquals", "value": true }
+}
+```
+
+Optional second argument remaps the prop name: `->preset('cols', as: 'columns')`.
+
+When a map named `{key}Nested` exists (e.g. `verticalSpacingNested` alongside `verticalSpacing`), `preset('{key}')` applies **both** class maps for the same prop value. Use this for Gutenberg editor spacing that must pierce `block-editor-inner-blocks` wrappers via `space-nested-y-*` while keeping `space-y-*` for frontend output.
 
 ## Match outcomes
 
@@ -157,7 +294,7 @@ Each `case` or `default` carries an `outcomes` array. Both Blade and the editor 
     ->end()
 ```
 
-Match groups may include a `condition` object (use `MatchBuilder::onlyWhen()` / `unlessProp()` in PHP).
+Match groups may include a `condition` object via `MatchBuilder::when()` / `unless()`.
 
 ## Alpine bindings
 
@@ -182,9 +319,9 @@ Component::make('accordion', tag: 'div')
     ]);
 ```
 
-`{name}` placeholders in attribute values resolve against the same `InstanceIds` bag as `uniqueId` / `idRef`. Interpolation runs automatically when a value contains `{…}`; set `"interpolateIds": false` to disable. Unknown placeholders throw in debug mode and stay literal otherwise.
+`{name}` placeholders in attribute values resolve against the same `InstanceIds` bag as `uniqueId` / `idRef`. Interpolation is always on when a value contains `{…}`. Escape a literal brace form with `{{name}}` (renders as `{name}`). Unknown placeholders throw in debug mode and stay literal otherwise.
 
-Full-form only: `@click` / `:class` shorthand is rejected by `AttributeFactory`. Use `x-on:*` and `x-bind:*`.
+Full-form only: `@click` is rejected by `AttributeFactory` (invalid attribute name). Prefer `x-on:*` and `x-bind:*` over Alpine bind shorthand (`:class`); the editor may still emit `:…` when `editor.alpine` is `emit`.
 
 In the Gutenberg canvas, Alpine attributes are **suppressed by default** (`config('sprout.editor.alpine')` / `window.sprout.config.editor.alpine` = `suppress`). Themes that boot Alpine in the editor iframe should set `emit` so directives reach the DOM. Blade output is never stripped. See [`docs/editor.md`](editor.md).
 
@@ -195,7 +332,7 @@ Generate stable per-instance IDs and cross-reference them from sibling nodes:
 ```php
 Node::make('label', tag: 'label')
     ->attr('for')->idRef('field')->end()
-    ->holdsNamedSlot('label'),
+    ->slot('label'),
 
 Node::make('field', tag: 'input')
     ->uniqueId('field')
@@ -203,7 +340,7 @@ Node::make('field', tag: 'input')
 
 Node::make('hint', tag: 'p')
     ->uniqueId('hint')
-    ->holdsNamedSlot('hint'),
+    ->slot('hint'),
 ```
 
 Schema shape:
@@ -238,7 +375,7 @@ Props are normalized before comparison so PHP, Blade, and the editor stay in syn
 
 **Booleans:** Prefer real PHP `bool` props and `->case(true)` / `->case(false)` in schemas. Blade string forms (`'true'`, `'1'`, `'false'`, `'0'`) still match bool cases at comparison time — numeric props like `level: 1` are not coerced to booleans.
 
-**Optional enums:** When a prop is `null` or empty, it matches a case labelled `'default'` (e.g. `->case(true, 'default')`). You can also normalize in `initialize()` or default the constructor to `'default'` for clarity.
+**Optional enums:** When a prop is `null` or empty, it matches a case labelled `'default'` (e.g. `->case(true, 'default')`). You can also normalize in `prepare()` or default the constructor to `'default'` for clarity.
 
 ## Theme blade views (optional)
 
@@ -260,13 +397,15 @@ Configure the fallback view via `config('sprout.shell_view')` (default: `Sprout:
 
 ## Node helpers
 
-- `Node::holdsNamedSlot('image')` — declare a named slot on a wrapper element (renders only when slot content exists)
-- `Node::holdsDefaultSlot()` — mark a node as the default slot container
-- `Node::namedSlot('icon')` — fragment-only named slot (prefer `holdsNamedSlot` on a wrapper when classes are needed)
-- `Node::mappedComponent()` — dynamic child component from prop map
-- `Node::uniqueId('panel')` — set this node's `id` from a generated unique ID
+- `->slot()` / `->slot('name')` — default or named slot holder (`defaultSlot` / `namedSlots` derived on serialize)
+- `->component('x')->from()->map()->class()->props()->end()` — nested / mapped child component
+- `->preset('cols')` — shared class map from `config('sprout.presets')`
+- `->token('group', 'name')` — token class rule (`mode: "token"`)
+- `->uniqueId('panel')` — set this node's `id` from a generated unique ID
 - `->attr('for')->idRef('field')->end()` — reference a generated unique ID
 - `->attr('type')->from('type')->unless('link.href')->end()` — conditional attributes
+- `->visible('prop')` / `->hidden('prop')` — whether the node renders
+- `->when()` / `->unless()` on classes (and builders) — condition the thing just declared
 - `->xData()` / `->xInit()` / `->xShow()` / `->xCloak()` / `->xOn()` / `->xBind()` — Alpine attribute helpers
 
 ## Ordinary HTML compositions
@@ -275,11 +414,7 @@ Representative fixtures under `tests/fixtures/html-compositions.php` cover forms
 
 ## Errors and debug DX
 
-When `app.debug` / `sprout.config.debug` is on, unknown match outcome types throw `Sprout\Exceptions\SchemaException` (component + path in the message). The editor `createComponent` path catches render errors and shows an in-block alert panel in debug mode instead of only logging to the console.
-
-## namedSlots metadata
-
-Every component schema includes a `namedSlots` array auto-collected from the structure tree. The editor runtime uses this list to route slot props dynamically — no hardcoded slot names.
+When `app.debug` / `sprout.editor.debug` is on (PHP), or `window.sprout.config.debug` is on (editor), unknown match outcome types throw `Sprout\Exceptions\SchemaException` (component + path in the message). The editor `createComponent` path catches render errors and shows an in-block alert panel in debug mode instead of only logging to the console. Unclosed builders fail at `toSchema()` with the open builder names.
 
 ## Slot resolution
 

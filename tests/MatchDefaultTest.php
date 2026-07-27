@@ -57,7 +57,7 @@ it('matches string true from blade to a bool case', function () {
 it('does not coerce an integer match value to boolean', function () {
     $schema = Component::make('heading', tag: 'div')
         ->match('level')
-        ->unlessProp('size')
+        ->unless('size')
         ->case(1)->classes('text-6xl')->end()
         ->case(2)->classes('text-4xl')->end()
         ->end()

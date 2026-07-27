@@ -4,7 +4,6 @@ use Sprout\Component;
 use Sprout\Node;
 
 return Component::make('button', tag: 'button')
-    ->slot('content')
     ->linkable('link')
     ->classes('inline-flex items-center gap-x-1 font-semibold')
     ->classes('gap-x-2')->when('arrow', true)
@@ -23,6 +22,6 @@ return Component::make('button', tag: 'button')
     ->default()->classes('bg-gray-900 text-white')->end()
     ->end()
     ->children([
-        Node::make('content')->fragment()->holdsDefaultSlot(),
+        Node::make('content')->fragment()->slot(),
     ])
     ->toSchema();

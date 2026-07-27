@@ -15,7 +15,7 @@ class SafelistCommand extends Command
 
     public function handle(ConfigCollector $collector, Host $host): int
     {
-        app('sprout')->discoverComponents();
+        app('sprout')->rediscoverComponents();
 
         $classes = [];
 
@@ -52,6 +52,10 @@ class SafelistCommand extends Command
         }
 
         foreach ($schema['matches'] ?? [] as $match) {
+            if (! empty($match['preset'])) {
+                $this->extractFromPreset((string) $match['preset'], $classes);
+            }
+
             foreach ($match['cases'] ?? [] as $case) {
                 foreach ($case['outcomes'] ?? [] as $outcome) {
                     if (($outcome['type'] ?? '') === 'classes' && ! empty($outcome['value'])) {
@@ -69,6 +73,31 @@ class SafelistCommand extends Command
 
         foreach ($schema['children'] ?? [] as $child) {
             $this->extractFromSchema($child, $classes);
+        }
+    }
+
+    protected function extractFromPreset(string $presetKey, array &$classes): void
+    {
+        foreach ([$presetKey, "{$presetKey}Nested"] as $mapKey) {
+            $map = config("sprout.presets.{$mapKey}", []);
+
+            if (! is_array($map)) {
+                continue;
+            }
+
+            $this->collectPresetClasses($map, $classes);
+        }
+    }
+
+    /** @param array<mixed> $map */
+    protected function collectPresetClasses(array $map, array &$classes): void
+    {
+        foreach ($map as $value) {
+            if (is_string($value) && $value !== '') {
+                $classes = array_merge($classes, preg_split('/\s+/', $value));
+            } elseif (is_array($value)) {
+                $this->collectPresetClasses($value, $classes);
+            }
         }
     }
 }

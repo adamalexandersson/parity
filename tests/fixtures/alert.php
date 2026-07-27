@@ -4,7 +4,6 @@ use Sprout\Component;
 use Sprout\Node;
 
 return Component::make('alert')
-    ->slot('wrapper.content')
     ->classes('rounded-lg border p-4')
     ->match('type')
     ->case('info')->classes('bg-blue-50 border-blue-200')->end()
@@ -16,13 +15,17 @@ return Component::make('alert')
             ->children([
                 Node::make('icon', tag: 'div')
                     ->classes('leading-none')
-                    ->mappedComponent('ui.icon', 'type', [
-                        'info' => 'heroicon-o-information-circle',
-                        'error' => 'heroicon-o-x-circle',
-                    ], 'size-7'),
+                    ->component('ui.icon')
+                        ->from('type')
+                        ->map([
+                            'info' => 'heroicon-o-information-circle',
+                            'error' => 'heroicon-o-x-circle',
+                        ])
+                        ->class('size-7')
+                        ->end(),
                 Node::make('content', tag: 'div')
                     ->classes('flex-1')
-                    ->holdsDefaultSlot(),
+                    ->slot(),
             ]),
     ])
     ->toSchema();

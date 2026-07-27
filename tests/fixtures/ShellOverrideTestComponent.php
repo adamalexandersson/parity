@@ -9,13 +9,12 @@ use Sprout\View\Component as SproutComponent;
 class ShellOverrideTestComponent extends SproutComponent
 {
     /** @return array<string, mixed> */
-    public static function schema(): array
+    public static function compose(): array
     {
         return Component::make('shell-override-test', tag: 'section')
             ->classes('override-test')
-            ->slot('content')
             ->children([
-                Node::make('content')->fragment()->holdsDefaultSlot(),
+                Node::make('content')->fragment()->slot(),
             ])
             ->toSchema();
     }
