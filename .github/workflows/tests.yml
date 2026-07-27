@@ -28,11 +28,11 @@ jobs:
         name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v5
               with:
-                  node-version: 20
+                  node-version: 22
                   cache: npm
 
             - name: Install JS dependencies
@@ -74,7 +74,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Bare Laravel install
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
               with:
                   path: parity
 

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-27
+
+### Fixed
+
+- Commit `package-lock.json` so CI `npm ci` and npm caching work
+- Bump GitHub Actions to `checkout`/`setup-node` v5 and Node 22
+
+### Added
+
+- VS Code Intelephense include paths for Laravel framework stubs
+
 ## [1.0.0] - 2026-07-27
 
 Initial public release. Schema version **1.0**.

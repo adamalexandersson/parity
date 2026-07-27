@@ -1,0 +1,6 @@
+{
+    "intelephense.environment.includePaths": [
+        "vendor/laravel/framework/src",
+        "vendor/illuminate"
+    ]
+}

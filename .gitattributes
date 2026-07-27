@@ -10,3 +10,4 @@
 /vitest.config.js export-ignore
 /vite.config.js export-ignore
 /package-lock.json export-ignore
+/.vscode export-ignore

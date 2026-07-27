@@ -3,7 +3,6 @@
 .phpunit.cache/
 .phpunit.result.cache
 composer.lock
-package-lock.json
 .DS_Store
 
 # Keep the precompiled editor bundle committed for Composer consumers.
