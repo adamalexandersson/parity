@@ -55,13 +55,20 @@ jobs:
 
             - name: Install Composer dependencies
               run: |
-                  composer require \
-                    "illuminate/support:^${{ matrix.laravel }}" \
-                    "illuminate/console:^${{ matrix.laravel }}" \
-                    "illuminate/view:^${{ matrix.laravel }}" \
-                    "illuminate/filesystem:^${{ matrix.laravel }}" \
-                    "orchestra/testbench:^${{ matrix.testbench }}" \
-                    --no-interaction --no-update
+                  packages=(
+                    "illuminate/support:^${{ matrix.laravel }}"
+                    "illuminate/console:^${{ matrix.laravel }}"
+                    "illuminate/view:^${{ matrix.laravel }}"
+                    "illuminate/filesystem:^${{ matrix.laravel }}"
+                    "orchestra/testbench:^${{ matrix.testbench }}"
+                  )
+                  if [ "${{ matrix.laravel }}" = "13" ]; then
+                      packages+=(
+                        "pestphp/pest:^4.4"
+                        "pestphp/pest-plugin-laravel:^4.0"
+                      )
+                  fi
+                  composer require "${packages[@]}" --dev --no-interaction --no-update
                   composer update --prefer-dist --no-interaction --with-all-dependencies
 
             - name: Run PHP tests
@@ -123,7 +130,7 @@ jobs:
                   }
                   PHP
 
-                  php artisan tinker --execute="echo Illuminate\Support\Facades\Blade::render('<x-parity-smoke label=\"Hello\" />');" \
+                  php artisan tinker --execute="config(['parity.classes.strategy' => 'passthrough']); echo Illuminate\Support\Facades\Blade::render('<x-parity-smoke label=\"Hello\" />');" \
                     | tee /tmp/parity-smoke.html
 
                   grep -q 'inline-flex' /tmp/parity-smoke.html

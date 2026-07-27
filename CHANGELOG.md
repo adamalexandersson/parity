@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-07-27
+
+### Fixed
+
+- Grant `contents: write` so the release workflow can publish GitHub Release assets
+- Use Pest 4 on the Laravel 13 matrix and keep Composer requires in `--dev`
+- Bare-Laravel smoke uses the passthrough class strategy without requiring Tailwind Merge
+
 ## [1.0.4] - 2026-07-27
 
 ### Fixed

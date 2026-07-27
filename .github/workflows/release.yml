@@ -5,6 +5,9 @@ on:
         tags:
             - 'v*'
 
+permissions:
+    contents: write
+
 env:
     COMPOSER_POLICY_ADVISORIES_BLOCK: '0'
 
