@@ -2,6 +2,4 @@
 
 namespace App\View\Components\Content;
 
-class Card
-{
-}
+class Card {}

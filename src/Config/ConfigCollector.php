@@ -4,10 +4,10 @@ namespace Parity\Config;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use ReflectionClass;
 use Parity\Contracts\Composable;
 use Parity\Contracts\Host;
 use Parity\Schema\Version;
+use ReflectionClass;
 
 class ConfigCollector
 {

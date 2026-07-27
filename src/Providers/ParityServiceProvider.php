@@ -12,9 +12,9 @@ use Parity\Console\ManifestCommand;
 use Parity\Console\SafelistCommand;
 use Parity\Contracts\Host;
 use Parity\Editor\EditorConfigBuilder;
+use Parity\Parity;
 use Parity\Registries\TransformRegistry;
 use Parity\Render\SchemaRenderer;
-use Parity\Parity;
 use Parity\Support\HostResolver;
 
 class ParityServiceProvider extends ServiceProvider

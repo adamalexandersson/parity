@@ -2,6 +2,8 @@
 
 namespace Parity\View;
 
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View;
 use Illuminate\View\Component as BladeComponent;
 use Parity\Concerns\ComposesMarkup;
 use Parity\Contracts\Composable;
@@ -23,7 +25,7 @@ abstract class Component extends BladeComponent implements Composable
      * Declared on the class (not only via the trait) so static analyzers treat
      * Illuminate\View\Component::render() as implemented.
      *
-     * @return \Closure|\Illuminate\Contracts\Support\Htmlable|\Illuminate\Contracts\View\View|string
+     * @return \Closure|Htmlable|View|string
      */
     public function render()
     {

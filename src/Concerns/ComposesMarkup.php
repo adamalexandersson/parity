@@ -3,18 +3,20 @@
 namespace Parity\Concerns;
 
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View;
 use Parity\Config\ConfigCollector;
+use Parity\Contracts\Composable;
 use Parity\Render\SchemaRenderer;
 use Parity\Schema\SlotCollector;
 
 /**
  * Schema-driven markup composition for Blade components.
  *
- * Classes using this trait must implement {@see \Parity\Contracts\Composable}.
+ * Classes using this trait must implement {@see Composable}.
  *
  * @method static array compose()
  *
- * @phpstan-require-implements \Parity\Contracts\Composable
+ * @phpstan-require-implements Composable
  */
 trait ComposesMarkup
 {
@@ -136,7 +138,7 @@ trait ComposesMarkup
     }
 
     /**
-     * @return \Closure|\Illuminate\Contracts\Support\Htmlable|\Illuminate\Contracts\View\View|string
+     * @return \Closure|Htmlable|View|string
      */
     public function render()
     {
@@ -144,7 +146,7 @@ trait ComposesMarkup
     }
 
     /**
-     * @return \Closure|\Illuminate\Contracts\Support\Htmlable|\Illuminate\Contracts\View\View|string
+     * @return \Closure|Htmlable|View|string
      */
     protected function renderComposed()
     {

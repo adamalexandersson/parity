@@ -16,13 +16,13 @@ return Component::make('alert')
                 Node::make('icon', tag: 'div')
                     ->classes('leading-none')
                     ->component('ui.icon')
-                        ->from('type')
-                        ->map([
-                            'info' => 'heroicon-o-information-circle',
-                            'error' => 'heroicon-o-x-circle',
-                        ])
-                        ->class('size-7')
-                        ->end(),
+                    ->from('type')
+                    ->map([
+                        'info' => 'heroicon-o-information-circle',
+                        'error' => 'heroicon-o-x-circle',
+                    ])
+                    ->class('size-7')
+                    ->end(),
                 Node::make('content', tag: 'div')
                     ->classes('flex-1')
                     ->slot(),
