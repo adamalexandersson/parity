@@ -26,7 +26,7 @@ describe('iconResolver', () => {
 
         expect(resolver).toHaveBeenCalledWith({
             name: 'heroicon-o-chevron-down',
-            componentRef: 'ui.icon',
+            ref: 'ui.icon',
             className: 'size-7',
             props: { foo: 'bar' },
         });

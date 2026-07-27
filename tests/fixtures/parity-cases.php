@@ -31,6 +31,14 @@ return [
             'arrow' => false,
         ],
     ],
+    'docs-button-lg-primary' => [
+        'schema' => require __DIR__.'/docs-button.php',
+        'props' => [
+            'size' => 'lg',
+            'themeColor' => 'primary',
+            'themeType' => 'solid',
+        ],
+    ],
     'badge-md-primary' => [
         'schema' => require __DIR__.'/badge.php',
         'props' => [

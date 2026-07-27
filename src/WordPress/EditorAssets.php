@@ -35,7 +35,7 @@ class EditorAssets
             $handle,
             $this->scriptUrl(),
             ['wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'],
-            filemtime($scriptPath),
+            $this->scriptVersion($scriptPath),
             true
         );
 
@@ -87,5 +87,15 @@ class EditorAssets
             'parity/editor/script_url',
             $this->host->url($relative)
         );
+    }
+
+    /**
+     * Content hash for cache busting that survives deploys which rewrite mtimes.
+     */
+    protected function scriptVersion(string $scriptPath): string
+    {
+        $hash = hash_file('xxh128', $scriptPath);
+
+        return is_string($hash) ? substr($hash, 0, 12) : '0';
     }
 }

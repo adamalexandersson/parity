@@ -18,6 +18,12 @@ jobs:
                       testbench: '9'
                     - laravel: '12'
                       testbench: '10'
+                    - php: '8.3'
+                      laravel: '13'
+                      testbench: '11'
+                    - php: '8.4'
+                      laravel: '13'
+                      testbench: '11'
 
         name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
 
@@ -64,10 +70,59 @@ jobs:
             - name: Run PHPStan
               run: composer analyse
 
-    release-smoke:
+    bare-laravel:
         runs-on: ubuntu-latest
-        needs: tests
-        if: startsWith(github.ref, 'refs/tags/') == false
+        name: Bare Laravel install
         steps:
             - uses: actions/checkout@v4
-            - run: echo "Matrix tests passed"
+              with:
+                  path: parity
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.3'
+                  coverage: none
+                  tools: composer:v2
+
+            - name: Create Laravel app
+              run: composer create-project laravel/laravel app --prefer-dist --no-interaction
+
+            - name: Require Parity from path
+              working-directory: app
+              run: |
+                  composer config repositories.parity path ../parity
+                  composer require adamalexandersson/parity:@dev --no-interaction
+
+            - name: Render a component without WordPress
+              working-directory: app
+              run: |
+                  mkdir -p app/View/Components
+                  cat > app/View/Components/ParitySmoke.php <<'PHP'
+                  <?php
+
+                  namespace App\View\Components;
+
+                  use Parity\Builders\Component;
+                  use Parity\View\Component as ParityComponent;
+
+                  class ParitySmoke extends ParityComponent
+                  {
+                      public function __construct(
+                          public string $label = 'Hello',
+                      ) {}
+
+                      public static function compose(): array
+                      {
+                          return Component::make('parity-smoke', tag: 'span')
+                              ->classes('inline-flex')
+                              ->toSchema();
+                      }
+                  }
+                  PHP
+
+                  php artisan tinker --execute="echo Illuminate\Support\Facades\Blade::render('<x-parity-smoke label=\"Hello\" />');" \
+                    | tee /tmp/parity-smoke.html
+
+                  grep -q 'inline-flex' /tmp/parity-smoke.html
+                  grep -q '<span' /tmp/parity-smoke.html
+                  ! grep -qi wordpress /tmp/parity-smoke.html

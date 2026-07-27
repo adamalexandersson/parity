@@ -63,7 +63,7 @@ function renderComponentRef(element, props = {}, registry = {}) {
             return createElement(Nested, nestedProps);
         }
 
-        return componentRefFallback(element, mappedValue);
+        return nestedComponentFallback(element, mappedValue);
     }
 
     const Nested = registry[ref];
@@ -78,10 +78,10 @@ function renderComponentRef(element, props = {}, registry = {}) {
         return icon;
     }
 
-    return componentRefFallback(element, null);
+    return nestedComponentFallback(element, null);
 }
 
-function componentRefFallback(element, mappedValue) {
+function nestedComponentFallback(element, mappedValue) {
     if (! isDebugMode()) {
         return null;
     }
