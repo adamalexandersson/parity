@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Security fixes are accepted for the latest released minor line and for `main` while the package is pre-1.0.
+Security fixes are accepted for the latest released **1.x** line and for `main`.
 
 ## Reporting a vulnerability
 

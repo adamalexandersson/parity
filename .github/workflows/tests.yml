@@ -130,7 +130,7 @@ jobs:
                   }
                   PHP
 
-                  php artisan tinker --execute="config(['parity.classes.strategy' => 'passthrough']); echo Illuminate\Support\Facades\Blade::render('<x-parity-smoke label=\"Hello\" />');" \
+                  php artisan tinker --execute="echo Illuminate\Support\Facades\Blade::render('<x-parity-smoke label=\"Hello\" />');" \
                     | tee /tmp/parity-smoke.html
 
                   grep -q 'inline-flex' /tmp/parity-smoke.html

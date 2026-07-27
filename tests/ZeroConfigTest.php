@@ -32,7 +32,6 @@ it('renders a view component shell with package defaults and no published config
         'parity.presets' => [],
         'parity.tokens' => [],
         'parity.shell_view' => 'Parity::shell',
-        'parity.classes.strategy' => 'passthrough',
     ]);
 
     $component = new class extends ViewComponent
@@ -59,4 +58,39 @@ it('renders a view component shell with package defaults and no published config
 
     expect($html)->toContain('class="block"')
         ->and($html)->toContain('<div');
+});
+
+it('renders with an explicit passthrough class strategy', function () {
+    config([
+        'parity.presets' => [],
+        'parity.tokens' => [],
+        'parity.shell_view' => 'Parity::shell',
+        'parity.classes.strategy' => 'passthrough',
+    ]);
+
+    $component = new class extends ViewComponent
+    {
+        /** @return array<string, mixed> */
+        public static function compose(): array
+        {
+            return Component::make('zero-config-passthrough', tag: 'div')
+                ->classes('block p-2 p-4')
+                ->slot()
+                ->toSchema();
+        }
+    };
+
+    $render = $component->render();
+    $data = [
+        'attributes' => new ComponentAttributeBag,
+        'slot' => new HtmlString(''),
+    ];
+
+    $html = $render instanceof Closure
+        ? (string) $render($data)
+        : (string) $render->with($data)->render();
+
+    expect($html)->toContain('block')
+        ->and($html)->toContain('p-2')
+        ->and($html)->toContain('p-4');
 });

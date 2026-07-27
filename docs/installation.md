@@ -8,6 +8,8 @@ Four steps. Laravel gets Blade only; Sage / Acorn also gets the Gutenberg editor
 composer require adamalexandersson/parity
 ```
 
+This also installs `gehrisandro/tailwind-merge-php`, which the default `tailwind` class strategy needs. Set `parity.classes.strategy` to `passthrough` if you do not want merge behaviour.
+
 ## 2. Publish config (optional)
 
 Root config is optional — package defaults render correctly without it.

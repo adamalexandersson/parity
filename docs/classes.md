@@ -14,7 +14,7 @@ Configured in `config/parity.php`:
 
 | Strategy | Behaviour | Requirement |
 |----------|-----------|-------------|
-| `tailwind` (default) | Conflict resolution via [tailwind-merge-php](https://github.com/gehrisandro/tailwind-merge-php) | Suggest `composer require gehrisandro/tailwind-merge-php` |
+| `tailwind` (default) | Conflict resolution via [tailwind-merge-php](https://github.com/gehrisandro/tailwind-merge-php) | Bundled as a package `require` |
 | `passthrough` | Concatenate and deduplicate tokens | None |
 
 The editor bundle always includes `tailwind-merge`, so the JS side resolves conflicts when the strategy is `tailwind`.

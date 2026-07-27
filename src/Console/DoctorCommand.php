@@ -53,6 +53,7 @@ class DoctorCommand extends Command
         }
 
         $issues += $this->checkManifestDrift($collector, $host);
+        $issues += $this->checkEditorScript($host);
         $issues += $this->checkCacheStaleness($collector);
         $issues += $this->checkUndefinedPresets($collector);
 
@@ -119,7 +120,15 @@ class DoctorCommand extends Command
         $manifestPath = $host->path($manifestRelative);
 
         if (! File::exists($manifestPath)) {
-            return 0;
+            if ($host->name() !== 'wordpress') {
+                return 0;
+            }
+
+            $this->components->warn(
+                "[manifest] missing {$manifestRelative}. Run parity:manifest before building the editor."
+            );
+
+            return 1;
         }
 
         $issues = 0;
@@ -162,6 +171,28 @@ class DoctorCommand extends Command
         }
 
         return $issues;
+    }
+
+    protected function checkEditorScript(Host $host): int
+    {
+        if ($host->name() !== 'wordpress') {
+            return 0;
+        }
+
+        $relative = config('parity.editor.script_path', 'dist/parity.js');
+        $vendorRelative = 'vendor/adamalexandersson/parity/'.$relative;
+        $themePath = $host->path($vendorRelative);
+        $packagePath = dirname(__DIR__, 2).'/'.$relative;
+
+        if (File::exists($themePath) || File::exists($packagePath)) {
+            return 0;
+        }
+
+        $this->components->warn(
+            "[editor] missing {$relative}. Gutenberg will not enqueue the Parity runtime until the committed dist bundle is present."
+        );
+
+        return 1;
     }
 
     protected function checkCacheStaleness(ConfigCollector $collector): int

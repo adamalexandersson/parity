@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-07-27
+
+### Fixed
+
+- `parity:make` closes each match outcome with `->end()` and scaffolds root components under `App\View\Components` (not `Components\Components`)
+- `parity:doctor` fails on WordPress hosts when the editor manifest or `dist/parity.js` is missing
+- Release workflow uses `composer update` (no committed lockfile) and `softprops/action-gh-release@v3`
+
+### Changed
+
+- `gehrisandro/tailwind-merge-php` is a hard `require` so the default `tailwind` class strategy works after `composer require`
+- Security policy covers the latest 1.x line and `main`
+
 ## [1.0.5] - 2026-07-27
 
 ### Fixed

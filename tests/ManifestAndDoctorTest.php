@@ -78,6 +78,24 @@ it('warns when discovered schemas reference undefined presets', function () {
         ->assertFailed();
 });
 
+it('fails doctor when the wordpress host is missing a manifest', function () {
+    app()->instance(Host::class, new FakeHost(
+        root: base_path($this->outputRelative.'/wp-theme'),
+        hostName: 'wordpress',
+    ));
+
+    config([
+        'parity.presets' => [
+            'cols' => ['1' => 'grid-cols-1'],
+        ],
+        'parity.editor.manifest_path' => 'resources/js/parity/manifest.json',
+    ]);
+
+    $this->artisan('parity:doctor')
+        ->expectsOutputToContain('missing resources/js/parity/manifest.json')
+        ->assertFailed();
+});
+
 it('resolves safelist output through the laravel host base path', function () {
     expect(app(Host::class))->toBeInstanceOf(LaravelHost::class);
 

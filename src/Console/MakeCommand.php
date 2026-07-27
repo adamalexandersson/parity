@@ -15,9 +15,10 @@ class MakeCommand extends Command
     public function handle(): int
     {
         $name = Str::studly($this->argument('name'));
-        $namespace = $this->option('ui') ? 'Ui' : 'Components';
-        $class = "App\\View\\Components\\{$namespace}\\{$name}";
-        $path = app_path("View/Components/{$namespace}/{$name}.php");
+        $ui = (bool) $this->option('ui');
+        $namespace = $ui ? 'App\\View\\Components\\Ui' : 'App\\View\\Components';
+        $relativeDir = $ui ? 'View/Components/Ui' : 'View/Components';
+        $path = app_path("{$relativeDir}/{$name}.php");
         $kebab = Str::kebab($name);
 
         if (File::exists($path)) {
@@ -28,19 +29,19 @@ class MakeCommand extends Command
 
         File::ensureDirectoryExists(dirname($path));
 
-        File::put($path, $this->stub($class, $kebab, $namespace, $name));
+        File::put($path, $this->stub($namespace, $kebab, $name));
 
         $this->components->info("Parity component created: {$path}");
 
         return self::SUCCESS;
     }
 
-    protected function stub(string $class, string $kebab, string $namespace, string $name): string
+    protected function stub(string $namespace, string $kebab, string $name): string
     {
         return <<<PHP
 <?php
 
-namespace App\\View\\Components\\{$namespace};
+namespace {$namespace};
 
 use Parity\\Component;
 use Parity\\Node;
@@ -57,9 +58,9 @@ class {$name} extends ParityComponent
         return Component::make('{$kebab}')
             ->classes('inline-flex items-center')
             ->match('size')
-                ->case('sm')->classes('text-sm')
-                ->case('lg')->classes('text-lg')
-                ->default()->classes('text-base')
+                ->case('sm')->classes('text-sm')->end()
+                ->case('lg')->classes('text-lg')->end()
+                ->default()->classes('text-base')->end()
                 ->end()
             ->children([
                 Node::make('content')->fragment()->slot(),
