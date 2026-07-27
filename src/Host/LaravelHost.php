@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Host;
+namespace Parity\Host;
 
-use Sprout\Contracts\Host;
+use Parity\Contracts\Host;
 
 class LaravelHost implements Host
 {

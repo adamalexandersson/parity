@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Support;
+namespace Parity\Support;
 
 use ReflectionClass;
 use ReflectionNamedType;

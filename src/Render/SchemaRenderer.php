@@ -1,15 +1,15 @@
 <?php
 
-namespace Sprout\Render;
+namespace Parity\Render;
 
-use Sprout\Concerns\EvaluatesConditions;
-use Sprout\Exceptions\SchemaException;
-use Sprout\Registries\TransformRegistry;
-use Sprout\Support\AttributeFactory;
-use Sprout\Support\ClassFactory;
-use Sprout\Support\IdInterpolator;
-use Sprout\Support\InlineStyleFactory;
-use Sprout\Support\InstanceIds;
+use Parity\Concerns\EvaluatesConditions;
+use Parity\Exceptions\SchemaException;
+use Parity\Registries\TransformRegistry;
+use Parity\Support\AttributeFactory;
+use Parity\Support\ClassFactory;
+use Parity\Support\IdInterpolator;
+use Parity\Support\InlineStyleFactory;
+use Parity\Support\InstanceIds;
 
 class SchemaRenderer
 {
@@ -148,7 +148,7 @@ class SchemaRenderer
             $mode = $rule['mode'] ?? null;
 
             if ($mode === 'token') {
-                $tokenClasses = config("sprout.tokens.{$rule['tokenGroup']}.{$rule['token']}");
+                $tokenClasses = config("parity.tokens.{$rule['tokenGroup']}.{$rule['token']}");
 
                 if (is_string($tokenClasses) && $tokenClasses !== '') {
                     $classes->apply($tokenClasses);
@@ -273,7 +273,7 @@ class SchemaRenderer
     protected function isDebug(): bool
     {
         try {
-            return (bool) config('app.debug', false) || (bool) config('sprout.editor.debug', false);
+            return (bool) config('app.debug', false) || (bool) config('parity.editor.debug', false);
         } catch (\Throwable) {
             return false;
         }
@@ -336,7 +336,7 @@ class SchemaRenderer
 
         $prop = $match['props'][0] ?? $match['preset'];
         $value = $this->lookupValue($props, $prop);
-        $map = config("sprout.presets.{$match['preset']}", []);
+        $map = config("parity.presets.{$match['preset']}", []);
 
         if (! is_array($map)) {
             return;
@@ -367,7 +367,7 @@ class SchemaRenderer
 
     protected function applyPresetMapEntry(string $presetKey, string $normalized, ClassFactory $classes): void
     {
-        $map = config("sprout.presets.{$presetKey}", []);
+        $map = config("parity.presets.{$presetKey}", []);
 
         if (! is_array($map)) {
             return;
@@ -378,7 +378,7 @@ class SchemaRenderer
         }
 
         $nestedKey = "{$presetKey}Nested";
-        $nestedMap = config("sprout.presets.{$nestedKey}", []);
+        $nestedMap = config("parity.presets.{$nestedKey}", []);
 
         if (is_array($nestedMap) && isset($nestedMap[$normalized])) {
             $classes->apply($nestedMap[$normalized]);

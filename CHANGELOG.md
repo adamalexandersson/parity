@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Phase 3 — Rename to Parity (breaking)
+
+Hard cutover from Sprout to Parity. No backwards-compatibility aliases.
+
+| Surface | Old | New |
+|---------|-----|-----|
+| Composer | `adamalexandersson/sprout` | `adamalexandersson/parity` |
+| PHP namespace | `Sprout\` | `Parity\` |
+| Facade / binding | `Sprout` / `sprout` | `Parity` / `parity` |
+| Config | `config/sprout.php`, `sprout.*` | `config/parity.php`, `parity.*` |
+| Env | `SPROUT_*` | `PARITY_*` |
+| Commands | `sprout:*` | `parity:*` |
+| Editor global / handle / dist | `window.sprout`, `sprout`, `dist/sprout.js` | `window.parity`, `parity`, `dist/parity.js` |
+| Filters | `sprout/editor/*` | `parity/editor/*` |
+| Views | `Sprout::shell` | `Parity::shell` |
+| Vite aliases | `@sprout/*` | `@parity/*` |
+
 ### Phase 2 — Authoring API (breaking)
 
 Full vocabulary rename; no deprecation aliases. Serialized schema keys stay stable where noted (`defaultSlot`, `namedSlots`, `matches[].preset`, nested `component`).

@@ -28,7 +28,7 @@ describe('react attribute map', () => {
     });
 
     it('keeps alpine attrs when editor.alpine is emit', () => {
-        globalThis.sprout = { config: { editor: { alpine: 'emit' } } };
+        globalThis.parity = { config: { editor: { alpine: 'emit' } } };
 
         const attrs = normalizeDomAttributes({
             'x-data': 'accordion({ single: false })',
@@ -87,7 +87,7 @@ describe('schema error helpers', () => {
 
     it('builds panel props', () => {
         const panel = schemaErrorPanelProps({ message: 'bad' }, 'card');
-        expect(panel['data-sprout-error']).toBe('true');
+        expect(panel['data-parity-error']).toBe('true');
         expect(panel.children).toContain('[card]');
     });
 });

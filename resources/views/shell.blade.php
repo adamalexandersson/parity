@@ -1,5 +1,5 @@
 @php
-    use Sprout\Support\Html;
+    use Parity\Support\Html;
 
     $isVoid = Html::isVoid($element ?? null);
 @endphp

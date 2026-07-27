@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Host;
+namespace Parity\Host;
 
-use Sprout\Contracts\Host;
+use Parity\Contracts\Host;
 
 class WordPressHost implements Host
 {
@@ -49,7 +49,7 @@ class WordPressHost implements Host
 
     public function url(string $relative): string
     {
-        $vendorRelative = 'vendor/adamalexandersson/sprout/'.$relative;
+        $vendorRelative = 'vendor/adamalexandersson/parity/'.$relative;
 
         if (function_exists('get_theme_file_uri') && function_exists('get_theme_file_path')) {
             if (file_exists(get_theme_file_path($vendorRelative))) {

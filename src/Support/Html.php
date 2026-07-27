@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Support;
+namespace Parity\Support;
 
 final class Html
 {

@@ -5,7 +5,7 @@ import { SchemaRenderer } from '../render/schemaRenderer.js';
 
 describe('alpine attributes', () => {
     beforeEach(() => {
-        globalThis.sprout = { config: { editor: { alpine: 'suppress' } } };
+        globalThis.parity = { config: { editor: { alpine: 'suppress' } } };
     });
 
     it('detects alpine directives and bind shorthand', () => {
@@ -19,15 +19,15 @@ describe('alpine attributes', () => {
 
     it('suppresses alpine attrs in editor normalization by default', () => {
         const attrs = normalizeDomAttributes({
-            id: 'sprout-demo-panel',
-            'aria-controls': 'sprout-demo-panel',
-            'x-on:click': "toggle('sprout-demo-panel')",
+            id: 'parity-demo-panel',
+            'aria-controls': 'parity-demo-panel',
+            'x-on:click': "toggle('parity-demo-panel')",
             'x-show': 'open',
             class: 'panel',
         });
 
-        expect(attrs.id).toBe('sprout-demo-panel');
-        expect(attrs['aria-controls']).toBe('sprout-demo-panel');
+        expect(attrs.id).toBe('parity-demo-panel');
+        expect(attrs['aria-controls']).toBe('parity-demo-panel');
         expect(attrs.className).toBe('panel');
         expect(attrs['x-on:click']).toBeUndefined();
         expect(attrs['x-show']).toBeUndefined();
@@ -35,7 +35,7 @@ describe('alpine attributes', () => {
     });
 
     it('keeps alpine attrs when emit is configured', () => {
-        globalThis.sprout = { config: { editor: { alpine: 'emit' } } };
+        globalThis.parity = { config: { editor: { alpine: 'emit' } } };
 
         const attrs = normalizeDomAttributes({
             'x-show': 'open',
@@ -69,11 +69,11 @@ describe('alpine attributes', () => {
         const root = renderer.renderComponentAttributes();
         const structure = renderer.renderStructure();
 
-        expect(root['x-init']).toBe("init('sprout-demo-root')");
-        expect(structure.panel.attributes['x-show']).toBe("isOpen('sprout-demo-panel')");
+        expect(root['x-init']).toBe("init('parity-demo-root')");
+        expect(structure.panel.attributes['x-show']).toBe("isOpen('parity-demo-panel')");
 
         const editorAttrs = normalizeDomAttributes(structure.panel.attributes);
-        expect(editorAttrs.id).toBe('sprout-demo-panel');
+        expect(editorAttrs.id).toBe('parity-demo-panel');
         expect(editorAttrs['x-show']).toBeUndefined();
     });
 });

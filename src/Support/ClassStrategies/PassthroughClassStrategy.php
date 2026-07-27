@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Support\ClassStrategies;
+namespace Parity\Support\ClassStrategies;
 
-use Sprout\Contracts\ClassStrategy;
+use Parity\Contracts\ClassStrategy;
 
 final class PassthroughClassStrategy implements ClassStrategy
 {

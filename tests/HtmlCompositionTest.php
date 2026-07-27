@@ -1,16 +1,16 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
-use Sprout\Support\Html;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
+use Parity\Support\Html;
 
 it('renders form media table and microdata structure attributes', function () {
     $compositions = require __DIR__.'/fixtures/html-compositions.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
 
     $form = $renderer->renderStructure($compositions['form'], ['instanceId' => 'form1'], 'form-demo');
-    expect($form['input']['attributes']['id'])->toBe('sprout-form1-input')
-        ->and($form['label']['attributes']['for'])->toBe('sprout-form1-input')
+    expect($form['input']['attributes']['id'])->toBe('parity-form1-input')
+        ->and($form['label']['attributes']['for'])->toBe('parity-form1-input')
         ->and($form['input']['attributes']['required'])->toBeTrue()
         ->and($form['select']['attributes']['multiple'])->toBeTrue()
         ->and($form['select']['children']['option']['attributes']['selected'])->toBeTrue()

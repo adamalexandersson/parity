@@ -1,14 +1,14 @@
 <?php
 
-namespace Sprout;
+namespace Parity;
 
-use Sprout\Builders\AttrBuilder;
-use Sprout\Builders\ConditionBuilder;
-use Sprout\Builders\EmbedBuilder;
-use Sprout\Builders\MatchBuilder;
-use Sprout\Builders\StyleBuilder;
-use Sprout\Exceptions\SchemaException;
-use Sprout\Schema\Version;
+use Parity\Builders\AttrBuilder;
+use Parity\Builders\ConditionBuilder;
+use Parity\Builders\EmbedBuilder;
+use Parity\Builders\MatchBuilder;
+use Parity\Builders\StyleBuilder;
+use Parity\Exceptions\SchemaException;
+use Parity\Schema\Version;
 
 /**
  * Fluent schema node builder.

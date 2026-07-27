@@ -93,11 +93,11 @@ function componentRefFallback(element, mappedValue) {
         : String(ref);
 
     return createElement('span', {
-        'data-sprout-component': ref,
-        'data-sprout-icon': mappedValue || undefined,
+        'data-parity-component': ref,
+        'data-parity-icon': mappedValue || undefined,
         className: comp.class || undefined,
         'aria-hidden': true,
-        title: `[Sprout] Unresolved component: ${label}`,
+        title: `[Parity] Unresolved component: ${label}`,
     }, `▾ ${label}`);
 }
 
@@ -186,7 +186,7 @@ function renderStructure({
 }
 
 export function createComponent(componentName, registry = {}) {
-    function SproutComponent({
+    function ParityComponent({
         children,
         editable,
         setAttributes,
@@ -196,7 +196,7 @@ export function createComponent(componentName, registry = {}) {
         ...componentProps
     }) {
         try {
-            const config = window.sprout?.config?.[componentName] ?? {};
+            const config = window.parity?.config?.[componentName] ?? {};
             const namedSlotNames = resolveNamedSlotNames(config);
 
             const structureProps = Object.fromEntries(
@@ -273,7 +273,7 @@ export function createComponent(componentName, registry = {}) {
         }
     }
 
-    return SproutComponent;
+    return ParityComponent;
 }
 
 export function registerComponent(name, component = null, registry = {}) {

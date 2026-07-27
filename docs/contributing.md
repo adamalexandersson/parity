@@ -1,4 +1,4 @@
-# Contributing to Sprout
+# Contributing to Parity
 
 ## Setup
 
@@ -13,7 +13,7 @@ composer test
 
 - **PHP authoring** — `src/Component.php`, `src/Node.php`, builders in `src/Builders/`
 - **PHP renderer** — `src/Render/SchemaRenderer.php` + `resources/views/structure.blade.php`
-- **Editor runtime** — `resources/js/` compiled to `dist/sprout.js`
+- **Editor runtime** — `resources/js/` compiled to `dist/parity.js`
 
 ## Parity tests
 

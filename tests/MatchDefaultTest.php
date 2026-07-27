@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Component;
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Component;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 it('matches null theme color to an explicit default case', function () {
     $schema = Component::make('card', tag: 'div')

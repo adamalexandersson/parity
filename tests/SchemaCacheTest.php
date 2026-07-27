@@ -1,15 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Cache;
-use Sprout\Config\ConfigCollector;
-use Sprout\Schema\Version;
+use Parity\Config\ConfigCollector;
+use Parity\Schema\Version;
 
 beforeEach(function () {
     ConfigCollector::forgetCache();
 
     config([
-        'sprout.components.path' => __DIR__.'/fixtures',
-        'sprout.components.namespace' => 'Sprout\\Tests\\Fixtures',
+        'parity.components.path' => __DIR__.'/fixtures',
+        'parity.components.namespace' => 'Parity\\Tests\\Fixtures',
     ]);
 });
 
@@ -18,7 +18,7 @@ afterEach(function () {
 });
 
 it('writes and hydrates schemas plus class map from cache', function () {
-    $this->artisan('sprout:cache')->assertSuccessful();
+    $this->artisan('parity:cache')->assertSuccessful();
 
     $payload = ConfigCollector::readCache();
 
@@ -33,16 +33,16 @@ it('writes and hydrates schemas plus class map from cache', function () {
 
     expect($collector->get('shell-structure-test'))->toBeArray()
         ->and($collector->classFor('shell-structure-test'))->toBe(
-            'Sprout\\Tests\\Fixtures\\ShellStructureTestComponent'
+            'Parity\\Tests\\Fixtures\\ShellStructureTestComponent'
         );
 });
 
 it('clears the schema cache', function () {
-    $this->artisan('sprout:cache')->assertSuccessful();
+    $this->artisan('parity:cache')->assertSuccessful();
 
     expect(ConfigCollector::readCache())->not->toBeNull();
 
-    $this->artisan('sprout:clear')->assertSuccessful();
+    $this->artisan('parity:clear')->assertSuccessful();
 
     expect(ConfigCollector::readCache())->toBeNull();
 });
@@ -64,7 +64,7 @@ it('discards cache when schemaVersion mismatches', function () {
 });
 
 it('fails doctor when the schema cache is stale', function () {
-    $this->artisan('sprout:cache')->assertSuccessful();
+    $this->artisan('parity:cache')->assertSuccessful();
 
     $payload = ConfigCollector::readCache();
     $payload['schemas']['ghost-component'] = [
@@ -75,8 +75,8 @@ it('fails doctor when the schema cache is stale', function () {
 
     // Point doctor away from any existing theme manifest.
     config([
-        'sprout.editor.manifest_path' => 'storage/framework/sprout-tests/missing-manifest.json',
+        'parity.editor.manifest_path' => 'storage/framework/parity-tests/missing-manifest.json',
     ]);
 
-    $this->artisan('sprout:doctor')->assertFailed();
+    $this->artisan('parity:doctor')->assertFailed();
 });

@@ -2,13 +2,13 @@
 
 ## Attribute names and values
 
-`Sprout\Support\AttributeFactory` rejects attribute names outside `^[a-zA-Z_:][\w:.-]*$`. Values are escaped with `e()` / `htmlspecialchars` when emitted into Blade attribute strings in `resources/views/structure.blade.php`.
+`Parity\Support\AttributeFactory` rejects attribute names outside `^[a-zA-Z_:][\w:.-]*$`. Values are escaped with `e()` / `htmlspecialchars` when emitted into Blade attribute strings in `resources/views/structure.blade.php`.
 
 Boolean attributes are emitted as bare names only when truthy.
 
 ## Inline editor config
 
-`Sprout\Editor\EditorConfigBuilder::encode()` delegates to `Host::jsonEncode()`. The WordPress host encodes with `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT` so values containing `</script>` cannot break out of the inline `<script>` injection used for `window.sprout.config` (see `Sprout\WordPress\EditorAssets`).
+`Parity\Editor\EditorConfigBuilder::encode()` delegates to `Host::jsonEncode()`. The WordPress host encodes with `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT` so values containing `</script>` cannot break out of the inline `<script>` injection used for `window.parity.config` (see `Parity\WordPress\EditorAssets`).
 
 ## Unescaped Blade (`{!! !!}`)
 

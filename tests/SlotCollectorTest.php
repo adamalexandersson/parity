@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Component;
-use Sprout\Node;
-use Sprout\Schema\SlotCollector;
+use Parity\Component;
+use Parity\Node;
+use Parity\Schema\SlotCollector;
 
 it('collects named slots from the schema tree', function () {
     $schema = Component::make('card', tag: 'div')

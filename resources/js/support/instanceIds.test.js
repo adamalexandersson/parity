@@ -14,7 +14,7 @@ describe('instanceIds interpolation', () => {
         ids.declare('panel');
 
         expect(interpolateIds('aria-controls="panel-{panel}"', ids)).toBe(
-            'aria-controls="panel-sprout-x-panel"'
+            'aria-controls="panel-parity-x-panel"'
         );
     });
 
@@ -23,7 +23,7 @@ describe('instanceIds interpolation', () => {
         ids.declare('panel');
 
         expect(interpolateIds('show {{panel}} then {panel}', ids)).toBe(
-            'show {panel} then sprout-x-panel'
+            'show {panel} then parity-x-panel'
         );
     });
 

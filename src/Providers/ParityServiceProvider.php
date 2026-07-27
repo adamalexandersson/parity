@@ -1,28 +1,28 @@
 <?php
 
-namespace Sprout\Providers;
+namespace Parity\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Sprout\Config\ConfigCollector;
-use Sprout\Console\CacheCommand;
-use Sprout\Console\ClearCommand;
-use Sprout\Console\DoctorCommand;
-use Sprout\Console\GenerateEditorExportsCommand;
-use Sprout\Console\MakeCommand;
-use Sprout\Console\ManifestCommand;
-use Sprout\Console\SafelistCommand;
-use Sprout\Contracts\Host;
-use Sprout\Editor\EditorConfigBuilder;
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
-use Sprout\Sprout;
-use Sprout\Support\HostResolver;
+use Parity\Config\ConfigCollector;
+use Parity\Console\CacheCommand;
+use Parity\Console\ClearCommand;
+use Parity\Console\DoctorCommand;
+use Parity\Console\GenerateEditorExportsCommand;
+use Parity\Console\MakeCommand;
+use Parity\Console\ManifestCommand;
+use Parity\Console\SafelistCommand;
+use Parity\Contracts\Host;
+use Parity\Editor\EditorConfigBuilder;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
+use Parity\Parity;
+use Parity\Support\HostResolver;
 
-class SproutServiceProvider extends ServiceProvider
+class ParityServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../../config/sprout.php', 'sprout');
+        $this->mergeConfigFrom(__DIR__.'/../../config/parity.php', 'parity');
 
         $this->app->singleton(Host::class, fn () => HostResolver::resolve());
 
@@ -37,11 +37,11 @@ class SproutServiceProvider extends ServiceProvider
         });
         $this->app->singleton(EditorConfigBuilder::class);
 
-        $this->app->singleton('sprout', function ($app) {
-            return new Sprout($app);
+        $this->app->singleton('parity', function ($app) {
+            return new Parity($app);
         });
 
-        $this->app->alias('sprout', Sprout::class);
+        $this->app->alias('parity', Parity::class);
 
         if ($this->app->make(Host::class)->name() === 'wordpress') {
             $this->app->register(WordPressServiceProvider::class);
@@ -51,11 +51,11 @@ class SproutServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__.'/../../config/sprout.php' => $this->app->configPath('sprout.php'),
-            __DIR__.'/../../stubs/presets.php.stub' => config_path('sprout/presets.php'),
-        ], 'sprout');
+            __DIR__.'/../../config/parity.php' => $this->app->configPath('parity.php'),
+            __DIR__.'/../../stubs/presets.php.stub' => config_path('parity/presets.php'),
+        ], 'parity');
 
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'Sprout');
+        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'Parity');
 
         $this->configureComponentDiscovery();
 
@@ -75,8 +75,8 @@ class SproutServiceProvider extends ServiceProvider
     protected function configureComponentDiscovery(): void
     {
         config([
-            'sprout.components.path' => config('sprout.components.path') ?? app_path('View/Components'),
-            'sprout.components.namespace' => config('sprout.components.namespace')
+            'parity.components.path' => config('parity.components.path') ?? app_path('View/Components'),
+            'parity.components.namespace' => config('parity.components.namespace')
                 ?? app()->getNamespace().'View\\Components',
         ]);
     }

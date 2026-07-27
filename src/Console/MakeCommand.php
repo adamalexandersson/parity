@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Console;
+namespace Parity\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -8,9 +8,9 @@ use Illuminate\Support\Str;
 
 class MakeCommand extends Command
 {
-    protected $signature = 'sprout:make {name : The component class name} {--ui : Place in the Ui namespace}';
+    protected $signature = 'parity:make {name : The component class name} {--ui : Place in the Ui namespace}';
 
-    protected $description = 'Create a new Sprout component class';
+    protected $description = 'Create a new Parity component class';
 
     public function handle(): int
     {
@@ -30,7 +30,7 @@ class MakeCommand extends Command
 
         File::put($path, $this->stub($class, $kebab, $namespace, $name));
 
-        $this->components->info("Sprout component created: {$path}");
+        $this->components->info("Parity component created: {$path}");
 
         return self::SUCCESS;
     }
@@ -42,11 +42,11 @@ class MakeCommand extends Command
 
 namespace App\\View\\Components\\{$namespace};
 
-use Sprout\\Component;
-use Sprout\\Node;
-use Sprout\\View\\Component as SproutComponent;
+use Parity\\Component;
+use Parity\\Node;
+use Parity\\View\\Component as ParityComponent;
 
-class {$name} extends SproutComponent
+class {$name} extends ParityComponent
 {
     public function __construct(
         public string \$size = 'md',

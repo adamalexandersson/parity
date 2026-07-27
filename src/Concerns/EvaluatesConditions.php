@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Concerns;
+namespace Parity\Concerns;
 
 trait EvaluatesConditions
 {

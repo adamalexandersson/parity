@@ -49,7 +49,7 @@ export class InstanceIds {
 
     get(name) {
         if (! this.ids[name]) {
-            this.ids[name] = `sprout-${this.instanceKey}-${name}`;
+            this.ids[name] = `parity-${this.instanceKey}-${name}`;
         }
 
         return this.ids[name];

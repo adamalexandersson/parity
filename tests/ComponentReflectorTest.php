@@ -1,9 +1,9 @@
 <?php
 
-use Sprout\Support\ComponentReflector;
-use Sprout\Tests\Fixtures\ReflectPropsTestComponent;
+use Parity\Support\ComponentReflector;
+use Parity\Tests\Fixtures\ReflectPropsTestComponent;
 
-it('reflects constructor props from a sprout component class', function () {
+it('reflects constructor props from a parity component class', function () {
     $props = ComponentReflector::constructorProps(ReflectPropsTestComponent::class);
     $byName = collect($props)->keyBy('name');
 

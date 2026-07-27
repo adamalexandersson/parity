@@ -1,10 +1,10 @@
 /**
- * Sprout editor export helpers.
- * Theme Vite alias: '@sprout/runtime' -> this file.
+ * Parity editor export helpers.
+ * Theme Vite alias: '@parity/runtime' -> this file.
  */
 
 function isProduction() {
-    if (typeof window !== 'undefined' && window.sprout?.config?.debug === true) {
+    if (typeof window !== 'undefined' && window.parity?.config?.debug === true) {
         return false;
     }
 
@@ -12,21 +12,21 @@ function isProduction() {
 }
 
 export function getComponent(name) {
-    if (typeof window !== 'undefined' && window.sprout?.getComponent) {
-        return window.sprout.getComponent(name);
+    if (typeof window !== 'undefined' && window.parity?.getComponent) {
+        return window.parity.getComponent(name);
     }
 
     if (! isProduction()) {
-        throw new Error(`[Sprout] Runtime unavailable while resolving "${name}". Ensure window.sprout is loaded before rendering.`);
+        throw new Error(`[Parity] Runtime unavailable while resolving "${name}". Ensure window.parity is loaded before rendering.`);
     }
 
-    return function SproutComponentFallback() {
+    return function ParityComponentFallback() {
         return null;
     };
 }
 
 export function createExport(slug) {
-    const ComponentExport = function SproutExport(props) {
+    const ComponentExport = function ParityExport(props) {
         const Component = getComponent(slug);
 
         if (typeof window !== 'undefined' && window.wp?.element?.createElement) {
@@ -36,7 +36,7 @@ export function createExport(slug) {
         return Component(props);
     };
 
-    ComponentExport.displayName = `Sprout(${slug})`;
+    ComponentExport.displayName = `Parity(${slug})`;
 
     return ComponentExport;
 }

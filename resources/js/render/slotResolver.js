@@ -1,5 +1,5 @@
 /**
- * Slot resolution rules shared with Sprout\Render\SlotResolver (PHP) and structure.blade.php.
+ * Slot resolution rules shared with Parity\Render\SlotResolver (PHP) and structure.blade.php.
  */
 
 export function hasStructureChildren(children) {

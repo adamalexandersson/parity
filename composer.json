@@ -1,5 +1,5 @@
 {
-    "name": "adamalexandersson/sprout",
+    "name": "adamalexandersson/parity",
     "type": "package",
     "description": "Schema-driven cross-runtime components for Laravel Blade and WordPress Gutenberg",
     "license": "MIT",
@@ -11,12 +11,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Sprout\\": "src/"
+            "Parity\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Sprout\\Tests\\": "tests/"
+            "Parity\\Tests\\": "tests/"
         }
     },
     "require": {
@@ -30,18 +30,18 @@
     "extra": {
         "acorn": {
             "providers": [
-                "Sprout\\Providers\\SproutServiceProvider"
+                "Parity\\Providers\\ParityServiceProvider"
             ],
             "aliases": {
-                "Sprout": "Sprout\\Facades\\Sprout"
+                "Parity": "Parity\\Facades\\Parity"
             }
         },
         "laravel": {
             "providers": [
-                "Sprout\\Providers\\SproutServiceProvider"
+                "Parity\\Providers\\ParityServiceProvider"
             ],
             "aliases": {
-                "Sprout": "Sprout\\Facades\\Sprout"
+                "Parity": "Parity\\Facades\\Parity"
             }
         }
     },
@@ -55,7 +55,7 @@
     },
     "suggest": {
         "blade-ui-kit/blade-icons": "Required for component() nodes that render SVG icons via @svg().",
-        "gehrisandro/tailwind-merge-php": "Required when sprout.classes.strategy is \"tailwind\" (the default). Use \"passthrough\" otherwise.",
+        "gehrisandro/tailwind-merge-php": "Required when parity.classes.strategy is \"tailwind\" (the default). Use \"passthrough\" otherwise.",
         "roots/acorn": "Required for Sage/WordPress themes that use the Gutenberg editor adapter."
     },
     "scripts": {

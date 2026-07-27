@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Support;
+namespace Parity\Support;
 
 final class InstanceIds
 {
@@ -61,7 +61,7 @@ final class InstanceIds
     public function get(string $name): string
     {
         if (! isset($this->ids[$name])) {
-            $this->ids[$name] = 'sprout-'.$this->instanceKey.'-'.$name;
+            $this->ids[$name] = 'parity-'.$this->instanceKey.'-'.$name;
         }
 
         return $this->ids[$name];

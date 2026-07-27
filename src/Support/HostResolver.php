@@ -1,10 +1,10 @@
 <?php
 
-namespace Sprout\Support;
+namespace Parity\Support;
 
-use Sprout\Contracts\Host;
-use Sprout\Host\LaravelHost;
-use Sprout\Host\WordPressHost;
+use Parity\Contracts\Host;
+use Parity\Host\LaravelHost;
+use Parity\Host\WordPressHost;
 
 final class HostResolver
 {
@@ -23,7 +23,7 @@ final class HostResolver
     {
         try {
             if (function_exists('config')) {
-                $value = config('sprout.host');
+                $value = config('parity.host');
 
                 return is_string($value) && $value !== '' ? $value : null;
             }

@@ -19,8 +19,8 @@ export function isAlpineAttribute(name) {
 
 export function shouldSuppressAlpine(config = null) {
     const root = typeof globalThis !== 'undefined' ? globalThis : {};
-    const sprout = root.window?.sprout ?? root.sprout;
-    const editor = config?.editor ?? sprout?.config?.editor ?? {};
+    const parity = root.window?.parity ?? root.parity;
+    const editor = config?.editor ?? parity?.config?.editor ?? {};
 
     return (editor.alpine ?? 'suppress') !== 'emit';
 }

@@ -1,6 +1,6 @@
 <?php
 
-use Sprout\Tests\TestCase;
+use Parity\Tests\TestCase;
 
 /*
 |--------------------------------------------------------------------------

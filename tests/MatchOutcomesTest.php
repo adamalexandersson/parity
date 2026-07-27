@@ -1,7 +1,7 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 it('applies attr and style match outcomes in php', function () {
     $schema = require __DIR__.'/fixtures/outcomes-attr-style.php';

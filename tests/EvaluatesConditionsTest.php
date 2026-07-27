@@ -1,6 +1,6 @@
 <?php
 
-use Sprout\Concerns\EvaluatesConditions;
+use Parity\Concerns\EvaluatesConditions;
 
 class ConditionHarness
 {

@@ -8,7 +8,7 @@ export function assertSchemaVersion(config) {
     if (config.schemaVersion !== SCHEMA_VERSION) {
         // eslint-disable-next-line no-console
         console.warn(
-            `[Sprout] Schema version mismatch. Expected ${SCHEMA_VERSION}, got ${config.schemaVersion}.`
+            `[Parity] Schema version mismatch. Expected ${SCHEMA_VERSION}, got ${config.schemaVersion}.`
         );
     }
 }

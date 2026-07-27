@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
-use Sprout\Support\InstanceIds;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
+use Parity\Support\InstanceIds;
 
 it('generates deterministic unique ids and id refs', function () {
     $schema = require __DIR__.'/fixtures/unique-id-a11y.php';
@@ -11,10 +11,10 @@ it('generates deterministic unique ids and id refs', function () {
 
     $structure = $renderer->renderStructure($schema, $props, 'unique-id-a11y');
 
-    expect($structure['field']['attributes']['id'])->toBe('sprout-demo-field')
-        ->and($structure['label']['attributes']['for'])->toBe('sprout-demo-field')
-        ->and($structure['field']['attributes']['aria-describedby'])->toBe('sprout-demo-hint')
-        ->and($structure['hint']['attributes']['id'])->toBe('sprout-demo-hint');
+    expect($structure['field']['attributes']['id'])->toBe('parity-demo-field')
+        ->and($structure['label']['attributes']['for'])->toBe('parity-demo-field')
+        ->and($structure['field']['attributes']['aria-describedby'])->toBe('parity-demo-hint')
+        ->and($structure['hint']['attributes']['id'])->toBe('parity-demo-hint');
 });
 
 it('matches php and js instance key fingerprints', function () {

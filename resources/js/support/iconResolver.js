@@ -1,7 +1,7 @@
 /**
  * Host-supplied icon resolution for schema component nodes.
  *
- * Themes register a resolver via window.sprout.registerIconResolver(fn).
+ * Themes register a resolver via window.parity.registerIconResolver(fn).
  * The resolver receives { name, componentRef, className, props } and returns a
  * React element, or null when it cannot render the icon.
  */
@@ -45,7 +45,7 @@ export function resolveIcon(name, element) {
         }) ?? null;
     } catch (error) {
         if (typeof console !== 'undefined' && console.error) {
-            console.error('[Sprout] icon resolver failed:', error);
+            console.error('[Parity] icon resolver failed:', error);
         }
 
         return null;

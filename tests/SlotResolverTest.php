@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
-use Sprout\Render\SlotResolver;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
+use Parity\Render\SlotResolver;
 
 it('collects expected default slot targets', function () {
     $cases = require __DIR__.'/fixtures/structure-cases.php';

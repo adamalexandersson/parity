@@ -1,7 +1,7 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 function structureCases(): array
 {
@@ -142,8 +142,8 @@ it('keeps php structure snapshots stable', function () {
 });
 
 it('matches php and js structure and slot targets', function () {
-    if (! file_exists(dirname(__DIR__).'/dist/sprout.js')) {
-        $this->markTestSkipped('dist/sprout.js not built');
+    if (! file_exists(dirname(__DIR__).'/dist/parity.js')) {
+        $this->markTestSkipped('dist/parity.js not built');
     }
 
     $script = dirname(__DIR__).'/scripts/structure-parity.mjs';

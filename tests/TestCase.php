@@ -1,16 +1,16 @@
 <?php
 
-namespace Sprout\Tests;
+namespace Parity\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Sprout\Providers\SproutServiceProvider;
+use Parity\Providers\ParityServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
     protected function getPackageProviders($app): array
     {
         return [
-            SproutServiceProvider::class,
+            ParityServiceProvider::class,
         ];
     }
 }

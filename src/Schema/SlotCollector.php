@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Schema;
+namespace Parity\Schema;
 
-use Sprout\Exceptions\SchemaException;
+use Parity\Exceptions\SchemaException;
 
 final class SlotCollector
 {

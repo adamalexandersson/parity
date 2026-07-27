@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Tests\Support;
+namespace Parity\Tests\Support;
 
-use Sprout\Contracts\Host;
+use Parity\Contracts\Host;
 
 class FakeHost implements Host
 {
@@ -10,7 +10,7 @@ class FakeHost implements Host
     protected array $filters = [];
 
     public function __construct(
-        protected string $root = '/tmp/sprout-fake-host',
+        protected string $root = '/tmp/parity-fake-host',
         protected bool $debug = false,
         protected bool $autoDiscover = true,
         protected string $hostName = 'laravel',

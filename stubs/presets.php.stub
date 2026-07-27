@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Shared Sprout class maps for ->preset('key').
+ * Shared Parity class maps for ->preset('key').
  *
- * @see https://github.com/adamalexandersson/sprout/blob/main/docs/schema-v1.md
+ * @see https://github.com/adamalexandersson/parity/blob/main/docs/schema-v1.md
  */
 return [
     //

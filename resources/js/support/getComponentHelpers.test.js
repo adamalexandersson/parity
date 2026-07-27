@@ -3,7 +3,7 @@ import { isProduction, missingComponentFallback } from './getComponentHelpers.js
 
 afterEach(() => {
     vi.unstubAllEnvs();
-    delete globalThis.sprout;
+    delete globalThis.parity;
 });
 
 describe('getComponentHelpers', () => {
@@ -25,7 +25,7 @@ describe('getComponentHelpers', () => {
 
     it('treats config.debug as non-production', () => {
         vi.stubEnv('NODE_ENV', 'production');
-        globalThis.sprout = { config: { debug: true } };
+        globalThis.parity = { config: { debug: true } };
 
         expect(isProduction()).toBe(false);
     });

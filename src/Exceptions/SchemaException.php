@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Exceptions;
+namespace Parity\Exceptions;
 
 use RuntimeException;
 

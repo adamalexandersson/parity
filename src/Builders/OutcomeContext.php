@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Builders;
+namespace Parity\Builders;
 
 final class OutcomeContext
 {

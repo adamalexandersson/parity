@@ -1,17 +1,17 @@
 <?php
 
-namespace Sprout\Config;
+namespace Parity\Config;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
-use Sprout\Contracts\Composable;
-use Sprout\Contracts\Host;
-use Sprout\Schema\Version;
+use Parity\Contracts\Composable;
+use Parity\Contracts\Host;
+use Parity\Schema\Version;
 
 class ConfigCollector
 {
-    public const CACHE_KEY = 'sprout.schemas';
+    public const CACHE_KEY = 'parity.schemas';
 
     /** @var array<string, array<string, mixed>> */
     protected array $configs = [];
@@ -189,8 +189,8 @@ class ConfigCollector
     protected function discoverFromFilesystem(?string $path = null, ?string $namespace = null): void
     {
         $this->discovered = true;
-        $path = $path ?? config('sprout.components.path') ?? app_path('View/Components');
-        $namespace = $namespace ?? config('sprout.components.namespace') ?? 'App\\View\\Components';
+        $path = $path ?? config('parity.components.path') ?? app_path('View/Components');
+        $namespace = $namespace ?? config('parity.components.namespace') ?? 'App\\View\\Components';
 
         if (! is_dir($path)) {
             return;

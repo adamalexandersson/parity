@@ -8,7 +8,7 @@ const results = {};
 for (const [name, caseItem] of Object.entries(cases)) {
     const schemaName = caseItem.schema?.name ?? 'component';
 
-    globalThis.sprout = {
+    globalThis.parity = {
         config: {
             ...(caseItem.config ?? {}),
             [schemaName]: caseItem.schema,

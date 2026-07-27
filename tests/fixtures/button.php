@@ -1,7 +1,7 @@
 <?php
 
-use Sprout\Component;
-use Sprout\Node;
+use Parity\Component;
+use Parity\Node;
 
 return Component::make('button', tag: 'button')
     ->linkable('link')

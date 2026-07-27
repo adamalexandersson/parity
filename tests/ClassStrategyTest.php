@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Support\ClassFactory;
-use Sprout\Support\ClassStrategies\PassthroughClassStrategy;
-use Sprout\Support\ClassStrategies\TailwindClassStrategy;
+use Parity\Support\ClassFactory;
+use Parity\Support\ClassStrategies\PassthroughClassStrategy;
+use Parity\Support\ClassStrategies\TailwindClassStrategy;
 
 it('merges conflicting utilities with the tailwind strategy', function () {
     $factory = new ClassFactory(new TailwindClassStrategy);

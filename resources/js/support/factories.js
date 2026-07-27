@@ -13,9 +13,9 @@ function toReactStyleProperty(property) {
 
 function resolveClassStrategy() {
     const root = typeof globalThis !== 'undefined' ? globalThis : {};
-    const sprout = root.window?.sprout ?? root.sprout;
+    const parity = root.window?.parity ?? root.parity;
 
-    return sprout?.config?.classes?.strategy ?? 'tailwind';
+    return parity?.config?.classes?.strategy ?? 'tailwind';
 }
 
 function mergeClasses(existing, value) {

@@ -12,9 +12,9 @@ export default defineConfig({
     build: {
         lib: {
             entry: 'resources/js/runtime.js',
-            name: 'sprout',
+            name: 'parity',
             formats: ['iife'],
-            fileName: () => 'sprout.js',
+            fileName: () => 'parity.js',
         },
         outDir: 'dist',
         emptyOutDir: true,

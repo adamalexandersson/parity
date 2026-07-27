@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Builders;
+namespace Parity\Builders;
 
-use Sprout\Node;
+use Parity\Node;
 
 /**
  * Fluent builder for nested component references.

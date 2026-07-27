@@ -1,8 +1,8 @@
-# Sprout
+# Parity
 
 Schema-driven cross-runtime components for **Laravel Blade** and **WordPress Gutenberg** (via a WordPress host adapter).
 
-Define a component once in PHP. Sprout renders it identically on the front end (Blade) and — on WordPress — in the block editor (`window.sprout`).
+Define a component once in PHP. Parity renders it identically on the front end (Blade) and — on WordPress — in the block editor (`window.parity`).
 
 ## Supported environments
 
@@ -16,21 +16,21 @@ Define a component once in PHP. Sprout renders it identically on the front end (
 ### Laravel
 
 ```bash
-composer require adamalexandersson/sprout
-php artisan vendor:publish --tag=sprout
+composer require adamalexandersson/parity
+php artisan vendor:publish --tag=parity
 ```
 
 Register the provider if your app does not auto-discover packages:
 
 ```php
-Sprout\Providers\SproutServiceProvider::class,
+Parity\Providers\ParityServiceProvider::class,
 ```
 
 ### Sage / Acorn (WordPress)
 
 ```bash
-composer require adamalexandersson/sprout
-wp acorn vendor:publish --tag=sprout
+composer require adamalexandersson/parity
+wp acorn vendor:publish --tag=parity
 ```
 
 Acorn auto-registers the provider via `extra.acorn`. The WordPress host activates when `add_action` exists and boots Gutenberg assets.
@@ -38,14 +38,14 @@ Acorn auto-registers the provider via `extra.acorn`. The WordPress host activate
 Publish config and common maps stub:
 
 ```bash
-wp acorn vendor:publish --tag=sprout
+wp acorn vendor:publish --tag=parity
 ```
 
 ### Gutenberg editor exports (WordPress themes)
 
 ```bash
-wp acorn sprout:manifest
-wp acorn sprout:generate-editor-exports
+wp acorn parity:manifest
+wp acorn parity:generate-editor-exports
 ```
 
 Theme `package.json`:
@@ -53,11 +53,11 @@ Theme `package.json`:
 ```json
 {
   "scripts": {
-    "sprout:manifest": "wp acorn sprout:manifest",
-    "sprout:exports": "wp acorn sprout:generate-editor-exports",
-    "sprout:sync": "npm run sprout:manifest && npm run sprout:exports",
-    "predev": "npm run sprout:sync",
-    "prebuild": "npm run sprout:sync"
+    "parity:manifest": "wp acorn parity:manifest",
+    "parity:exports": "wp acorn parity:generate-editor-exports",
+    "parity:sync": "npm run parity:manifest && npm run parity:exports",
+    "predev": "npm run parity:sync",
+    "prebuild": "npm run parity:sync"
   }
 }
 ```
@@ -65,27 +65,27 @@ Theme `package.json`:
 Vite aliases (see [docs/editor.md](docs/editor.md)):
 
 ```js
-'@sprout/runtime': path.resolve(__dirname, 'vendor/adamalexandersson/sprout/resources/js/editor/runtime.js'),
-'@sprout/components': '/resources/js/sprout/components.js',
+'@parity/runtime': path.resolve(__dirname, 'vendor/adamalexandersson/parity/resources/js/editor/runtime.js'),
+'@parity/components': '/resources/js/parity/components.js',
 ```
 
 ## Theme integration
 
-Sprout auto-discovers components from `app/View/Components` that implement `Sprout\Contracts\Composable` (a static `compose()` method). No theme Blade shell is required for schema-only components — Sprout provides a default wrapper. Override by adding `resources/views/components/{namespace}/{name}.blade.php` when needed.
+Parity auto-discovers components from `app/View/Components` that implement `Parity\Contracts\Composable` (a static `compose()` method). No theme Blade shell is required for schema-only components — Parity provides a default wrapper. Override by adding `resources/views/components/{namespace}/{name}.blade.php` when needed.
 
-Extend Sprout from any service provider that boots with your theme — for example an integration `Init.php` or `AppServiceProvider`:
+Extend Parity from any service provider that boots with your theme — for example an integration `Init.php` or `AppServiceProvider`:
 
 ```php
-use Sprout\Facades\Sprout;
+use Parity\Facades\Parity;
 
 public function boot(): void
 {
-    Sprout::transforms()->register('imageUrl', function ($value) {
+    Parity::transforms()->register('imageUrl', function ($value) {
         return is_numeric($value) ? wp_get_attachment_url((int) $value) : $value;
     });
 
     // WordPress only — applied by the WordPress host
-    add_filter('sprout/editor/config', function (array $config) {
+    add_filter('parity/editor/config', function (array $config) {
         return array_merge($config, [
             'icons' => [],
         ]);
@@ -93,35 +93,35 @@ public function boot(): void
 }
 ```
 
-Shared Tailwind class maps for `->preset('cols')` live in `config/sprout/presets.php` (`config('sprout.presets')`).
+Shared Tailwind class maps for `->preset('cols')` live in `config/parity/presets.php` (`config('parity.presets')`).
 
 Class composition defaults to Tailwind Merge (`gehrisandro/tailwind-merge-php`, suggested). Install that package when using the default strategy, or switch to passthrough (concatenate + dedupe):
 
 ```php
-// config/sprout.php
+// config/parity.php
 'classes' => [
     'strategy' => 'passthrough', // or 'tailwind'
 ],
 ```
 
-The editor runtime bundles `tailwind-merge` into `dist/sprout.js`, so the JS side always has conflict resolution when strategy is `tailwind`.
+The editor runtime bundles `tailwind-merge` into `dist/parity.js`, so the JS side always has conflict resolution when strategy is `tailwind`.
 
-Mapped icon nodes that call `@svg()` require optional [`blade-ui-kit/blade-icons`](https://github.com/blade-ui-kit/blade-icons). Without it, Sprout still renders the mapped dynamic component; outside production it throws naming the missing package, and in production it skips the SVG child.
+Mapped icon nodes that call `@svg()` require optional [`blade-ui-kit/blade-icons`](https://github.com/blade-ui-kit/blade-icons). Without it, Parity still renders the mapped dynamic component; outside production it throws naming the missing package, and in production it skips the SVG child.
 
-Force a host with `SPROUT_HOST=laravel` or `SPROUT_HOST=wordpress` (default: auto-detect).
+Force a host with `PARITY_HOST=laravel` or `PARITY_HOST=wordpress` (default: auto-detect).
 
 ## Author a component
 
-Extend `Sprout\View\Component` (or use `ComposesMarkup` and implement `Composable`). Composition boots lazily — no `parent::__construct(...func_get_args())`.
+Extend `Parity\View\Component` (or use `ComposesMarkup` and implement `Composable`). Composition boots lazily — no `parent::__construct(...func_get_args())`.
 
 ```php
 namespace App\View\Components\Ui;
 
-use Sprout\Component;
-use Sprout\Node;
-use Sprout\View\Component as SproutComponent;
+use Parity\Component;
+use Parity\Node;
+use Parity\View\Component as ParityComponent;
 
-class Button extends SproutComponent
+class Button extends ParityComponent
 {
     public function __construct(
         public string $size = 'md',
@@ -163,10 +163,10 @@ Front end:
 See [docs/schema-v1.md](docs/schema-v1.md) for `preset()`, `token()`, nested `component()`, `when`/`unless` vs `visible`/`hidden`, and always-on `{name}` ID interpolation.
 ## Use in a Gutenberg block
 
-Declare `sprout` as a script dependency:
+Declare `parity` as a script dependency:
 
 ```jsx
-import { Button } from '@sprout/components';
+import { Button } from '@parity/components';
 
 export default function Edit({ attributes, setAttributes }) {
     return (
@@ -175,25 +175,25 @@ export default function Edit({ attributes, setAttributes }) {
 }
 ```
 
-Sprout auto-enqueues the precompiled editor bundle and injects `window.sprout.config` with your component schemas.
+Parity auto-enqueues the precompiled editor bundle and injects `window.parity.config` with your component schemas.
 
 ## Commands
 
 ```bash
-wp acorn sprout:make Button --ui
-wp acorn sprout:manifest
-wp acorn sprout:generate-editor-exports
-wp acorn sprout:safelist
-wp acorn sprout:cache
-wp acorn sprout:clear
-wp acorn sprout:doctor
+wp acorn parity:make Button --ui
+wp acorn parity:manifest
+wp acorn parity:generate-editor-exports
+wp acorn parity:safelist
+wp acorn parity:cache
+wp acorn parity:clear
+wp acorn parity:doctor
 ```
 
 On plain Laravel, use `php artisan` instead of `wp acorn`.
 
 ## Schema version
 
-Sprout uses schema version **1.0**. Every serialized component includes `schemaVersion: "1.0"`. The editor runtime warns when versions mismatch.
+Parity uses schema version **1.0**. Every serialized component includes `schemaVersion: "1.0"`. The editor runtime warns when versions mismatch.
 
 See [docs/schema-v1.md](docs/schema-v1.md) for the full schema reference and [docs/editor.md](docs/editor.md) for Gutenberg/manifest details.
 
@@ -207,11 +207,11 @@ composer test
 composer analyse
 ```
 
-The compiled bundle is written to `dist/sprout.js` and shipped with the Composer package.
+The compiled bundle is written to `dist/parity.js` and shipped with the Composer package.
 
 ## Escape hatch
 
-Prefer schema attributes (including Alpine helpers) for interactive markup. For exceptional cases only — register a hand-written React component via `window.sprout.registerComponent('name', MyComponent)`, or add a theme Blade shell override when the schema cannot express a dynamic loop. Called with only a name, `registerComponent` builds the usual schema-driven wrapper.
+Prefer schema attributes (including Alpine helpers) for interactive markup. For exceptional cases only — register a hand-written React component via `window.parity.registerComponent('name', MyComponent)`, or add a theme Blade shell override when the schema cannot express a dynamic loop. Called with only a name, `registerComponent` builds the usual schema-driven wrapper.
 
 ## License
 

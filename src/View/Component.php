@@ -1,10 +1,10 @@
 <?php
 
-namespace Sprout\View;
+namespace Parity\View;
 
 use Illuminate\View\Component as BladeComponent;
-use Sprout\Concerns\ComposesMarkup;
-use Sprout\Contracts\Composable;
+use Parity\Concerns\ComposesMarkup;
+use Parity\Contracts\Composable;
 
 /**
  * Thin convenience base for the common case.

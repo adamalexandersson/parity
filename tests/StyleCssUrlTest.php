@@ -1,7 +1,7 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 it('wraps a resolved background image url in css url()', function () {
     $transforms = new TransformRegistry;

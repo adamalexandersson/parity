@@ -1,6 +1,6 @@
-# Sprout schema v1.0
+# Parity schema v1.0
 
-Machine-readable contract: [`resources/schema/component.schema.json`](../resources/schema/component.schema.json) (used by `sprout:doctor` and parity coverage).
+Machine-readable contract: [`resources/schema/component.schema.json`](../resources/schema/component.schema.json) (used by `parity:doctor` and parity coverage).
 
 Every component schema includes:
 
@@ -40,16 +40,16 @@ Serialized keys that stay stable across the authoring rename: `defaultSlot`, `na
 
 ## Authoring API
 
-Components implement `Sprout\Contracts\Composable` (usually by extending `Sprout\View\Component`, which uses the `ComposesMarkup` trait):
+Components implement `Parity\Contracts\Composable` (usually by extending `Parity\View\Component`, which uses the `ComposesMarkup` trait):
 
 ```php
 namespace App\View\Components\Ui;
 
-use Sprout\Component;
-use Sprout\Node;
-use Sprout\View\Component as SproutComponent;
+use Parity\Component;
+use Parity\Node;
+use Parity\View\Component as ParityComponent;
 
-class Button extends SproutComponent
+class Button extends ParityComponent
 {
     public function __construct(
         public string $size = 'md',
@@ -82,7 +82,7 @@ class Button extends SproutComponent
 | `prepare()` | Optional instance hook after schema load, before attributes/structure build |
 | `ComposesMarkup` / `Composable` | Lazy boot from `data()` / `render()` — no `parent::__construct(...func_get_args())` |
 
-Discovery finds classes that implement `Composable` under `config('sprout.components')`. Call `sprout:doctor` to flag pre-Phase-2 names (`schema()`, `initialize()`, `includeCommon()`, …).
+Discovery finds classes that implement `Composable` under `config('parity.components')`. Call `parity:doctor` to flag pre-Phase-2 names (`schema()`, `initialize()`, `includeCommon()`, …).
 
 ### Boot lifecycle
 
@@ -213,7 +213,7 @@ Serializes as a nested object (not flat `componentRef` keys):
 
 Omit `from` / `map` for a fixed ref; omit `class` / `props` when unused.
 
-Mapped icon names can render via Blade Icons (`@svg()`). That path is optional: install `blade-ui-kit/blade-icons` when you need SVG mapping. Without it, Sprout still renders the mapped dynamic component wrapper; outside production it throws a clear exception naming the missing package, and in production it skips the `@svg()` child.
+Mapped icon names can render via Blade Icons (`@svg()`). That path is optional: install `blade-ui-kit/blade-icons` when you need SVG mapping. Without it, Parity still renders the mapped dynamic component wrapper; outside production it throws a clear exception naming the missing package, and in production it skips the `@svg()` child.
 
 ## Style casts
 
@@ -230,7 +230,7 @@ For CSS properties that require `url(...)`, chain `->asCssUrl()` after the sourc
     ->end()
 ```
 
-Register theme-specific transforms (e.g. `imageUrl` for attachment IDs) via `Sprout::transforms()->register()`. Use `cssUrl` only for the final CSS wrapper — not inside custom transforms.
+Register theme-specific transforms (e.g. `imageUrl` for attachment IDs) via `Parity::transforms()->register()`. Use `cssUrl` only for the final CSS wrapper — not inside custom transforms.
 
 ## Slots
 
@@ -257,10 +257,10 @@ Every component schema includes a `namedSlots` array auto-collected from the str
 
 ## Presets
 
-Reference shared class maps from `config('sprout.presets')` (published as `config/sprout/presets.php`):
+Reference shared class maps from `config('parity.presets')` (published as `config/parity/presets.php`):
 
 ```php
-use Sprout\Builders\ConditionBuilder;
+use Parity\Builders\ConditionBuilder;
 
 Component::make('container')
     ->preset('verticalSpacing', condition: ConditionBuilder::notEquals('noVerticalSpacing', true)->toArray())
@@ -323,7 +323,7 @@ Component::make('accordion', tag: 'div')
 
 Full-form only: `@click` is rejected by `AttributeFactory` (invalid attribute name). Prefer `x-on:*` and `x-bind:*` over Alpine bind shorthand (`:class`); the editor may still emit `:…` when `editor.alpine` is `emit`.
 
-In the Gutenberg canvas, Alpine attributes are **suppressed by default** (`config('sprout.editor.alpine')` / `window.sprout.config.editor.alpine` = `suppress`). Themes that boot Alpine in the editor iframe should set `emit` so directives reach the DOM. Blade output is never stripped. See [`docs/editor.md`](editor.md).
+In the Gutenberg canvas, Alpine attributes are **suppressed by default** (`config('parity.editor.alpine')` / `window.parity.config.editor.alpine` = `suppress`). Themes that boot Alpine in the editor iframe should set `emit` so directives reach the DOM. Blade output is never stripped. See [`docs/editor.md`](editor.md).
 
 ## Unique IDs and accessibility
 
@@ -351,7 +351,7 @@ Schema shape:
 { "name": "aria-controls", "idRef": "panel" }
 ```
 
-IDs render as `sprout-{instanceKey}-{name}`. Prefer an explicit `instanceId` (or `id`) prop for stable output across Blade and the editor; otherwise Sprout fingerprints scalar props. Pass a fixed `instanceId` in parity tests.
+IDs render as `parity-{instanceKey}-{name}`. Prefer an explicit `instanceId` (or `id`) prop for stable output across Blade and the editor; otherwise Parity fingerprints scalar props. Pass a fixed `instanceId` in parity tests.
 
 ## Boolean attributes and React mapping
 
@@ -379,7 +379,7 @@ Props are normalized before comparison so PHP, Blade, and the editor stay in syn
 
 ## Theme blade views (optional)
 
-Schema-only components do **not** require a theme Blade file. When no view exists at `resources/views/components/{namespace}/{name}.blade.php`, Sprout renders the built-in shell (`Sprout::shell`). Void root tags omit the closing tag.
+Schema-only components do **not** require a theme Blade file. When no view exists at `resources/views/components/{namespace}/{name}.blade.php`, Parity renders the built-in shell (`Parity::shell`). Void root tags omit the closing tag.
 
 Variables available in the default shell:
 
@@ -391,15 +391,15 @@ Variables available in the default shell:
 | `$content` | Rendered structure tree (components with `children`) |
 | `$slot` | Default slot content (slot-only components like Heading) |
 
-**Override:** Create a theme blade at the path above to replace the default shell. Sprout detects it automatically — no PHP changes needed. Prefer schema attributes (including Alpine helpers) for structure and behavior. Use overrides only for exceptional cases — dynamic loops the schema cannot express yet, or a full custom shell.
+**Override:** Create a theme blade at the path above to replace the default shell. Parity detects it automatically — no PHP changes needed. Prefer schema attributes (including Alpine helpers) for structure and behavior. Use overrides only for exceptional cases — dynamic loops the schema cannot express yet, or a full custom shell.
 
-Configure the fallback view via `config('sprout.shell_view')` (default: `Sprout::shell`).
+Configure the fallback view via `config('parity.shell_view')` (default: `Parity::shell`).
 
 ## Node helpers
 
 - `->slot()` / `->slot('name')` — default or named slot holder (`defaultSlot` / `namedSlots` derived on serialize)
 - `->component('x')->from()->map()->class()->props()->end()` — nested / mapped child component
-- `->preset('cols')` — shared class map from `config('sprout.presets')`
+- `->preset('cols')` — shared class map from `config('parity.presets')`
 - `->token('group', 'name')` — token class rule (`mode: "token"`)
 - `->uniqueId('panel')` — set this node's `id` from a generated unique ID
 - `->attr('for')->idRef('field')->end()` — reference a generated unique ID
@@ -414,11 +414,11 @@ Representative fixtures under `tests/fixtures/html-compositions.php` cover forms
 
 ## Errors and debug DX
 
-When `app.debug` / `sprout.editor.debug` is on (PHP), or `window.sprout.config.debug` is on (editor), unknown match outcome types throw `Sprout\Exceptions\SchemaException` (component + path in the message). The editor `createComponent` path catches render errors and shows an in-block alert panel in debug mode instead of only logging to the console. Unclosed builders fail at `toSchema()` with the open builder names.
+When `app.debug` / `parity.editor.debug` is on (PHP), or `window.parity.config.debug` is on (editor), unknown match outcome types throw `Parity\Exceptions\SchemaException` (component + path in the message). The editor `createComponent` path catches render errors and shows an in-block alert panel in debug mode instead of only logging to the console. Unclosed builders fail at `toSchema()` with the open builder names.
 
 ## Slot resolution
 
-Default and named slot insertion is handled by `Sprout\Render\SlotResolver` (PHP), `resources/js/render/slotResolver.js` (editor), and `structure.blade.php` (frontend). All three share the same rules:
+Default and named slot insertion is handled by `Parity\Render\SlotResolver` (PHP), `resources/js/render/slotResolver.js` (editor), and `structure.blade.php` (frontend). All three share the same rules:
 
 - A node is a default-slot target when `shouldRenderDefaultSlot()` is true: it matches `defaultSlot` (by path or key, or `slot.default`), has **no structure children**, and is not a RichText node.
 - Empty structure children (`[]` / `{}`) must **not** block slot rendering — only nodes with actual child elements in the schema tree count as having structure children.

@@ -34,9 +34,9 @@ jobs:
 
             - name: Create release archive
               run: |
-                  git archive --format=zip HEAD -o sprout.zip
-                  zip -ur sprout.zip dist/
+                  git archive --format=zip HEAD -o parity.zip
+                  zip -ur parity.zip dist/
 
             - uses: softprops/action-gh-release@v2
               with:
-                  files: sprout.zip
+                  files: parity.zip

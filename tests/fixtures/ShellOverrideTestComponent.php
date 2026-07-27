@@ -1,12 +1,12 @@
 <?php
 
-namespace Sprout\Tests\Fixtures;
+namespace Parity\Tests\Fixtures;
 
-use Sprout\Component;
-use Sprout\Node;
-use Sprout\View\Component as SproutComponent;
+use Parity\Component;
+use Parity\Node;
+use Parity\View\Component as ParityComponent;
 
-class ShellOverrideTestComponent extends SproutComponent
+class ShellOverrideTestComponent extends ParityComponent
 {
     /** @return array<string, mixed> */
     public static function compose(): array

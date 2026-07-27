@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { SchemaRenderer } from './schemaRenderer.js';
 
 beforeEach(() => {
-    globalThis.sprout = {
+    globalThis.parity = {
         config: {
             tokens: {
                 gap: { md: 'gap-4' },
@@ -139,8 +139,8 @@ describe('SchemaRenderer conditions', () => {
 
         expect(attrs.className).toContain('hit');
         expect(attrs.className).toContain('empty-hit');
-        expect(structure.field.attributes.id).toBe('sprout-x-field');
-        expect(structure.label.attributes.for).toBe('sprout-x-field');
-        expect(structure.field.attributes['aria-labelledby']).toBe('sprout-x-label');
+        expect(structure.field.attributes.id).toBe('parity-x-field');
+        expect(structure.label.attributes.for).toBe('parity-x-field');
+        expect(structure.field.attributes['aria-labelledby']).toBe('parity-x-label');
     });
 });

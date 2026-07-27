@@ -1,13 +1,13 @@
 <?php
 
-namespace Sprout;
+namespace Parity;
 
 use Illuminate\Contracts\Foundation\Application;
-use Sprout\Config\ConfigCollector;
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Config\ConfigCollector;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
-class Sprout
+class Parity
 {
     public function __construct(
         protected Application $app,
@@ -36,8 +36,8 @@ class Sprout
     public function rediscoverComponents(): void
     {
         $this->collector()->rediscover(
-            config('sprout.components.path'),
-            config('sprout.components.namespace'),
+            config('parity.components.path'),
+            config('parity.components.namespace'),
         );
     }
 }

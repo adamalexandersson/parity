@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Support;
+namespace Parity\Support;
 
-use Sprout\Exceptions\SchemaException;
+use Parity\Exceptions\SchemaException;
 
 final class IdInterpolator
 {

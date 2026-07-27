@@ -6,15 +6,15 @@ import { registerIconResolver } from './support/iconResolver.js';
 
 const registry = {};
 
-function getSproutConfig() {
+function getParityConfig() {
     const root = typeof globalThis !== 'undefined' ? globalThis : {};
-    const sprout = root.window?.sprout ?? root.sprout;
+    const parity = root.window?.parity ?? root.parity;
 
-    return sprout?.config ?? {};
+    return parity?.config ?? {};
 }
 
 function bootstrapComponents() {
-    const configs = getSproutConfig();
+    const configs = getParityConfig();
 
     Object.keys(configs).forEach((name) => {
         if (['presets', 'schemaVersion', 'tokens', 'classes', 'debug', 'editor'].includes(name)) {
@@ -27,7 +27,7 @@ function bootstrapComponents() {
     });
 }
 
-const config = getSproutConfig();
+const config = getParityConfig();
 
 bootstrapComponents();
 
@@ -36,7 +36,7 @@ function getComponent(name) {
         return registry[name];
     }
 
-    const componentConfig = getSproutConfig()[name];
+    const componentConfig = getParityConfig()[name];
 
     if (componentConfig && typeof componentConfig === 'object' && componentConfig.schemaVersion) {
         return registerComponent(name, null, registry);
@@ -46,9 +46,9 @@ function getComponent(name) {
 }
 
 const root = typeof globalThis !== 'undefined' ? globalThis : {};
-const previous = root.sprout && typeof root.sprout === 'object' ? root.sprout : {};
+const previous = root.parity && typeof root.parity === 'object' ? root.parity : {};
 
-root.sprout = {
+root.parity = {
     ...previous,
     version: SCHEMA_VERSION,
     config,
@@ -61,7 +61,7 @@ root.sprout = {
 };
 
 if (typeof window !== 'undefined') {
-    window.sprout = root.sprout;
+    window.parity = root.parity;
 }
 
-export default root.sprout;
+export default root.parity;

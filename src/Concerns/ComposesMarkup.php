@@ -1,20 +1,20 @@
 <?php
 
-namespace Sprout\Concerns;
+namespace Parity\Concerns;
 
 use Illuminate\Contracts\Support\Htmlable;
-use Sprout\Config\ConfigCollector;
-use Sprout\Render\SchemaRenderer;
-use Sprout\Schema\SlotCollector;
+use Parity\Config\ConfigCollector;
+use Parity\Render\SchemaRenderer;
+use Parity\Schema\SlotCollector;
 
 /**
  * Schema-driven markup composition for Blade components.
  *
- * Classes using this trait must implement {@see \Sprout\Contracts\Composable}.
+ * Classes using this trait must implement {@see \Parity\Contracts\Composable}.
  *
  * @method static array compose()
  *
- * @phpstan-require-implements \Sprout\Contracts\Composable
+ * @phpstan-require-implements \Parity\Contracts\Composable
  */
 trait ComposesMarkup
 {
@@ -178,7 +178,7 @@ trait ComposesMarkup
     {
         $namedSlots = $this->resolveNamedSlots($data);
 
-        return view('Sprout::structure', [
+        return view('Parity::structure', [
             'structure' => $this->structure,
             'slotElement' => $this->slotElement,
             'slot' => $data['slot'] ?? null,
@@ -220,7 +220,7 @@ trait ComposesMarkup
 
     protected function resolveShellViewPath(): string
     {
-        return config('sprout.shell_view', 'Sprout::shell');
+        return config('parity.shell_view', 'Parity::shell');
     }
 
     /** @param array<string, mixed> $data */

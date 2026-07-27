@@ -1,6 +1,6 @@
 <?php
 
-use Sprout\Schema\SchemaValidator;
+use Parity\Schema\SchemaValidator;
 
 /**
  * @return array<string, array<string, bool>>

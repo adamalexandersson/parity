@@ -1,23 +1,23 @@
 <?php
 
-namespace Sprout\Console;
+namespace Parity\Console;
 
 use Illuminate\Console\Command;
-use Sprout\Config\ConfigCollector;
+use Parity\Config\ConfigCollector;
 
 class CacheCommand extends Command
 {
-    protected $signature = 'sprout:cache';
+    protected $signature = 'parity:cache';
 
-    protected $description = 'Cache discovered Sprout component schemas';
+    protected $description = 'Cache discovered Parity component schemas';
 
     public function handle(ConfigCollector $collector): int
     {
-        app('sprout')->rediscoverComponents();
+        app('parity')->rediscoverComponents();
         $collector->writeCache();
 
         $count = count($collector->all());
-        $this->components->info("Sprout schemas cached ({$count} components).");
+        $this->components->info("Parity schemas cached ({$count} components).");
 
         return self::SUCCESS;
     }

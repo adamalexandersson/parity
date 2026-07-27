@@ -1,145 +1,145 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Property Sprout\\Builders\\AttrBuilder\:\:\$condition type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Builders\\AttrBuilder\:\:\$condition type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Builders/AttrBuilder.php
 
 		-
-			message: '#^Method Sprout\\Builders\\ConditionBuilder\:\:in\(\) has parameter \$value with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Builders\\ConditionBuilder\:\:in\(\) has parameter \$value with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Builders/ConditionBuilder.php
 
 		-
-			message: '#^Method Sprout\\Builders\\ConditionBuilder\:\:notIn\(\) has parameter \$value with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Builders\\ConditionBuilder\:\:notIn\(\) has parameter \$value with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Builders/ConditionBuilder.php
 
 		-
-			message: '#^Method Sprout\\Builders\\ConditionBuilder\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Builders\\ConditionBuilder\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Builders/ConditionBuilder.php
 
 		-
-			message: '#^Method Sprout\\Builders\\MatchBuilder\:\:__construct\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Builders\\MatchBuilder\:\:__construct\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Builders/MatchBuilder.php
 
 		-
-			message: '#^Property Sprout\\Builders\\MatchBuilder\:\:\$condition type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Builders\\MatchBuilder\:\:\$condition type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Builders/MatchBuilder.php
 
 		-
-			message: '#^Property Sprout\\Builders\\StyleBuilder\:\:\$condition type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Builders\\StyleBuilder\:\:\$condition type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Builders/StyleBuilder.php
 
 		-
-			message: '#^Method Sprout\\Component\:\:toSchema\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Component\:\:toSchema\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Component.php
 
 		-
-			message: '#^Property Sprout\\Component\:\:\$linkable type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Component\:\:\$linkable type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Component.php
 
 		-
-			message: '#^Method Sprout\\Config\\ConfigCollector\:\:get\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Config\\ConfigCollector\:\:get\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Config/ConfigCollector.php
 
 		-
-			message: '#^Method Sprout\\Config\\ConfigCollector\:\:register\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Config\\ConfigCollector\:\:register\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Config/ConfigCollector.php
 
 		-
-			message: '#^Method Sprout\\Console\\SafelistCommand\:\:extractFromSchema\(\) has parameter \$classes with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Console\\SafelistCommand\:\:extractFromSchema\(\) has parameter \$classes with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Console/SafelistCommand.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:attrs\(\) has parameter \$attributes with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:attrs\(\) has parameter \$attributes with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:component\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:component\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:includeCommon\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:includeCommon\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:mappedComponent\(\) has parameter \$map with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:mappedComponent\(\) has parameter \$map with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:pushAttribute\(\) has parameter \$attribute with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:pushAttribute\(\) has parameter \$attribute with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:pushMatch\(\) has parameter \$match with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:pushMatch\(\) has parameter \$match with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:pushStyle\(\) has parameter \$style with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:pushStyle\(\) has parameter \$style with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:richText\(\) has parameter \$allowedFormats with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:richText\(\) has parameter \$allowedFormats with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Node\:\:toSchema\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Node\:\:toSchema\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Property Sprout\\Node\:\:\$hidden type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Node\:\:\$hidden type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Property Sprout\\Node\:\:\$richText type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Node\:\:\$richText type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
 
 		-
-			message: '#^Property Sprout\\Node\:\:\$visible type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Node\:\:\$visible type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Node.php
@@ -151,199 +151,199 @@ parameters:
 			path: src/Node.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:applyAttributes\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyAttributes\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:applyClassRules\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyClassRules\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:applyCommonMatch\(\) has parameter \$match with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyCommonMatch\(\) has parameter \$match with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:applyCommonMatch\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyCommonMatch\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:applyMatches\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyMatches\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:applyStyles\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:applyStyles\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:evaluateAllCondition\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:evaluateAllCondition\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:evaluateAnyCondition\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:evaluateAnyCondition\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:evaluateCondition\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:evaluateCondition\(\) has parameter \$condition with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:findMatchCase\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:findMatchCase\(\) has parameter \$values with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:findMatchCase\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:findMatchCase\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:lookupValue\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:lookupValue\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:renderComponentAttributes\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:renderComponentAttributes\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:renderComponentAttributes\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:renderComponentAttributes\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:renderNode\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:renderNode\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:renderNode\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:renderNode\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:renderStructure\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:renderStructure\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:renderStructure\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:renderStructure\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SchemaRenderer\:\:shouldRenderNode\(\) has parameter \$props with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SchemaRenderer\:\:shouldRenderNode\(\) has parameter \$props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SchemaRenderer.php
 
 		-
-			message: '#^Method Sprout\\Render\\SlotResolver\:\:shouldSkipNamedSlotNode\(\) has parameter \$namedSlotProps with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Render\\SlotResolver\:\:shouldSkipNamedSlotNode\(\) has parameter \$namedSlotProps with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Render/SlotResolver.php
 
 		-
-			message: '#^Method Sprout\\Schema\\SlotCollector\:\:collect\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Schema\\SlotCollector\:\:collect\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Schema/SlotCollector.php
 
 		-
-			message: '#^Method Sprout\\Schema\\SlotCollector\:\:walk\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Schema\\SlotCollector\:\:walk\(\) has parameter \$schema with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Schema/SlotCollector.php
 
 		-
-			message: '#^Method Sprout\\Support\\AttributeFactory\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Support\\AttributeFactory\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Support/AttributeFactory.php
 
 		-
-			message: '#^Property Sprout\\Support\\AttributeFactory\:\:\$attributes type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Support\\AttributeFactory\:\:\$attributes type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Support/AttributeFactory.php
 
 		-
-			message: '#^Method Sprout\\Support\\ClassFactory\:\:add\(\) has parameter \$class with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Support\\ClassFactory\:\:add\(\) has parameter \$class with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Support/ClassFactory.php
 
 		-
-			message: '#^Method Sprout\\Support\\ClassFactory\:\:apply\(\) has parameter \$class with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Support\\ClassFactory\:\:apply\(\) has parameter \$class with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Support/ClassFactory.php
 
 		-
-			message: '#^Property Sprout\\Support\\ClassFactory\:\:\$classes type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Support\\ClassFactory\:\:\$classes type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Support/ClassFactory.php
 
 		-
-			message: '#^Method Sprout\\Support\\InlineStyleFactory\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\Support\\InlineStyleFactory\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Support/InlineStyleFactory.php
 
 		-
-			message: '#^Property Sprout\\Support\\InlineStyleFactory\:\:\$styles type has no value type specified in iterable type array\.$#'
+			message: '#^Property Parity\\Support\\InlineStyleFactory\:\:\$styles type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Support/InlineStyleFactory.php
 
 		-
-			message: '#^Method Sprout\\View\\Component\:\:__construct\(\) has parameter \$args with no type specified\.$#'
+			message: '#^Method Parity\\View\\Component\:\:__construct\(\) has parameter \$args with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: src/View/Component.php
 
 		-
-			message: '#^Method Sprout\\View\\Component\:\:initialize\(\) has parameter \$args with no type specified\.$#'
+			message: '#^Method Parity\\View\\Component\:\:initialize\(\) has parameter \$args with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: src/View/Component.php
 
 		-
-			message: '#^Method Sprout\\View\\Component\:\:resolveNamedSlots\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\View\\Component\:\:resolveNamedSlots\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/View/Component.php
 
 		-
-			message: '#^Method Sprout\\View\\Component\:\:shouldRenderElement\(\) has parameter \$structure with no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\View\\Component\:\:shouldRenderElement\(\) has parameter \$structure with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/View/Component.php
@@ -379,7 +379,7 @@ parameters:
 			path: src/WordPress/EditorAssets.php
 
 		-
-			message: '#^Method Sprout\\WordPress\\EditorAssets\:\:injectIframeConfig\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Parity\\WordPress\\EditorAssets\:\:injectIframeConfig\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/WordPress/EditorAssets.php

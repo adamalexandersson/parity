@@ -1,24 +1,24 @@
 <?php
 
-namespace Sprout\Console;
+namespace Parity\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Sprout\Config\ConfigCollector;
-use Sprout\Contracts\Host;
-use Sprout\Editor\EditorConfigBuilder;
-use Sprout\Schema\SchemaValidator;
-use Sprout\Schema\Version;
+use Parity\Config\ConfigCollector;
+use Parity\Contracts\Host;
+use Parity\Editor\EditorConfigBuilder;
+use Parity\Schema\SchemaValidator;
+use Parity\Schema\Version;
 
 class DoctorCommand extends Command
 {
-    protected $signature = 'sprout:doctor';
+    protected $signature = 'parity:doctor';
 
-    protected $description = 'Validate Sprout schemas and report issues';
+    protected $description = 'Validate Parity schemas and report issues';
 
     public function handle(ConfigCollector $collector, Host $host): int
     {
-        app('sprout')->rediscoverComponents();
+        app('parity')->rediscoverComponents();
         $issues = 0;
         $validator = new SchemaValidator;
 
@@ -52,7 +52,7 @@ class DoctorCommand extends Command
         $issues += $this->checkLegacySchemaKeys($collector);
 
         if ($issues === 0) {
-            $this->components->info('All Sprout schemas look good.');
+            $this->components->info('All Parity schemas look good.');
         } else {
             $this->components->error("Found {$issues} issue(s).");
         }
@@ -178,7 +178,7 @@ class DoctorCommand extends Command
 
     protected function checkManifestDrift(ConfigCollector $collector, Host $host): int
     {
-        $manifestRelative = config('sprout.editor.manifest_path', 'resources/js/sprout/manifest.json');
+        $manifestRelative = config('parity.editor.manifest_path', 'resources/js/parity/manifest.json');
         $manifestPath = $host->path($manifestRelative);
 
         if (! File::exists($manifestPath)) {
@@ -212,14 +212,14 @@ class DoctorCommand extends Command
 
         foreach (array_keys($discovered) as $slug) {
             if (! array_key_exists($slug, $manifestComponents)) {
-                $this->components->warn("[manifest] missing discovered component \"{$slug}\". Run sprout:manifest.");
+                $this->components->warn("[manifest] missing discovered component \"{$slug}\". Run parity:manifest.");
                 $issues++;
             }
         }
 
         foreach (array_keys($manifestComponents) as $slug) {
             if (! array_key_exists($slug, $discovered)) {
-                $this->components->warn("[manifest] lists unknown component \"{$slug}\". Run sprout:manifest.");
+                $this->components->warn("[manifest] lists unknown component \"{$slug}\". Run parity:manifest.");
                 $issues++;
             }
         }
@@ -250,7 +250,7 @@ class DoctorCommand extends Command
             json_encode($freshSchemas) !== json_encode($cachedSchemas)
             || json_encode($freshClasses) !== json_encode($cachedClasses)
         ) {
-            $this->components->warn('[cache] sprout.schemas is stale. Run sprout:cache or sprout:clear.');
+            $this->components->warn('[cache] parity.schemas is stale. Run parity:cache or parity:clear.');
 
             return 1;
         }

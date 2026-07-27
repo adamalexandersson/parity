@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Contracts\Host;
-use Sprout\Host\LaravelHost;
-use Sprout\Providers\WordPressServiceProvider;
+use Parity\Contracts\Host;
+use Parity\Host\LaravelHost;
+use Parity\Providers\WordPressServiceProvider;
 
 it('binds the laravel host outside wordpress', function () {
     expect(app(Host::class))->toBeInstanceOf(LaravelHost::class)

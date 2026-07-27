@@ -1,9 +1,9 @@
 <?php
 
-use Sprout\Component;
-use Sprout\Node;
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Component;
+use Parity\Node;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 it('serializes alpine helpers and interpolates id placeholders', function () {
     $schema = Component::make('alpine-demo', tag: 'div')
@@ -29,12 +29,12 @@ it('serializes alpine helpers and interpolates id placeholders', function () {
     $root = $renderer->renderComponentAttributes($schema, $props, 'alpine-demo');
     $structure = $renderer->renderStructure($schema, $props, 'alpine-demo');
 
-    expect($root['id'])->toBe('sprout-demo-root')
+    expect($root['id'])->toBe('parity-demo-root')
         ->and($root['x-data'])->toBe('accordion({ single: true })')
-        ->and($root['x-init'])->toBe("init('sprout-demo-root')")
-        ->and($structure['trigger']['attributes']['aria-controls'])->toBe('sprout-demo-panel')
-        ->and($structure['trigger']['attributes']['x-on:click'])->toBe("toggle('sprout-demo-panel')")
-        ->and($structure['panel']['attributes']['x-show'])->toBe("isOpen('sprout-demo-panel')")
+        ->and($root['x-init'])->toBe("init('parity-demo-root')")
+        ->and($structure['trigger']['attributes']['aria-controls'])->toBe('parity-demo-panel')
+        ->and($structure['trigger']['attributes']['x-on:click'])->toBe("toggle('parity-demo-panel')")
+        ->and($structure['panel']['attributes']['x-show'])->toBe("isOpen('parity-demo-panel')")
         ->and($structure['panel']['attributes']['x-cloak'])->toBeTrue();
 });
 
@@ -43,6 +43,6 @@ it('resolves placeholders from the alpine accordion fixture', function () {
     $renderer = new SchemaRenderer(new TransformRegistry);
     $structure = $renderer->renderStructure($schema, ['instanceId' => 'fix'], 'alpine-accordion');
 
-    expect($structure['trigger']['attributes']['x-on:click'])->toBe("toggle('sprout-fix-panel')")
-        ->and($structure['panel']['attributes']['id'])->toBe('sprout-fix-panel');
+    expect($structure['trigger']['attributes']['x-on:click'])->toBe("toggle('parity-fix-panel')")
+        ->and($structure['panel']['attributes']['id'])->toBe('parity-fix-panel');
 });

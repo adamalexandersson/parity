@@ -1,6 +1,6 @@
 <?php
 
-use Sprout\Support\AttributeFactory;
+use Parity\Support\AttributeFactory;
 
 it('accepts safe attribute names', function () {
     expect(AttributeFactory::isValidName('href'))->toBeTrue()

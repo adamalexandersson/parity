@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Registries;
+namespace Parity\Registries;
 
-use Sprout\Contracts\Host;
+use Parity\Contracts\Host;
 
 class TransformRegistry
 {

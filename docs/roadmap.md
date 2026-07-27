@@ -4,7 +4,7 @@ Working plan toward a production-ready 1.0 on Packagist, and beyond.
 
 The single promise is that **a component defined once in PHP renders identically on the front end (Blade) and in the Gutenberg editor (React)**. Every item below is justified by either protecting that promise, removing a reason to work around it, or making the package trustworthy enough for others to adopt.
 
-> **Naming.** The package ships today as `adamalexandersson/sprout` with the `Sprout\` namespace. It is being renamed to **Parity** before 1.0 ([D2](#d2-package-name-and-brand--resolved-rename-to-parity), [Phase 3](#phase-3--rename-to-parity)). This document uses `Sprout` when describing code as it exists now and `Parity` when describing the target.
+> **Naming.** The package is `adamalexandersson/parity` with the `Parity\` namespace ([D2](#d2-package-name-and-brand--resolved-rename-to-parity), [Phase 3](#phase-3--rename-to-parity)).
 
 - [Shipped](#shipped)
 - [Current state](#current-state)
@@ -27,9 +27,9 @@ The single promise is that **a component defined once in PHP renders identically
 
 Completed work, summarized. Full detail lives in `CHANGELOG.md`.
 
-**Correctness and foundations.** Test suite converted to Pest. The four launch-blocking bugs fixed: void elements, `any`/`all` condition divergence, the undeclared `blade-icons` dependency, and eager export binding caching failures permanently. Missing components now fail loudly outside production. Parity coverage is enforced from the JSON Schema rather than sampled, so a feature without a fixture fails CI. `sprout:doctor` validates every discovered schema against `resources/schema/component.schema.json` and exits non-zero. Vitest added for the editor runtime. Matrix CI across PHP 8.2–8.4 and Laravel 11–12, with PHPStan level 6 and Pint. Class composition moved behind a pluggable strategy seam (`tailwind`, `passthrough`), mirrored in JS. BEM's `mode: 'element'` / `mode: 'modifier'` reserved in the schema. Security pass on attribute names, inline config injection, and every `{!! !!}` in the shipped views.
+**Correctness and foundations.** Test suite converted to Pest. The four launch-blocking bugs fixed: void elements, `any`/`all` condition divergence, the undeclared `blade-icons` dependency, and eager export binding caching failures permanently. Missing components now fail loudly outside production. Parity coverage is enforced from the JSON Schema rather than sampled, so a feature without a fixture fails CI. `parity:doctor` validates every discovered schema against `resources/schema/component.schema.json` and exits non-zero. Vitest added for the editor runtime. Matrix CI across PHP 8.2–8.4 and Laravel 11–12, with PHPStan level 6 and Pint. Class composition moved behind a pluggable strategy seam (`tailwind`, `passthrough`), mirrored in JS. BEM's `mode: 'element'` / `mode: 'modifier'` reserved in the schema. Security pass on attribute names, inline config injection, and every `{!! !!}` in the shipped views.
 
-**Laravel-first architecture.** WordPress moved behind a `Host` contract with `LaravelHost` and `WordPressHost` implementations; the schema and render layers no longer reference WordPress at all. Providers split into a core provider and a WordPress provider that registers only when WordPress is detected. `roots/acorn` moved from `require` to `suggest`. Editor exports split into a data step and a code step: `sprout:manifest` writes a committed `manifest.json`, and `sprout:generate-editor-exports` builds `components.js` plus `components.d.ts` from it without booting WordPress. Resolution logic moved out of generated files and into the package. `sprout:doctor` fails on manifest drift.
+**Laravel-first architecture.** WordPress moved behind a `Host` contract with `LaravelHost` and `WordPressHost` implementations; the schema and render layers no longer reference WordPress at all. Providers split into a core provider and a WordPress provider that registers only when WordPress is detected. `roots/acorn` moved from `require` to `suggest`. Editor exports split into a data step and a code step: `parity:manifest` writes a committed `manifest.json`, and `parity:generate-editor-exports` builds `components.js` plus `components.d.ts` from it without booting WordPress. Resolution logic moved out of generated files and into the package. `parity:doctor` fails on manifest drift.
 
 **Schema completeness.** Void and boolean attributes, the React attribute-name mapping table, SVG namespacing, responsive image attributes, full form and media element coverage, table structure, and microdata. Unique-ID generation (`uniqueId`, `idRef`, `{name}` interpolation) with deterministic output so Blade and editor IDs are comparable in parity tests. Condition operators extended to `in`, `notIn`, `gt`, `gte`, `lt`, `lte`, `contains`, `empty`, `notEmpty`, plus nested groups — each with a parity fixture.
 
@@ -47,17 +47,17 @@ All five previously tracked bugs are closed. Open issues are listed under [Known
 |------|--------|
 | Schema builder (`Component`, `Node`, builders) | Feature-complete; Phase 2 vocabulary shipped |
 | PHP renderer (`SchemaRenderer`, `structure.blade.php`) | Working |
-| Editor runtime (`dist/sprout.js`) | Working, at parity with PHP |
-| `Sprout\View\Component` | Thin abstract over `ComposesMarkup` + `Composable` |
+| Editor runtime (`dist/parity.js`) | Working, at parity with PHP |
+| `Parity\View\Component` | Thin abstract over `ComposesMarkup` + `Composable` |
 | Host adapter | `LaravelHost` / `WordPressHost` behind a contract |
 | Parity tests | Coverage-enforced from JSON Schema enums |
 | JS unit tests | Vitest, in CI |
 | Static analysis | PHPStan level 6 + baseline |
 | CI matrix | PHP 8.2–8.4 × Laravel 11–12 |
-| Editor globals | `window.sprout.config` (package) / `window.sleak` (theme icons + AJAX only) |
+| Editor globals | `window.parity.config` (package) / `window.sleak` (theme icons + AJAX only) |
 | Editor component imports | Committed manifest → generated module + types; lazy binding, loud failure outside production |
 | Theme install surface | ~10 steps; target ≤4 in Phase 4 |
-| Package name | `adamalexandersson/sprout`; renaming to Parity in Phase 3 |
+| Package name | `adamalexandersson/parity`; renaming to Parity in Phase 3 |
 | Packagist release | Not yet published |
 
 ---
@@ -89,7 +89,7 @@ Parity targets Laravel with Blade as its foundation. WordPress integration lives
 
 ### D2. Package name and brand — Resolved: rename to Parity
 
-Supersedes the earlier decision to keep `Sprout`. The package becomes:
+Supersedes the earlier decision to keep the working package name. The package is:
 
 | Surface | Value |
 |---------|-------|
@@ -105,7 +105,7 @@ Supersedes the earlier decision to keep `Sprout`. The package becomes:
 | View namespace | `Parity::shell`, `Parity::structure` |
 | Vite aliases | `@parity/runtime`, `@parity/components` |
 
-**Rationale.** "Sprout" says nothing about what the package does; "Parity" names the single promise and is the word already used throughout the docs, tests, and this roadmap to describe the guarantee. The vendor-scoped name is kept: `parity/parity` is unclaimed but `icecave/parity` is an established PHP package with millions of installs, so an unscoped name would compete for search results with an unrelated comparison library.
+**Rationale.** The previous working name said nothing about what the package does; "Parity" names the single promise and is already used throughout the docs, tests, and this roadmap to describe the guarantee. The vendor-scoped name is kept: `parity/parity` is unclaimed but `icecave/parity` is an established PHP package with millions of installs, so an unscoped name would compete for search results with an unrelated comparison library.
 
 **Consequences.** Mechanical but wide. No backwards-compatibility aliases — the package is unpublished, so it is a single cutover, sequenced after the API work so nothing is renamed twice. See [Phase 3](#phase-3--rename-to-parity).
 
@@ -171,7 +171,7 @@ Sequenced first so nothing dead gets carried through the rename or the API pass.
 ### Remove or wire up dead code
 
 - [x] `ComponentRegistry` is registered in the container and exposed on the facade, but nothing reads or writes it — delete it, or wire it as the real Blade-to-editor name map and test it
-- [x] `parity:cache` writes `Cache::forever('sprout.schemas', …)` but `ConfigCollector` never reads the cache, so the command has no effect — implement the read path or remove both `cache` and `clear`
+- [x] `parity:cache` writes `Cache::forever('parity.schemas', …)` but `ConfigCollector` never reads the cache, so the command has no effect — implement the read path or remove both `cache` and `clear`
 - [x] Remove the reserved `icons` / `iconAjaxUrl` / `iconAjaxNonce` keys filtered out during discovery; they are vestiges of the pre-schema theme config era
 - [x] Sweep `resources/js/` for unreferenced exports and support modules left over from earlier editor iterations
 - [x] Audit test fixtures and cached artifacts for references to removed features
@@ -184,7 +184,7 @@ Sequenced first so nothing dead gets carried through the rename or the API pass.
 
 ### Reconcile overlapping surfaces
 
-- [x] Three publish tags (`sprout`, `sprout-config`, `sprout-common`) ship overlapping content — reduce to one tag plus documented granular tags if genuinely needed
+- [x] Three publish tags (`parity`, `parity-config`, `parity-common`) ship overlapping content — reduce to one tag plus documented granular tags if genuinely needed
 - [x] `blade-ui-kit/blade-icons` is optional but the failure mode when absent should be a clear exception, not a fatal
 - [x] Move `gehrisandro/tailwind-merge-php` to optional now that the class-strategy seam exists (carried over from Phase 0)
 
@@ -267,22 +267,24 @@ Five names currently express two ideas: `Component::slot()`, `Node::namedSlot()`
 
 Implements [D2](#d2-package-name-and-brand--resolved-rename-to-parity). Deliberately last among the breaking changes: by this point the API is final, so the rename is one mechanical, reviewable commit and nothing is renamed twice.
 
-- [ ] Confirm `adamalexandersson/parity` is still unclaimed on Packagist immediately before the change
-- [ ] `composer.json`: name, description, autoload, facade alias, `extra.laravel` and `extra.acorn` provider entries
-- [ ] PHP namespace `Sprout\` → `Parity\` across `src/`, `tests/`, and `stubs/`
-- [ ] Config: `config/sprout.php` → `config/parity.php`, all `config('sprout.*')` reads, all `PARITY_*` env vars
-- [ ] Console command signatures and their references in scripts and docs
-- [ ] Editor runtime: `window.sprout` → `window.parity`, `dist/sprout.js` → `dist/parity.js`, script handle, Vite build output
-- [ ] Host filter names (`parity/editor/config`, `parity/editor/export-names`, `parity/editor/script_url`)
-- [ ] Blade view namespace and published view paths
-- [ ] Vite aliases `@parity/runtime` and `@parity/components`, and the plugin path from Phase 4 if it lands first
-- [ ] Publish tags
-- [ ] `README.md`, all of `docs/`, `CHANGELOG.md`, `SECURITY.md`, issue templates
+- [x] Confirm `adamalexandersson/parity` is still unclaimed on Packagist immediately before the change
+- [x] `composer.json`: name, description, autoload, facade alias, `extra.laravel` and `extra.acorn` provider entries
+- [x] PHP namespace cutover to `Parity\` across `src/`, `tests/`, and `stubs/`
+- [x] Config: `config/parity.php`, all `config('parity.*')` reads, all `PARITY_*` env vars
+- [x] Console command signatures and their references in scripts and docs
+- [x] Editor runtime: `window.parity`, `dist/parity.js`, script handle, Vite build output
+- [x] Host filter names (`parity/editor/config`, `parity/editor/export-names`, `parity/editor/script_url`)
+- [x] Blade view namespace and published view paths
+- [x] Vite aliases `@parity/runtime` and `@parity/components`, and the plugin path from Phase 4 if it lands first
+- [x] Publish tags
+- [x] `README.md`, all of `docs/`, `CHANGELOG.md`, `SECURITY.md`, issue templates
 - [ ] Rename the GitHub repository and confirm the redirect works for existing clones
-- [ ] Migrate the reference theme in the same change: composer requirement, path repo, integration namespace, Vite config, generated artifacts, npm scripts
-- [ ] Full test suite, `parity:doctor`, and a clean theme build green before merging
+- [x] Migrate the reference theme in the same change: composer requirement, path repo, integration namespace, Vite config, generated artifacts, npm scripts
+- [x] Full test suite, `parity:doctor`, and a clean theme build green before merging
 
-**Done when:** the string `sprout` appears nowhere in the package except historical `CHANGELOG.md` entries.
+**Done when:** the former package brand string appears nowhere except historical `CHANGELOG.md` entries.
+
+> GitHub repository rename remains a manual post-merge step.
 
 ---
 
@@ -354,7 +356,7 @@ Ends with a `1.0.0` tag on Packagist.
 ### Pre-release checklist
 
 - [ ] Phases 1 through 4 complete
-- [ ] No `sprout` identifiers remain anywhere in the public surface
+- [ ] No former-brand identifiers remain anywhere in the public surface
 - [ ] `parity:doctor` green on the reference theme
 - [ ] Parity coverage test green
 - [ ] Matrix CI green

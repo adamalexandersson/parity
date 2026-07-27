@@ -1,6 +1,6 @@
 <?php
 
-use Sprout\Support\Html;
+use Parity\Support\Html;
 
 it('lists the html void elements', function () {
     expect(Html::VOID_ELEMENTS)->toBe([

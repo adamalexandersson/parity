@@ -1,11 +1,11 @@
 <?php
 
-namespace Sprout\Tests\Fixtures;
+namespace Parity\Tests\Fixtures;
 
-use Sprout\Component;
-use Sprout\View\Component as SproutComponent;
+use Parity\Component;
+use Parity\View\Component as ParityComponent;
 
-class ShellSlotTestComponent extends SproutComponent
+class ShellSlotTestComponent extends ParityComponent
 {
     public ?string $element = 'h2';
 

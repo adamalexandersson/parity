@@ -1,6 +1,6 @@
 <?php
 
-use Sprout\Schema\SchemaValidator;
+use Parity\Schema\SchemaValidator;
 
 it('accepts a valid component schema', function () {
     $validator = new SchemaValidator;

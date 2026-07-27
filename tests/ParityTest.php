@@ -2,8 +2,8 @@
 
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 function parityCases(): array
 {
@@ -32,9 +32,9 @@ function bindParityConfig(?array $caseConfig = null): void
     }
 
     config([
-        'sprout.tokens' => $caseConfig['tokens'] ?? [],
-        'sprout.presets' => $caseConfig['presets'] ?? $caseConfig['common'] ?? [],
-        'sprout.classes.strategy' => $caseConfig['classes']['strategy'] ?? 'tailwind',
+        'parity.tokens' => $caseConfig['tokens'] ?? [],
+        'parity.presets' => $caseConfig['presets'] ?? $caseConfig['common'] ?? [],
+        'parity.classes.strategy' => $caseConfig['classes']['strategy'] ?? 'tailwind',
     ]);
 }
 
@@ -58,8 +58,8 @@ it('produces stable normalized classes from the php renderer', function () {
 });
 
 it('matches php and js renderers for parity cases', function () {
-    if (! file_exists(dirname(__DIR__).'/dist/sprout.js')) {
-        $this->markTestSkipped('dist/sprout.js not built');
+    if (! file_exists(dirname(__DIR__).'/dist/parity.js')) {
+        $this->markTestSkipped('dist/parity.js not built');
     }
 
     $script = dirname(__DIR__).'/scripts/render-parity.mjs';

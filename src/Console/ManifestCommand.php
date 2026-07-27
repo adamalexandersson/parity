@@ -1,24 +1,24 @@
 <?php
 
-namespace Sprout\Console;
+namespace Parity\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Sprout\Config\ConfigCollector;
-use Sprout\Contracts\Host;
-use Sprout\Editor\EditorConfigBuilder;
-use Sprout\Schema\Version;
-use Sprout\Support\ComponentReflector;
+use Parity\Config\ConfigCollector;
+use Parity\Contracts\Host;
+use Parity\Editor\EditorConfigBuilder;
+use Parity\Schema\Version;
+use Parity\Support\ComponentReflector;
 
 class ManifestCommand extends Command
 {
-    protected $signature = 'sprout:manifest {--output= : Output path relative to the host root}';
+    protected $signature = 'parity:manifest {--output= : Output path relative to the host root}';
 
-    protected $description = 'Write a committed Sprout editor component manifest from discovered schemas';
+    protected $description = 'Write a committed Parity editor component manifest from discovered schemas';
 
     public function handle(ConfigCollector $collector, Host $host): int
     {
-        app('sprout')->rediscoverComponents();
+        app('parity')->rediscoverComponents();
 
         $exportNames = [];
         $reserved = EditorConfigBuilder::reservedConfigKeys();
@@ -38,7 +38,7 @@ class ManifestCommand extends Command
         ksort($exportNames);
 
         /** @var array<string, string> $exportNames */
-        $exportNames = $host->filter('sprout/editor/export-names', $exportNames);
+        $exportNames = $host->filter('parity/editor/export-names', $exportNames);
 
         $components = [];
 
@@ -59,7 +59,7 @@ class ManifestCommand extends Command
         ];
 
         $output = $this->option('output')
-            ?? config('sprout.editor.manifest_path', 'resources/js/sprout/manifest.json');
+            ?? config('parity.editor.manifest_path', 'resources/js/parity/manifest.json');
 
         $path = $host->path($output);
         File::ensureDirectoryExists(dirname($path));

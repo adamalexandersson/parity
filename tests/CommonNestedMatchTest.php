@@ -2,10 +2,10 @@
 
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
-use Sprout\Component;
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
-use Sprout\Support\ClassFactory;
+use Parity\Component;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
+use Parity\Support\ClassFactory;
 
 beforeEach(function () {
     $container = Container::getInstance();
@@ -15,7 +15,7 @@ beforeEach(function () {
     }
 
     config([
-        'sprout.presets' => [
+        'parity.presets' => [
             'verticalSpacing' => [
                 4 => 'space-y-4',
             ],

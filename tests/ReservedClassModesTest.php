@@ -1,7 +1,7 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 it('ignores reserved bem class-rule modes', function () {
     $schema = [

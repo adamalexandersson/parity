@@ -1,20 +1,20 @@
 <?php
 
-namespace Sprout\Console;
+namespace Parity\Console;
 
 use Illuminate\Console\Command;
-use Sprout\Config\ConfigCollector;
+use Parity\Config\ConfigCollector;
 
 class ClearCommand extends Command
 {
-    protected $signature = 'sprout:clear';
+    protected $signature = 'parity:clear';
 
-    protected $description = 'Clear cached Sprout schemas';
+    protected $description = 'Clear cached Parity schemas';
 
     public function handle(): int
     {
         ConfigCollector::forgetCache();
-        $this->components->info('Sprout schema cache cleared.');
+        $this->components->info('Parity schema cache cleared.');
 
         return self::SUCCESS;
     }

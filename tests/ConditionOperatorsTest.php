@@ -1,7 +1,7 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 it('evaluates the extended condition operators', function () {
     $schema = require __DIR__.'/fixtures/conditions-operators.php';

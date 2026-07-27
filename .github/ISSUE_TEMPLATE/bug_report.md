@@ -20,7 +20,7 @@ labels: bug
 
 ## Environment
 
-- Sprout version:
+- Parity version:
 - PHP:
 - Laravel / Acorn:
 - WordPress (if applicable):

@@ -1,7 +1,7 @@
 <?php
 
-use Sprout\Component;
-use Sprout\Node;
+use Parity\Component;
+use Parity\Node;
 
 return Component::make('badge', tag: 'span')
     ->classes('inline-flex items-center justify-center font-medium')

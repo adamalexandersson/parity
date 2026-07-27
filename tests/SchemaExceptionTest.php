@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Exceptions\SchemaException;
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
+use Parity\Exceptions\SchemaException;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
 
 it('formats schema exceptions with component and path', function () {
     $exception = new SchemaException('bad node', 'card', 'header.title');

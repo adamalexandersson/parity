@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout\Support\ClassStrategies;
+namespace Parity\Support\ClassStrategies;
 
-use Sprout\Contracts\ClassStrategy;
+use Parity\Contracts\ClassStrategy;
 use TailwindMerge\TailwindMerge;
 
 final class TailwindClassStrategy implements ClassStrategy
@@ -17,7 +17,7 @@ final class TailwindClassStrategy implements ClassStrategy
             throw new \RuntimeException(
                 'The "tailwind" class strategy requires gehrisandro/tailwind-merge-php. '
                 .'Run `composer require gehrisandro/tailwind-merge-php` or set '
-                .'config(\'sprout.classes.strategy\') to \'passthrough\'.'
+                .'config(\'parity.classes.strategy\') to \'passthrough\'.'
             );
         }
 

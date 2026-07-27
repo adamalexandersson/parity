@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Render;
+namespace Parity\Render;
 
 final class SlotResolver
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Sprout\WordPress;
+namespace Parity\WordPress;
 
-use Sprout\Contracts\Host;
-use Sprout\Editor\EditorConfigBuilder;
+use Parity\Contracts\Host;
+use Parity\Editor\EditorConfigBuilder;
 
 class EditorAssets
 {
@@ -24,7 +24,7 @@ class EditorAssets
 
     public function enqueue(): void
     {
-        $handle = config('sprout.editor.script_handle', 'sprout');
+        $handle = config('parity.editor.script_handle', 'parity');
         $scriptPath = $this->scriptPath();
 
         if (! file_exists($scriptPath)) {
@@ -44,7 +44,7 @@ class EditorAssets
         wp_add_inline_script(
             $handle,
             sprintf(
-                'window.sprout=window.sprout||{};window.sprout.config=%s;',
+                'window.parity=window.parity||{};window.parity.config=%s;',
                 $this->configBuilder->encode($this->configBuilder->build())
             ),
             'before'
@@ -55,7 +55,7 @@ class EditorAssets
     public function injectIframeConfig(array $settings): array
     {
         $inlineScript = sprintf(
-            '<script>window.sprout=window.sprout||{};window.sprout.config=%s;</script>',
+            '<script>window.parity=window.parity||{};window.parity.config=%s;</script>',
             $this->configBuilder->encode($this->configBuilder->build())
         );
 
@@ -68,8 +68,8 @@ class EditorAssets
 
     protected function scriptPath(): string
     {
-        $relative = config('sprout.editor.script_path', 'dist/sprout.js');
-        $vendorRelative = 'vendor/adamalexandersson/sprout/'.$relative;
+        $relative = config('parity.editor.script_path', 'dist/parity.js');
+        $vendorRelative = 'vendor/adamalexandersson/parity/'.$relative;
         $themePath = $this->host->path($vendorRelative);
 
         if (file_exists($themePath)) {
@@ -81,10 +81,10 @@ class EditorAssets
 
     protected function scriptUrl(): string
     {
-        $relative = config('sprout.editor.script_path', 'dist/sprout.js');
+        $relative = config('parity.editor.script_path', 'dist/parity.js');
 
         return $this->host->filter(
-            'sprout/editor/script_url',
+            'parity/editor/script_url',
             $this->host->url($relative)
         );
     }

@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Registries\TransformRegistry;
-use Sprout\Render\SchemaRenderer;
-use Sprout\Support\ClassFactory;
+use Parity\Registries\TransformRegistry;
+use Parity\Render\SchemaRenderer;
+use Parity\Support\ClassFactory;
 
 it('renders schemas without wordpress escape helpers defined', function () {
     expect(function_exists('esc_attr'))->toBeFalse()

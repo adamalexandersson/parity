@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Schema;
+namespace Parity\Schema;
 
 use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Validator;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Schema;
+namespace Parity\Schema;
 
 final class Version
 {

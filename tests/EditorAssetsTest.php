@@ -1,8 +1,8 @@
 <?php
 
-use Sprout\Config\ConfigCollector;
-use Sprout\Editor\EditorConfigBuilder;
-use Sprout\Host\LaravelHost;
+use Parity\Config\ConfigCollector;
+use Parity\Editor\EditorConfigBuilder;
+use Parity\Host\LaravelHost;
 
 it('encodes config so script tags cannot break out', function () {
     $builder = new EditorConfigBuilder(new ConfigCollector, new LaravelHost);

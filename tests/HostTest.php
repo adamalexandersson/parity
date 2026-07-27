@@ -1,9 +1,9 @@
 <?php
 
-use Sprout\Host\LaravelHost;
-use Sprout\Host\WordPressHost;
-use Sprout\Support\HostResolver;
-use Sprout\Tests\Support\FakeHost;
+use Parity\Host\LaravelHost;
+use Parity\Host\WordPressHost;
+use Parity\Support\HostResolver;
+use Parity\Tests\Support\FakeHost;
 
 it('resolves laravel host by default outside wordpress', function () {
     expect(HostResolver::resolve('laravel'))->toBeInstanceOf(LaravelHost::class)
@@ -24,10 +24,10 @@ it('escapes attributes through the laravel host', function () {
 
 it('applies laravel host filters in registration order', function () {
     $host = new LaravelHost;
-    $host->listen('sprout/test', fn ($value) => $value.'-one');
-    $host->listen('sprout/test', fn ($value) => $value.'-two');
+    $host->listen('parity/test', fn ($value) => $value.'-one');
+    $host->listen('parity/test', fn ($value) => $value.'-two');
 
-    expect($host->filter('sprout/test', 'base'))->toBe('base-one-two');
+    expect($host->filter('parity/test', 'base'))->toBe('base-one-two');
 });
 
 it('encodes json safely for script injection', function () {

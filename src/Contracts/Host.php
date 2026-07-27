@@ -1,6 +1,6 @@
 <?php
 
-namespace Sprout\Contracts;
+namespace Parity\Contracts;
 
 interface Host
 {

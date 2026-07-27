@@ -1,6 +1,6 @@
 @php
-    use Sprout\Render\SlotResolver;
-    use Sprout\Support\Html;
+    use Parity\Render\SlotResolver;
+    use Parity\Support\Html;
 
     $namedSlots = $namedSlots ?? [];
     $props = $props ?? [];
@@ -119,7 +119,7 @@
             @endif
 
             @if (! empty($children))
-                @include('Sprout::structure', $includeData)
+                @include('Parity::structure', $includeData)
             @endif
 
             @if (! $isFragment)

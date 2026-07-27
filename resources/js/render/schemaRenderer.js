@@ -2,17 +2,17 @@ import { ClassFactory, InlineStyleFactory } from '../support/factories.js';
 import { InstanceIds, interpolateIds, shouldInterpolateIds } from '../support/instanceIds.js';
 import { assertSchemaVersion } from '../schema/version.js';
 
-function getSproutConfig() {
+function getParityConfig() {
     const root = typeof globalThis !== 'undefined' ? globalThis : {};
-    const sprout = root.window?.sprout ?? root.sprout;
+    const parity = root.window?.parity ?? root.parity;
 
-    return sprout?.config ?? {};
+    return parity?.config ?? {};
 }
 
 export class SchemaRenderer {
     constructor(componentName, props = {}, config = null) {
         this.componentName = componentName;
-        this.config = config ?? getSproutConfig()[componentName] ?? {};
+        this.config = config ?? getParityConfig()[componentName] ?? {};
         this.props = props;
         this.instanceIds = new InstanceIds(componentName, props);
         this.predeclareIds(this.config);
@@ -123,7 +123,7 @@ export class SchemaRenderer {
             const mode = rule.mode ?? null;
 
             if (mode === 'token') {
-                const tokenClasses = getSproutConfig().tokens?.[rule.tokenGroup]?.[rule.token];
+                const tokenClasses = getParityConfig().tokens?.[rule.tokenGroup]?.[rule.token];
 
                 if (tokenClasses) {
                     classes.apply(tokenClasses);
@@ -167,7 +167,7 @@ export class SchemaRenderer {
 
         const prop = match.props?.[0] ?? match.preset;
         const value = this.normalizeLookupValue(this.lookupValue(prop));
-        const map = getSproutConfig().presets?.[match.preset] ?? {};
+        const map = getParityConfig().presets?.[match.preset] ?? {};
 
         if (map.base && map.responsive) {
             if (map.base[value]) {
@@ -189,7 +189,7 @@ export class SchemaRenderer {
     }
 
     applyPresetMapEntry(presetKey, normalizedValue, classes) {
-        const presets = getSproutConfig().presets ?? {};
+        const presets = getParityConfig().presets ?? {};
         const map = presets[presetKey] ?? {};
 
         if (map[normalizedValue]) {
@@ -280,7 +280,7 @@ export class SchemaRenderer {
     }
 
     failLoud(message, path = null) {
-        const debug = getSproutConfig().debug === true
+        const debug = getParityConfig().debug === true
             || (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production');
 
         if (! debug) {
@@ -315,7 +315,7 @@ export class SchemaRenderer {
             return value;
         }
 
-        const debug = getSproutConfig().debug === true
+        const debug = getParityConfig().debug === true
             || (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production');
 
         return interpolateIds(value, this.instanceIds, {

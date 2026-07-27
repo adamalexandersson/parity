@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://sprout.dev/schema/component.schema.json",
-    "title": "Sprout component schema",
+    "$id": "https://raw.githubusercontent.com/adamalexandersson/parity/main/resources/schema/component.schema.json",
+    "title": "Parity component schema",
     "type": "object",
     "required": ["schemaVersion", "name"],
     "additionalProperties": true,

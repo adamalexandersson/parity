@@ -1,8 +1,8 @@
 export function isDebugMode() {
     const root = typeof globalThis !== 'undefined' ? globalThis : {};
-    const sprout = root.window?.sprout ?? root.sprout;
+    const parity = root.window?.parity ?? root.parity;
 
-    if (sprout?.config?.debug === true) {
+    if (parity?.config?.debug === true) {
         return true;
     }
 
@@ -23,7 +23,7 @@ export function formatSchemaError(error, componentName = null) {
 
 export function schemaErrorPanelProps(error, componentName = null) {
     return {
-        'data-sprout-error': 'true',
+        'data-parity-error': 'true',
         role: 'alert',
         style: {
             border: '1px solid #b91c1c',

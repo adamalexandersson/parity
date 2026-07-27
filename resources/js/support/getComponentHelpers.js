@@ -4,9 +4,9 @@ export function isProduction(config = null) {
     }
 
     const root = typeof globalThis !== 'undefined' ? globalThis : {};
-    const sprout = root.window?.sprout ?? root.sprout;
+    const parity = root.window?.parity ?? root.parity;
 
-    if (sprout?.config?.debug === true) {
+    if (parity?.config?.debug === true) {
         return false;
     }
 
@@ -15,13 +15,13 @@ export function isProduction(config = null) {
 
 export function missingComponentFallback(name, registeredNames = []) {
     const registered = [...registeredNames].sort();
-    const message = `[Sprout] Unknown component "${name}". Registered: ${registered.length ? registered.join(', ') : '(none)'}`;
+    const message = `[Parity] Unknown component "${name}". Registered: ${registered.length ? registered.join(', ') : '(none)'}`;
 
     if (! isProduction()) {
         throw new Error(message);
     }
 
-    return function SproutComponentFallback() {
+    return function ParityComponentFallback() {
         return null;
     };
 }

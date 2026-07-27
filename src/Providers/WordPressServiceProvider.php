@@ -1,9 +1,9 @@
 <?php
 
-namespace Sprout\Providers;
+namespace Parity\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Sprout\WordPress\EditorAssets;
+use Parity\WordPress\EditorAssets;
 
 class WordPressServiceProvider extends ServiceProvider
 {
@@ -18,7 +18,7 @@ class WordPressServiceProvider extends ServiceProvider
 
         if (function_exists('add_action')) {
             add_action('init', function () {
-                $this->app->make('sprout')->discoverComponents();
+                $this->app->make('parity')->discoverComponents();
             }, 10);
         }
     }

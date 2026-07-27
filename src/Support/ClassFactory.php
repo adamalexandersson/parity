@@ -1,11 +1,11 @@
 <?php
 
-namespace Sprout\Support;
+namespace Parity\Support;
 
-use Sprout\Contracts\ClassStrategy;
-use Sprout\Contracts\Host;
-use Sprout\Support\ClassStrategies\PassthroughClassStrategy;
-use Sprout\Support\ClassStrategies\TailwindClassStrategy;
+use Parity\Contracts\ClassStrategy;
+use Parity\Contracts\Host;
+use Parity\Support\ClassStrategies\PassthroughClassStrategy;
+use Parity\Support\ClassStrategies\TailwindClassStrategy;
 
 final class ClassFactory
 {
@@ -30,7 +30,7 @@ final class ClassFactory
 
             try {
                 if (function_exists('config')) {
-                    $name = (string) config('sprout.classes.strategy', 'tailwind');
+                    $name = (string) config('parity.classes.strategy', 'tailwind');
                 }
             } catch (\Throwable) {
                 $name = 'tailwind';

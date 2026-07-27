@@ -1,23 +1,23 @@
-# Sprout editor integration
+# Parity editor integration
 
-Gutenberg integration is **WordPress-only**. Plain Laravel applications use Sprout for Blade/schema rendering; they do not enqueue `dist/sprout.js`.
+Gutenberg integration is **WordPress-only**. Plain Laravel applications use Parity for Blade/schema rendering; they do not enqueue `dist/parity.js`.
 
 ## Globals
 
 | Global | Owner | Contents |
 |--------|-------|----------|
-| `window.sprout` | Sprout package | Runtime API + `config` (schemas, `presets`, `tokens`, `classes`, `debug`) |
-| `window.sleak` | Theme (optional) | Icons and AJAX helpers only — not part of Sprout. Interactive UI belongs on `@sprout/components`. |
+| `window.parity` | Parity package | Runtime API + `config` (schemas, `presets`, `tokens`, `classes`, `debug`) |
+| `window.sleak` | Theme (optional) | Icons and AJAX helpers only — not part of Parity. Interactive UI belongs on `@parity/components`. |
 
-Config is injected with `wp_add_inline_script` before the Sprout bundle when the WordPress host is active (`SCRIPT_DEBUG` maps to `config.debug`).
+Config is injected with `wp_add_inline_script` before the Parity bundle when the WordPress host is active (`SCRIPT_DEBUG` maps to `config.debug`).
 
 ## Manifest workflow
 
 Editor named imports are generated from a committed manifest so the JS build does not need WordPress:
 
 ```bash
-wp acorn sprout:manifest
-wp acorn sprout:generate-editor-exports
+wp acorn parity:manifest
+wp acorn parity:generate-editor-exports
 ```
 
 Or in a theme `package.json`:
@@ -25,30 +25,30 @@ Or in a theme `package.json`:
 ```json
 {
   "scripts": {
-    "sprout:manifest": "wp acorn sprout:manifest",
-    "sprout:exports": "wp acorn sprout:generate-editor-exports",
-    "sprout:sync": "npm run sprout:manifest && npm run sprout:exports",
-    "predev": "npm run sprout:sync",
-    "prebuild": "npm run sprout:sync"
+    "parity:manifest": "wp acorn parity:manifest",
+    "parity:exports": "wp acorn parity:generate-editor-exports",
+    "parity:sync": "npm run parity:manifest && npm run parity:exports",
+    "predev": "npm run parity:sync",
+    "prebuild": "npm run parity:sync"
   }
 }
 ```
 
-Paths (configurable in `config/sprout.php`):
+Paths (configurable in `config/parity.php`):
 
-- `editor.manifest_path` → `resources/js/sprout/manifest.json`
-- `editor.exports_path` → `resources/js/sprout/components.js`
-- `editor.types_path` → `resources/js/sprout/components.d.ts`
+- `editor.manifest_path` → `resources/js/parity/manifest.json`
+- `editor.exports_path` → `resources/js/parity/components.js`
+- `editor.types_path` → `resources/js/parity/components.d.ts`
 
-`sprout:doctor` fails when the manifest drifts from discovered schemas.
+`parity:doctor` fails when the manifest drifts from discovered schemas.
 
 ## Vite aliases
 
 ```js
 resolve: {
     alias: {
-        '@sprout/runtime': path.resolve(__dirname, 'vendor/adamalexandersson/sprout/resources/js/editor/runtime.js'),
-        '@sprout/components': '/resources/js/sprout/components.js',
+        '@parity/runtime': path.resolve(__dirname, 'vendor/adamalexandersson/parity/resources/js/editor/runtime.js'),
+        '@parity/components': '/resources/js/parity/components.js',
     },
 }
 ```
@@ -56,11 +56,11 @@ resolve: {
 Generated exports are thin:
 
 ```js
-import { createExport } from '@sprout/runtime';
+import { createExport } from '@parity/runtime';
 export const Card = createExport('card');
 ```
 
-`createExport` resolves lazily through `window.sprout.getComponent` on render (never at module evaluation time).
+`createExport` resolves lazily through `window.parity.getComponent` on render (never at module evaluation time).
 
 ## TypeScript
 
@@ -68,7 +68,7 @@ export const Card = createExport('card');
 
 ## Attributes in the editor
 
-`createComponent` maps HTML attribute names for React (`class` → `className`, `for` → `htmlFor`, SVG camelCase) and coerces boolean attributes. When `window.sprout.config.debug` is true, schema/render errors surface as an in-block alert instead of failing silently. See [`docs/schema-v1.md`](schema-v1.md) for `compose()`, `uniqueId` / `idRef`, nested `component` nodes, and match outcomes.
+`createComponent` maps HTML attribute names for React (`class` → `className`, `for` → `htmlFor`, SVG camelCase) and coerces boolean attributes. When `window.parity.config.debug` is true, schema/render errors surface as an in-block alert instead of failing silently. See [`docs/schema-v1.md`](schema-v1.md) for `compose()`, `uniqueId` / `idRef`, nested `component` nodes, and match outcomes.
 
 ### Dual-driver interactivity
 
@@ -92,19 +92,19 @@ Recipe for interactive organizers in a host theme:
 
 ### Alpine in the canvas
 
-By default (`sprout.editor.alpine` = `suppress`), attributes matching `^x-` or Alpine bind shorthand `^:[a-zA-Z]` are omitted before `createElement`. Static `id`, `aria-*`, classes, and styles remain. This is the recommended setting for interactive organizers: React owns toggles; Alpine stays frontend-only.
+By default (`parity.editor.alpine` = `suppress`), attributes matching `^x-` or Alpine bind shorthand `^:[a-zA-Z]` are omitted before `createElement`. Static `id`, `aria-*`, classes, and styles remain. This is the recommended setting for interactive organizers: React owns toggles; Alpine stays frontend-only.
 
 Set `editor.alpine` to `emit` only when you need Alpine directives on the canvas for **non-conflicting** preview (no React-owned controls on the same nodes). `emit` is incompatible with React-owned toggles on the same triggers — both will fight for state.
 
 ```php
 // Theme: filter (opt-in preview only — not for React-driven organizers)
-add_filter('sprout/editor/config', function (array $config): array {
+add_filter('parity/editor/config', function (array $config): array {
     $config['editor']['alpine'] = 'emit';
     return $config;
 });
 
 // Or env / published config:
-// SPROUT_EDITOR_ALPINE=emit
+// PARITY_EDITOR_ALPINE=emit
 ```
 
 ### Icons and nested `component` nodes
@@ -112,9 +112,9 @@ add_filter('sprout/editor/config', function (array $config): array {
 Blade Icons are PHP-only. Schema nodes serialize nested components as `"component": { "ref", "from", "map", "class", "props" }` (from `->component('x')->from()->map()->class()->props()->end()`). In the editor those nodes resolve through a host-supplied icon resolver:
 
 ```js
-window.sprout.registerIconResolver(({ name, componentRef, className, props }) => {
+window.parity.registerIconResolver(({ name, componentRef, className, props }) => {
     // return a React element for `name`, or null
 });
 ```
 
-The resolver callback still receives `componentRef` as the resolved `component.ref` string for host convenience. Resolution order: registered Sprout component → icon resolver → labelled debug placeholder (or nothing in production). Missing mapped values render nothing, matching Blade.
+The resolver callback still receives `componentRef` as the resolved `component.ref` string for host convenience. Resolution order: registered Parity component → icon resolver → labelled debug placeholder (or nothing in production). Missing mapped values render nothing, matching Blade.

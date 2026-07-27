@@ -1,7 +1,7 @@
 <?php
 
-use Sprout\Component;
-use Sprout\Node;
+use Parity\Component;
+use Parity\Node;
 
 return Component::make('section', tag: 'section')
     ->classes('relative overflow-x-clip')

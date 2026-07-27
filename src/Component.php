@@ -1,8 +1,8 @@
 <?php
 
-namespace Sprout;
+namespace Parity;
 
-use Sprout\Schema\SlotCollector;
+use Parity\Schema\SlotCollector;
 
 final class Component extends Node
 {
