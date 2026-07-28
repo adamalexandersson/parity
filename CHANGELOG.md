@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-07-28
+
+### Performance
+
+Frontend Blade rendering of deeply nested component trees. Measured on a `button` schema: ~1.24ms → ~0.010ms per component render.
+
+- Reuse a single `TailwindMerge` instance and memoize merge results. `TailwindMerge::instance()` rebuilds the entire merged config on every call, which dominated render cost on nested trees
+- Cache immutable `compose()` schemas per component class, so nested instances of the same component do not rebuild their schema
+- Build root attributes and structure in one `SchemaRenderer::renderComponent()` pass instead of two, sharing instance IDs and prop lookups
+- Cache prop lookups, presets/tokens, class strategy, debug flag, and reflected class metadata (public props, view path, theme-view existence)
+- Defer Tailwind class merging until `ClassFactory::get()` so each node merges once instead of on every `apply()` (mirrored in the JS runtime)
+- Skip schema auto-discovery on public WordPress pages; `shouldAutoDiscover()` is now console/admin only. Run `wp acorn parity:cache` to keep admin/editor loads warm
+
+### Added
+
+- `TailwindClassStrategy::flush()` for resetting the shared merger and memo cache
+
 ## [1.0.6] - 2026-07-27
 
 ### Fixed

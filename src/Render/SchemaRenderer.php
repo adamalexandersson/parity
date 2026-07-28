@@ -3,6 +3,8 @@
 namespace Parity\Render;
 
 use Parity\Concerns\EvaluatesConditions;
+use Parity\Contracts\ClassStrategy;
+use Parity\Contracts\Host;
 use Parity\Exceptions\SchemaException;
 use Parity\Registries\TransformRegistry;
 use Parity\Support\AttributeFactory;
@@ -20,17 +22,80 @@ class SchemaRenderer
 
     protected ?InstanceIds $instanceIds = null;
 
+    /** @var array<string, mixed> */
+    protected array $lookupCache = [];
+
+    protected ?ClassStrategy $classStrategy = null;
+
+    protected ?Host $host = null;
+
+    protected bool $hostResolved = false;
+
+    /** @var array<string, mixed>|null */
+    protected ?array $presets = null;
+
+    /** @var array<string, mixed>|null */
+    protected ?array $tokens = null;
+
+    protected ?bool $debug = null;
+
     public function __construct(
         protected TransformRegistry $transforms,
     ) {}
 
+    /**
+     * Build root attributes and structure in one pass (shared IDs / lookups).
+     *
+     * @param  array<string, mixed>  $schema
+     * @param  array<string, mixed>  $props
+     * @return array{attributes: array<string, mixed>, structure: array<string, mixed>}
+     */
+    public function renderComponent(array $schema, array $props, ?string $componentName = null): array
+    {
+        $this->beginRender($schema, $props, $componentName);
+
+        return [
+            'attributes' => $this->buildComponentAttributes($schema, $props, $componentName),
+            'structure' => $this->buildStructureTree($schema, $props),
+        ];
+    }
+
     /** @param array<string, mixed> $schema */
     public function renderComponentAttributes(array $schema, array $props, ?string $componentName = null): array
     {
+        $this->beginRender($schema, $props, $componentName);
+
+        return $this->buildComponentAttributes($schema, $props, $componentName);
+    }
+
+    /** @param array<string, mixed> $schema */
+    public function renderStructure(array $schema, array $props, ?string $componentName = null): array
+    {
+        $this->beginRender($schema, $props, $componentName);
+
+        return $this->buildStructureTree($schema, $props);
+    }
+
+    /**
+     * @param  array<string, mixed>  $schema
+     * @param  array<string, mixed>  $props
+     */
+    protected function beginRender(array $schema, array $props, ?string $componentName): void
+    {
         $this->contextProps = $props;
+        $this->lookupCache = [];
         $this->instanceIds = new InstanceIds($componentName ?? ($schema['name'] ?? 'component'), $props);
         $this->predeclareIds($schema);
-        $classes = new ClassFactory;
+    }
+
+    /**
+     * @param  array<string, mixed>  $schema
+     * @param  array<string, mixed>  $props
+     * @return array<string, mixed>
+     */
+    protected function buildComponentAttributes(array $schema, array $props, ?string $componentName = null): array
+    {
+        $classes = $this->newClassFactory();
         $styles = new InlineStyleFactory;
         $attr = new AttributeFactory;
 
@@ -59,12 +124,13 @@ class SchemaRenderer
         return $attr->toArray();
     }
 
-    /** @param array<string, mixed> $schema */
-    public function renderStructure(array $schema, array $props, ?string $componentName = null): array
+    /**
+     * @param  array<string, mixed>  $schema
+     * @param  array<string, mixed>  $props
+     * @return array<string, mixed>
+     */
+    protected function buildStructureTree(array $schema, array $props): array
     {
-        $this->contextProps = $props;
-        $this->instanceIds = new InstanceIds($componentName ?? ($schema['name'] ?? 'component'), $props);
-        $this->predeclareIds($schema);
         $built = [];
 
         foreach ($schema['children'] ?? [] as $key => $childSchema) {
@@ -83,7 +149,7 @@ class SchemaRenderer
     {
         $path = $parentPath !== null ? "{$parentPath}.{$key}" : $key;
 
-        $classes = new ClassFactory;
+        $classes = $this->newClassFactory();
         $styles = new InlineStyleFactory;
         $attr = new AttributeFactory;
 
@@ -93,13 +159,15 @@ class SchemaRenderer
         $this->applyStyles($schema['styles'] ?? [], $props, $styles);
 
         $attributes = $attr->toArray();
+        $styleString = $styles->get();
+        $classString = $classes->get();
 
-        if ($styles->get() !== '') {
-            $attributes['style'] = $styles->get();
+        if ($styleString !== '') {
+            $attributes['style'] = $styleString;
         }
 
-        if ($classes->get() !== '') {
-            $attributes['class'] = $classes->get();
+        if ($classString !== '') {
+            $attributes['class'] = $classString;
         }
 
         $node = [
@@ -121,6 +189,69 @@ class SchemaRenderer
         }
 
         return $node;
+    }
+
+    protected function newClassFactory(): ClassFactory
+    {
+        return new ClassFactory($this->classStrategy(), $this->host());
+    }
+
+    protected function classStrategy(): ClassStrategy
+    {
+        return $this->classStrategy ??= ClassFactory::resolveStrategy();
+    }
+
+    protected function host(): ?Host
+    {
+        if ($this->hostResolved) {
+            return $this->host;
+        }
+
+        $this->hostResolved = true;
+
+        try {
+            if (function_exists('app') && app()->bound(Host::class)) {
+                $this->host = app(Host::class);
+            }
+        } catch (\Throwable) {
+            $this->host = null;
+        }
+
+        return $this->host;
+    }
+
+    /** @return array<string, mixed> */
+    protected function presets(): array
+    {
+        if ($this->presets !== null) {
+            return $this->presets;
+        }
+
+        try {
+            $presets = config('parity.presets', []);
+            $this->presets = is_array($presets) ? $presets : [];
+        } catch (\Throwable) {
+            $this->presets = [];
+        }
+
+        return $this->presets;
+    }
+
+    /** @return array<string, mixed> */
+    protected function tokens(): array
+    {
+        if ($this->tokens !== null) {
+            return $this->tokens;
+        }
+
+        try {
+            $tokens = config('parity.tokens', []);
+            $this->tokens = is_array($tokens) ? $tokens : [];
+        } catch (\Throwable) {
+            $this->tokens = [];
+        }
+
+        return $this->tokens;
     }
 
     /** @param array<string, mixed> $schema */
@@ -148,7 +279,7 @@ class SchemaRenderer
             $mode = $rule['mode'] ?? null;
 
             if ($mode === 'token') {
-                $tokenClasses = config("parity.tokens.{$rule['tokenGroup']}.{$rule['token']}");
+                $tokenClasses = $this->tokens()[$rule['tokenGroup']][$rule['token']] ?? null;
 
                 if (is_string($tokenClasses) && $tokenClasses !== '') {
                     $classes->apply($tokenClasses);
@@ -272,11 +403,17 @@ class SchemaRenderer
 
     protected function isDebug(): bool
     {
-        try {
-            return (bool) config('app.debug', false) || (bool) config('parity.editor.debug', false);
-        } catch (\Throwable) {
-            return false;
+        if ($this->debug !== null) {
+            return $this->debug;
         }
+
+        try {
+            $this->debug = (bool) config('app.debug', false) || (bool) config('parity.editor.debug', false);
+        } catch (\Throwable) {
+            $this->debug = false;
+        }
+
+        return $this->debug;
     }
 
     /** @param list<array<string, mixed>> $cases */
@@ -336,7 +473,7 @@ class SchemaRenderer
 
         $prop = $match['props'][0] ?? $match['preset'];
         $value = $this->lookupValue($props, $prop);
-        $map = config("parity.presets.{$match['preset']}", []);
+        $map = $this->presets()[$match['preset']] ?? [];
 
         if (! is_array($map)) {
             return;
@@ -367,7 +504,8 @@ class SchemaRenderer
 
     protected function applyPresetMapEntry(string $presetKey, string $normalized, ClassFactory $classes): void
     {
-        $map = config("parity.presets.{$presetKey}", []);
+        $presets = $this->presets();
+        $map = $presets[$presetKey] ?? [];
 
         if (! is_array($map)) {
             return;
@@ -378,7 +516,7 @@ class SchemaRenderer
         }
 
         $nestedKey = "{$presetKey}Nested";
-        $nestedMap = config("parity.presets.{$nestedKey}", []);
+        $nestedMap = $presets[$nestedKey] ?? [];
 
         if (is_array($nestedMap) && isset($nestedMap[$normalized])) {
             $classes->apply($nestedMap[$normalized]);
@@ -513,6 +651,10 @@ class SchemaRenderer
 
     protected function lookupValue(array $props, string $key): mixed
     {
+        if ($props === $this->contextProps && array_key_exists($key, $this->lookupCache)) {
+            return $this->lookupCache[$key];
+        }
+
         $parts = explode('.', $key);
         $value = $props;
 
@@ -522,8 +664,16 @@ class SchemaRenderer
             } elseif (is_object($value) && isset($value->{$part})) {
                 $value = $value->{$part};
             } else {
+                if ($props === $this->contextProps) {
+                    $this->lookupCache[$key] = null;
+                }
+
                 return null;
             }
+        }
+
+        if ($props === $this->contextProps) {
+            $this->lookupCache[$key] = $value;
         }
 
         return $value;

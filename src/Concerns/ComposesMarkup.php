@@ -38,6 +38,18 @@ trait ComposesMarkup
 
     protected bool $composed = false;
 
+    /** @var array<class-string, array<string, mixed>> */
+    protected static array $composedSchemas = [];
+
+    /** @var array<class-string, list<string>> */
+    protected static array $publicPropNames = [];
+
+    /** @var array<class-string, string> */
+    protected static array $viewPaths = [];
+
+    /** @var array<class-string, bool> */
+    protected static array $themeViewExists = [];
+
     protected function bootComposition(): void
     {
         if ($this->composed) {
@@ -45,12 +57,22 @@ trait ComposesMarkup
         }
 
         $this->composed = true;
-        $this->name = $this->resolveComponentName();
-        $this->schema = static::compose();
+        $this->schema = $this->resolvedSchema();
+        $this->name = $this->resolveComponentName($this->schema);
         $this->prepare();
         $this->props = $this->collectPublicProps();
         $this->resolveElement();
         $this->build();
+    }
+
+    /**
+     * Immutable compose() output, shared across instances of the same class.
+     *
+     * @return array<string, mixed>
+     */
+    protected function resolvedSchema(): array
+    {
+        return self::$composedSchemas[static::class] ??= static::compose();
     }
 
     protected function prepare(): void {}
@@ -123,8 +145,9 @@ trait ComposesMarkup
     protected function build(): void
     {
         $renderer = app(SchemaRenderer::class);
-        $this->attr = $renderer->renderComponentAttributes($this->schema, $this->props, $this->name);
-        $this->structure = $renderer->renderStructure($this->schema, $this->props, $this->name);
+        $rendered = $renderer->renderComponent($this->schema, $this->props, $this->name);
+        $this->attr = $rendered['attributes'];
+        $this->structure = $rendered['structure'];
         $this->slotElement = $this->schema['defaultSlot'] ?? null;
 
         app(ConfigCollector::class)->register($this->name, $this->schema);
@@ -192,7 +215,7 @@ trait ComposesMarkup
 
     protected function hasThemeView(): bool
     {
-        return view()->exists($this->resolveViewPath());
+        return self::$themeViewExists[static::class] ??= view()->exists($this->resolveViewPath());
     }
 
     public function resolveRootTag(): string
@@ -253,22 +276,30 @@ trait ComposesMarkup
 
     protected function resolveViewPath(): string
     {
+        if (isset(self::$viewPaths[static::class])) {
+            return self::$viewPaths[static::class];
+        }
+
         $reflection = new \ReflectionClass(static::class);
         $namespaceParts = explode('\\', $reflection->getNamespaceName());
         $componentsIndex = array_search('Components', $namespaceParts, true);
 
         if ($componentsIndex !== false && isset($namespaceParts[$componentsIndex + 1])) {
             $subNamespace = strtolower($namespaceParts[$componentsIndex + 1]);
-
-            return "components.{$subNamespace}.{$this->name}";
+            $path = "components.{$subNamespace}.{$this->name}";
+        } else {
+            $path = "components.{$this->name}";
         }
 
-        return "components.{$this->name}";
+        return self::$viewPaths[static::class] = $path;
     }
 
-    protected function resolveComponentName(): string
+    /**
+     * @param  array<string, mixed>|null  $schema
+     */
+    protected function resolveComponentName(?array $schema = null): string
     {
-        $schema = static::compose();
+        $schema ??= $this->schema;
 
         if (! empty($schema['name'])) {
             return $schema['name'];
@@ -282,7 +313,24 @@ trait ComposesMarkup
     /** @return array<string, mixed> */
     protected function collectPublicProps(): array
     {
+        $propNames = $this->publicPropNames();
         $props = [];
+
+        foreach ($propNames as $name) {
+            $props[$name] = $this->{$name};
+        }
+
+        return $props;
+    }
+
+    /** @return list<string> */
+    protected function publicPropNames(): array
+    {
+        if (isset(self::$publicPropNames[static::class])) {
+            return self::$publicPropNames[static::class];
+        }
+
+        $propNames = [];
         $reflection = new \ReflectionClass($this);
 
         foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
@@ -292,9 +340,9 @@ trait ComposesMarkup
                 continue;
             }
 
-            $props[$name] = $property->getValue($this);
+            $propNames[] = $name;
         }
 
-        return $props;
+        return self::$publicPropNames[static::class] = $propNames;
     }
 }

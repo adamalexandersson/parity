@@ -82,10 +82,24 @@ class WordPressHost implements Host
 
     public function shouldAutoDiscover(): bool
     {
-        if (function_exists('app') && app()->runningInConsole()) {
+        if ($this->runningInConsole()) {
             return true;
         }
 
-        return function_exists('did_action') && did_action('init');
+        // Editor / admin need the full schema catalog for window.parity.config.
+        // Public frontend pages compose schemas per Blade instance and should not
+        // pay for filesystem discovery (or even cache hydrate) on every request.
+        return function_exists('is_admin') && is_admin();
+    }
+
+    protected function runningInConsole(): bool
+    {
+        try {
+            return function_exists('app')
+                && method_exists(app(), 'runningInConsole')
+                && app()->runningInConsole();
+        } catch (\Throwable) {
+            return false;
+        }
     }
 }

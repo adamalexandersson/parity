@@ -38,7 +38,7 @@ interface Host
 | `path` | `base_path()` | `get_theme_file_path()` |
 | `url` | `asset()` | Theme `vendor/adamalexandersson/parity/…` URI, else `plugins_url()` |
 | `isDebug` | `config('app.debug')` | `SCRIPT_DEBUG` |
-| `shouldAutoDiscover` | Always true | Console, or after WordPress `init` |
+| `shouldAutoDiscover` | Always true | Console or `is_admin()` (not public frontend) |
 
 ## Editor assets
 

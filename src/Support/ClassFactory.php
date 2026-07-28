@@ -13,6 +13,8 @@ final class ClassFactory
 
     private string $classString = '';
 
+    private bool $dirty = false;
+
     private ClassStrategy $strategy;
 
     private ?Host $host;
@@ -45,7 +47,15 @@ final class ClassFactory
 
     public function get(): string
     {
+        if ($this->dirty) {
+            $this->join();
+        }
+
         $value = $this->classString;
+
+        if ($this->host) {
+            return $this->host->escAttr($value);
+        }
 
         try {
             if (function_exists('app') && app()->bound(Host::class)) {
@@ -53,10 +63,6 @@ final class ClassFactory
             }
         } catch (\Throwable) {
             //
-        }
-
-        if ($this->host) {
-            return $this->host->escAttr($value);
         }
 
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
@@ -72,7 +78,7 @@ final class ClassFactory
             $this->addClassesFromString($class);
         }
 
-        $this->join();
+        $this->dirty = true;
     }
 
     public function apply(string|array $class = ''): self
@@ -84,10 +90,14 @@ final class ClassFactory
 
     public function remove(string $remove): bool
     {
+        if ($this->dirty) {
+            $this->join();
+        }
+
         if (($key = array_search($remove, $this->classes, true)) !== false) {
             unset($this->classes[$key]);
             $this->classes = array_values($this->classes);
-            $this->join();
+            $this->dirty = true;
 
             return true;
         }
@@ -110,6 +120,8 @@ final class ClassFactory
 
     private function join(): void
     {
+        $this->dirty = false;
+
         if ($this->classes === []) {
             $this->classString = '';
 

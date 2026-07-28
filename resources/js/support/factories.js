@@ -18,28 +18,33 @@ function resolveClassStrategy() {
     return parity?.config?.classes?.strategy ?? 'tailwind';
 }
 
-function mergeClasses(existing, value) {
-    const next = String(value);
+function mergeClassParts(parts) {
+    if (parts.length === 0) {
+        return '';
+    }
 
     if (resolveClassStrategy() === 'passthrough') {
-        const parts = `${existing} ${next}`.split(/\s+/).filter(Boolean);
         const unique = [];
 
         parts.forEach((part) => {
-            if (!unique.includes(part)) {
-                unique.push(part);
-            }
+            String(part).split(/\s+/).forEach((token) => {
+                if (token && !unique.includes(token)) {
+                    unique.push(token);
+                }
+            });
         });
 
         return unique.join(' ');
     }
 
-    return twMerge(existing, next);
+    return twMerge(...parts);
 }
 
 export class ClassFactory {
     constructor() {
-        this.classString = '';
+        this.parts = [];
+        this.merged = '';
+        this.dirty = false;
     }
 
     apply(value) {
@@ -47,13 +52,19 @@ export class ClassFactory {
             return this;
         }
 
-        this.classString = mergeClasses(this.classString, value);
+        this.parts.push(String(value));
+        this.dirty = true;
 
         return this;
     }
 
     get() {
-        return this.classString;
+        if (this.dirty) {
+            this.merged = mergeClassParts(this.parts);
+            this.dirty = false;
+        }
+
+        return this.merged;
     }
 }
 
