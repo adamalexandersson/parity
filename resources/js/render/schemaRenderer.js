@@ -1,6 +1,7 @@
 import { ClassFactory, InlineStyleFactory } from '../support/factories.js';
 import { InstanceIds, interpolateIds, shouldInterpolateIds } from '../support/instanceIds.js';
 import { assertSchemaVersion } from '../schema/version.js';
+import { ClassNameGenerator } from '../support/classNameGenerator.js';
 
 function getParityConfig() {
     const root = typeof globalThis !== 'undefined' ? globalThis : {};
@@ -15,6 +16,10 @@ export class SchemaRenderer {
         this.config = config ?? getParityConfig()[componentName] ?? {};
         this.props = props;
         this.instanceIds = new InstanceIds(componentName, props);
+        this.classNames = new ClassNameGenerator();
+        this.rootBlock = this.classNames.resolveBlock(this.config);
+        this.hasCategory = Boolean(this.config.category);
+        this.emitRootBlock = this.classNames.shouldEmitBlock(this.config);
         this.predeclareIds(this.config);
 
         assertSchemaVersion(this.config);
@@ -25,7 +30,7 @@ export class SchemaRenderer {
         const styles = new InlineStyleFactory();
         const attributes = {};
 
-        this.applyClassRules(this.config.classRules ?? [], classes);
+        this.applyClassRules(this.config.classRules ?? [], classes, true);
         this.applyMatches(this.config.matches ?? [], classes, attributes, styles);
 
         if (this.props.className) {
@@ -68,7 +73,7 @@ export class SchemaRenderer {
         const styles = new InlineStyleFactory();
         const attributes = {};
 
-        this.applyClassRules(schema.classRules ?? [], classes);
+        this.applyClassRules(schema.classRules ?? [], classes, false);
         this.applyMatches(schema.matches ?? [], classes, attributes, styles);
         this.applyAttributes(schema.attributes ?? [], attributes);
         this.applyStyles(schema.styles ?? [], styles);
@@ -114,7 +119,36 @@ export class SchemaRenderer {
         return true;
     }
 
-    applyClassRules(rules, classes) {
+    applyClassRules(rules, classes, root = false) {
+        const generator = this.classNames;
+        const style = generator.namingStyle(rules, this.hasCategory);
+        const base = this.rootBlock;
+        let elementName = null;
+
+        rules.forEach((rule) => {
+            if (rule.mode === 'element' && typeof rule.element === 'string') {
+                elementName = rule.element;
+            }
+        });
+
+        let qualifierBase = base;
+
+        if (elementName !== null && base !== '') {
+            qualifierBase = generator.elementClass(base, elementName, style);
+        }
+
+        if (root && this.emitRootBlock && base !== '') {
+            classes.apply(base);
+        }
+
+        if (!root && elementName !== null && qualifierBase !== '') {
+            classes.apply(qualifierBase);
+        }
+
+        if (!root && elementName === null && generator.rulesUseNaming(rules) && base !== '') {
+            qualifierBase = base;
+        }
+
         rules.forEach((rule) => {
             if (!this.evaluateCondition(rule.condition ?? null)) {
                 return;
@@ -132,7 +166,48 @@ export class SchemaRenderer {
                 return;
             }
 
-            // Reserved / unknown modes (e.g. element, modifier) are no-ops until implemented.
+            if (mode === 'element') {
+                return;
+            }
+
+            if (mode === 'modifier') {
+                if (!qualifierBase) {
+                    return;
+                }
+
+                const token = generator.modifierClass(qualifierBase, rule, this.props);
+
+                if (token) {
+                    classes.apply(token);
+                }
+
+                return;
+            }
+
+            if (mode === 'variant') {
+                if (!qualifierBase) {
+                    return;
+                }
+
+                const token = generator.variantClass(qualifierBase, rule, this.props);
+
+                if (token) {
+                    classes.apply(token);
+                }
+
+                return;
+            }
+
+            if (mode === 'state') {
+                const token = generator.stateClass(rule, this.props);
+
+                if (token) {
+                    classes.apply(token);
+                }
+
+                return;
+            }
+
             if (mode !== null) {
                 return;
             }

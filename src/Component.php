@@ -10,6 +10,10 @@ final class Component extends Node
 
     protected ?array $linkable = null;
 
+    protected ?string $category = null;
+
+    protected ?string $blockName = null;
+
     public static function make(string $name, ?string $tag = 'div'): static
     {
         $component = new self;
@@ -18,6 +22,20 @@ final class Component extends Node
         $component->tag = $tag;
 
         return $component;
+    }
+
+    public function category(string $category): self
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    public function block(string $block): self
+    {
+        $this->blockName = $block;
+
+        return $this;
     }
 
     public function linkable(string $prop = 'link', string $tag = 'a'): self
@@ -34,6 +52,14 @@ final class Component extends Node
     {
         $schema = parent::toSchema();
         $schema['name'] = $this->name;
+
+        if ($this->category !== null) {
+            $schema['category'] = $this->category;
+        }
+
+        if ($this->blockName !== null) {
+            $schema['block'] = $this->blockName;
+        }
 
         if ($this->linkable !== null) {
             $schema['linkable'] = $this->linkable;

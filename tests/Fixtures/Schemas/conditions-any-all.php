@@ -33,18 +33,6 @@ return [
             'token' => 'md',
             'condition' => null,
         ],
-        [
-            'classes' => '',
-            'mode' => 'element',
-            'element' => 'header',
-            'condition' => null,
-        ],
-        [
-            'classes' => '',
-            'mode' => 'modifier',
-            'modifier' => 'type',
-            'condition' => null,
-        ],
     ],
     'matches' => [
         [

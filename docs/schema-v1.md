@@ -170,12 +170,16 @@ Literal class rules omit `mode`. Token rules use `mode: "token"` with `tokenGrou
 ->token('padding', 'md')
 ```
 
-Reserved for Phase 5 (BEM) — recognized by the schema and ignored by renderers until implemented:
+Reserved for Phase 6 (BEM / kebab naming) — recognized by the schema and implemented by renderers:
 
 ```json
-{ "mode": "element", "element": "header", "condition": null }
-{ "mode": "modifier", "modifier": "type", "condition": null }
+{ "mode": "element", "element": "label", "condition": null }
+{ "mode": "modifier", "source": "size", "as": "size", "breakpoint": null, "condition": null }
+{ "mode": "variant", "source": "size", "breakpoint": null, "condition": null }
+{ "mode": "state", "state": "is", "source": "active", "stateName": "active", "condition": null }
 ```
+
+Root schema may also include optional `category` and `block` (CSS block override; default = `name`). See [classes.md](classes.md).
 
 ## Nested components
 
@@ -410,7 +414,7 @@ Configure the fallback view via `config('parity.shell_view')` (default: `Parity:
 
 ## Ordinary HTML compositions
 
-Representative fixtures under `tests/Fixtures/html-compositions.php` cover forms (`label`/`for`, `input`, `select`/`option`, `textarea`, `fieldset`/`legend`), `picture`/`source`/`img` (`srcset`, `sizes`, `loading`, `decoding`), `video`/`track`, tables (`thead`/`th`/`scope`/`colgroup`/`col`), and FAQ-style microdata (`itemscope` / `itemtype` / `itemprop`).
+Representative fixtures under `tests/Fixtures/Schemas/html-compositions.php` cover forms (`label`/`for`, `input`, `select`/`option`, `textarea`, `fieldset`/`legend`), `picture`/`source`/`img` (`srcset`, `sizes`, `loading`, `decoding`), `video`/`track`, tables (`thead`/`th`/`scope`/`colgroup`/`col`), and FAQ-style microdata (`itemscope` / `itemtype` / `itemprop`).
 
 ## Errors and debug DX
 

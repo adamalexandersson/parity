@@ -21,7 +21,15 @@ This package does **not** commit `composer.lock` (library convention). Local and
 
 ## Parity tests
 
-Golden fixtures live in `tests/Fixtures/`. PHPUnit compares PHP renderer output with the bundled JS renderer via `scripts/render-parity.mjs`:
+Golden fixtures live in `tests/Fixtures/`:
+
+| Folder | Contents |
+|--------|----------|
+| `Schemas/` | Serialized component schemas (`Component::make(...)->toSchema()`) |
+| `Cases/` | Parity/structure case maps (`parity-cases.php`, `structure-cases.php`) |
+| `Components/` | PHP class fixtures under `Parity\Tests\Fixtures\Components` |
+
+PHPUnit compares PHP renderer output with the bundled JS renderer via `scripts/render-parity.mjs`:
 
 ```bash
 composer test:parity

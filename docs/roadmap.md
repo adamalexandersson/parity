@@ -118,8 +118,10 @@ Supersedes the earlier decision to keep the working package name. The package is
 `->element()` and `->modifier()` serialize as entries in the existing `classRules` array carrying a `mode`, following the precedent set by `token()` with `mode: 'token'`:
 
 ```json
-{ "mode": "element", "element": "header", "condition": null }
-{ "mode": "modifier", "modifier": "type", "condition": null }
+{ "mode": "element", "element": "label", "condition": null }
+{ "mode": "modifier", "source": "size", "as": "size", "breakpoint": null, "condition": null }
+{ "mode": "variant", "source": "size", "breakpoint": null, "condition": null }
+{ "mode": "state", "state": "is", "source": "active", "stateName": "active", "condition": null }
 ```
 
 **Rationale.** No new top-level schema keys means the change is purely additive. Runtimes that ignore unknown modes degrade gracefully, and both renderers already branch on `mode` inside their class-rule loop.
@@ -364,19 +366,22 @@ Ends with a `1.0.0` tag on Packagist.
 
 ---
 
-## Phase 6 — BEM and non-Tailwind support
+## Phase 6 — BEM and kebab class naming
 
-Ships as 1.1, on the class-strategy seam and the `classRules` mode shape from [D4](#d4-where-do-bem-element-and-modifier-calls-live-in-the-schema--resolved-classrules-with-a-mode-flag). Additive, no breaking changes, no schema major.
+Ships as 1.1. Naming generates tokens in `classRules`; class strategies remain merge-only (`tailwind` / `passthrough`). Additive, no breaking changes, no schema major. Locked decisions: [classes.md](classes.md).
 
-- [ ] `->element('header')` producing `block__element`, serialized as `mode: 'element'`
-- [ ] `->modifier('type', 'list')` producing `block--modifier`, serialized as `mode: 'modifier'`, driven by prop values
-- [ ] Block name derived from the component name, overridable
-- [ ] `config('parity.bem')` for separators, defaulting to `__` and `--`
-- [ ] Configurable modifier value formatting (kebab-case, raw)
-- [ ] BEM as a selectable class strategy, composable with literal classes
-- [ ] Mirror the generator in JS so parity holds
-- [ ] Parity fixtures for every BEM feature
-- [ ] `docs/classes.md` BEM section with a full worked example
+- [x] `->element('label')` producing BEM `block__element` / kebab `block-element`, serialized as `mode: 'element'`
+- [x] `->modifier()` producing `block--key-value` / boolean `block--key`, driven by prop values (compounds, rename, static `value`)
+- [x] `->variant()` producing kebab value-only / boolean-as-name classes
+- [x] `->is()` / `->has()` state classes (`is-*` / `has-*`)
+- [x] Block name derived from `make()`, overridable with `->block()`; `->category()` prefixes
+- [x] Separate `parity.bem`, `parity.variant`, and `parity.state` config (exported to the editor)
+- [x] Configurable value formatting via `parity.variant.format` (kebab / raw)
+- [x] Responsive breakpoints: BEM `{block}@{bp}--{key}-{value}`, kebab `{block}-{bp}-{value}`
+- [x] Mirror the generator in JS so parity holds
+- [x] Parity fixtures for naming features (block override, states, responsive, organizers, omission)
+- [x] `docs/classes.md` naming section with full worked examples
+- [x] Tailwind projects unchanged: no auto-emitted block on pure `make('button')` + utility classes
 
 ---
 

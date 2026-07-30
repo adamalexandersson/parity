@@ -39,6 +39,27 @@ function normalizeClassString(string $classes): string
 }
 
 /**
+ * @param  array<string, mixed>|null  $caseConfig
+ */
+function bindParityConfig(?array $caseConfig = null): void
+{
+    $container = \Illuminate\Container\Container::getInstance();
+
+    if (! $container->bound('config')) {
+        $container->instance('config', new \Illuminate\Config\Repository([]));
+    }
+
+    config([
+        'parity.tokens' => $caseConfig['tokens'] ?? [],
+        'parity.presets' => $caseConfig['presets'] ?? $caseConfig['common'] ?? [],
+        'parity.classes.strategy' => $caseConfig['classes']['strategy'] ?? 'tailwind',
+        'parity.bem' => $caseConfig['bem'] ?? \Parity\Support\ClassNameGenerator::defaultBem(),
+        'parity.variant' => $caseConfig['variant'] ?? \Parity\Support\ClassNameGenerator::defaultVariant(),
+        'parity.state' => $caseConfig['state'] ?? \Parity\Support\ClassNameGenerator::defaultState(),
+    ]);
+}
+
+/**
  * @param  array<string, mixed>  $structure
  * @return array<string, mixed>
  */

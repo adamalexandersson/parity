@@ -69,6 +69,57 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | BEM naming
+    |--------------------------------------------------------------------------
+    |
+    | Category prefixes and BEM structural separators for ->modifier() /
+    | ->element() generation. Kebab/variant settings live under "variant".
+    |
+    */
+    'bem' => [
+        'categories' => [
+            'component' => 'c-',
+            'object' => 'o-',
+            'organizer' => 'o-',
+            'module' => 'm-',
+            'utility' => 'u-',
+        ],
+        'element' => '__',
+        'modifier' => '--',
+        'breakpoint' => '@',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Variant (kebab) naming
+    |--------------------------------------------------------------------------
+    |
+    | Separators for ->variant() / kebab ->element(), plus shared value
+    | formatting used when turning prop values into class segments (BEM and
+    | kebab alike).
+    |
+    */
+    'variant' => [
+        'element' => '-',
+        'join' => '-',
+        'format' => 'kebab',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | State class prefixes
+    |--------------------------------------------------------------------------
+    |
+    | ->is('active') / ->has('icon') emit is-active / has-icon when truthy.
+    |
+    */
+    'state' => [
+        'is' => 'is-',
+        'has' => 'has-',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Default component shell view
     |--------------------------------------------------------------------------
     |

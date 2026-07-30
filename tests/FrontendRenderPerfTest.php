@@ -4,7 +4,7 @@ use Parity\Component;
 use Parity\Host\WordPressHost;
 use Parity\Node;
 use Parity\Render\SchemaRenderer;
-use Parity\Tests\Fixtures\ShellStructureTestComponent;
+use Parity\Tests\Fixtures\Components\ShellStructureTestComponent;
 
 it('reuses compose() schemas across component instances', function () {
     $first = new ShellStructureTestComponent;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Parity\Tests\Fixtures;
+namespace Parity\Tests\Fixtures\Components;
 
 use Parity\Component;
 use Parity\Node;

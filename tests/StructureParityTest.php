@@ -5,7 +5,7 @@ use Parity\Render\SchemaRenderer;
 
 function structureCases(): array
 {
-    return require __DIR__.'/Fixtures/structure-cases.php';
+    return require __DIR__.'/Fixtures/Cases/structure-cases.php';
 }
 
 /**
@@ -127,6 +127,32 @@ function expectedStructures(): array
                 ],
             ]),
         ],
+        'bem-badge-element' => [
+            'content' => structureNode('content', 'span', false, ['name' => null, 'default' => true], [
+                'class' => 'c-badge__label c-badge__label--size-md',
+            ]),
+        ],
+        'kebab-badge-element' => [
+            'content' => structureNode('content', 'span', false, ['name' => null, 'default' => true], [
+                'class' => 'badge-label badge-label-md',
+            ]),
+        ],
+        'bem-button-elements' => [
+            'arrow' => structureNode('arrow', 'span', false, ['name' => 'arrow', 'default' => false], [
+                'class' => 'c-button__arrow',
+            ]),
+            'icon' => structureNode('icon', 'span', false, ['name' => 'icon', 'default' => false], [
+                'class' => 'c-button__icon',
+            ]),
+            'label' => structureNode('label', 'span', false, ['name' => null, 'default' => true], [
+                'class' => 'c-button__label c-button__label--size-md',
+            ]),
+        ],
+        'bem-button-elements-no-affordance' => [
+            'label' => structureNode('label', 'span', false, ['name' => null, 'default' => true], [
+                'class' => 'c-button__label c-button__label--size-lg',
+            ]),
+        ],
     ];
 }
 
@@ -134,6 +160,8 @@ it('keeps php structure snapshots stable', function () {
     $renderer = new SchemaRenderer(new TransformRegistry);
 
     foreach (structureCases() as $name => $case) {
+        bindParityConfig($case['config'] ?? null);
+
         $structure = $renderer->renderStructure($case['schema'], $case['props'] ?? []);
 
         expect(normalizeStructure($structure))
@@ -157,6 +185,8 @@ it('matches php and js structure and slot targets', function () {
     $jsResults = runNodeParityScript($script, $cases);
 
     foreach ($cases as $name => $case) {
+        bindParityConfig($case['config'] ?? null);
+
         $phpStructure = normalizeStructure(
             $phpRenderer->renderStructure($case['schema'], $case['props'] ?? [])
         );

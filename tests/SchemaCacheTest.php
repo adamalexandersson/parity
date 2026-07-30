@@ -33,7 +33,7 @@ it('writes and hydrates schemas plus class map from cache', function () {
 
     expect($collector->get('shell-structure-test'))->toBeArray()
         ->and($collector->classFor('shell-structure-test'))->toBe(
-            'Parity\\Tests\\Fixtures\\ShellStructureTestComponent'
+            'Parity\\Tests\\Fixtures\\Components\\ShellStructureTestComponent'
         );
 });
 

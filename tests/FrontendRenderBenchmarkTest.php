@@ -2,7 +2,7 @@
 
 use Parity\Render\SchemaRenderer;
 use Parity\Support\ClassStrategies\TailwindClassStrategy;
-use Parity\Tests\Fixtures\ShellStructureTestComponent;
+use Parity\Tests\Fixtures\Components\ShellStructureTestComponent;
 use Parity\Tests\TestCase;
 
 pest()->extend(TestCase::class);
@@ -22,8 +22,8 @@ function benchMs(int $iterations, callable $fn): float
 
 it('measures frontend hot-path speedups', function () {
     $iterations = 1000;
-    $schema = require __DIR__.'/Fixtures/button.php';
-    $idSchema = require __DIR__.'/Fixtures/unique-id-a11y.php';
+    $schema = require __DIR__.'/Fixtures/Schemas/button.php';
+    $idSchema = require __DIR__.'/Fixtures/Schemas/unique-id-a11y.php';
 
     $props = [
         'pill' => false,

@@ -55,7 +55,62 @@ describe('SchemaRenderer conditions', () => {
         expect(attrs.className).toContain('all-hit');
     });
 
-    it('skips reserved class-rule modes', () => {
+    it('applies bem and kebab naming modes', () => {
+        globalThis.parity = {
+            config: {
+                classes: { strategy: 'passthrough' },
+                bem: {
+                    categories: {
+                        component: 'c-',
+                        object: 'o-',
+                        organizer: 'o-',
+                        module: 'm-',
+                        utility: 'u-',
+                    },
+                    element: '__',
+                    modifier: '--',
+                    breakpoint: '@',
+                },
+                variant: { element: '-', join: '-', format: 'kebab' },
+                state: { is: 'is-', has: 'has-' },
+            },
+        };
+
+        const schema = {
+            schemaVersion: '1.0',
+            name: 'status-badge',
+            block: 'badge',
+            category: 'component',
+            classRules: [
+                { mode: 'modifier', source: 'pill', as: 'pill', classes: '', condition: null },
+                { mode: 'modifier', source: 'size', as: 'size', classes: '', condition: null },
+                { mode: 'state', state: 'is', stateName: 'active', source: 'active', classes: '', condition: null },
+            ],
+            children: {
+                content: {
+                    tag: 'span',
+                    classRules: [
+                        { mode: 'element', element: 'label', classes: '', condition: null },
+                        { mode: 'modifier', source: 'size', as: 'size', classes: '', condition: null },
+                    ],
+                    slot: { name: null, default: true },
+                },
+            },
+        };
+
+        const renderer = new SchemaRenderer('status-badge', {
+            pill: true,
+            size: 'md',
+            active: true,
+        }, schema);
+
+        expect(renderer.renderComponentAttributes().className).toContain('c-badge');
+        expect(renderer.renderComponentAttributes().className).toContain('c-badge--pill');
+        expect(renderer.renderComponentAttributes().className).toContain('is-active');
+        expect(renderer.renderStructure().content.attributes.className).toBe('c-badge__label c-badge__label--size-md');
+    });
+
+    it('skips the classes field on naming modes and ignores unknown modes', () => {
         const schema = {
             schemaVersion: '1.0',
             name: 'demo',
@@ -63,6 +118,7 @@ describe('SchemaRenderer conditions', () => {
                 { classes: 'keep', condition: null },
                 { mode: 'element', element: 'header', classes: 'skip-me', condition: null },
                 { mode: 'token', tokenGroup: 'gap', token: 'md', classes: '', condition: null },
+                { mode: 'future-mode', classes: 'also-skip', condition: null },
             ],
         };
 
@@ -71,6 +127,7 @@ describe('SchemaRenderer conditions', () => {
         expect(attrs.className).toContain('keep');
         expect(attrs.className).toContain('gap-4');
         expect(attrs.className).not.toContain('skip-me');
+        expect(attrs.className).not.toContain('also-skip');
     });
 
     it('applies attr and style match outcomes', () => {

@@ -2,10 +2,10 @@
 
 use Illuminate\Support\HtmlString;
 use Illuminate\View\ComponentAttributeBag;
-use Parity\Tests\Fixtures\ShellLinkableTestComponent;
-use Parity\Tests\Fixtures\ShellOverrideTestComponent;
-use Parity\Tests\Fixtures\ShellSlotTestComponent;
-use Parity\Tests\Fixtures\ShellStructureTestComponent;
+use Parity\Tests\Fixtures\Components\ShellLinkableTestComponent;
+use Parity\Tests\Fixtures\Components\ShellOverrideTestComponent;
+use Parity\Tests\Fixtures\Components\ShellSlotTestComponent;
+use Parity\Tests\Fixtures\Components\ShellStructureTestComponent;
 use Parity\View\Component as ParityComponent;
 
 beforeEach(function () {

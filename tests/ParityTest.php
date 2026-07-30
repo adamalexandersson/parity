@@ -7,7 +7,7 @@ use Parity\Render\SchemaRenderer;
 
 function parityCases(): array
 {
-    return require __DIR__.'/Fixtures/parity-cases.php';
+    return require __DIR__.'/Fixtures/Cases/parity-cases.php';
 }
 
 function expectedClassSnapshots(): array
@@ -21,22 +21,16 @@ function expectedClassSnapshots(): array
         'link-md-arrow' => 'font-bold gap-x-1.5 inline-flex items-center leading-6 text-primary-600',
         'conditions-any-affordance' => 'base gap-4 has-affordance text-sm',
         'conditions-all-safe-link' => 'base gap-4 safe-link text-base',
+        'bem-badge' => 'c-badge c-badge--pill c-badge--size-md c-badge--theme-outline-primary c-badge--theme-primary has-icon is-active',
+        'bem-button' => 'c-button c-button--pill c-button--size-md c-button--theme-primary c-button--theme-solid-primary has-arrow has-icon is-active',
+        'bem-button-inactive' => 'c-button c-button--size-lg c-button--theme-outline-primary c-button--theme-primary',
+        'kebab-badge' => 'badge badge-md badge-pill badge-primary is-active',
+        'bem-grid-responsive' => 'o-grid o-grid@md--cols-2',
+        'bem-grid-inferred' => 'o-grid o-grid@md--cols-2',
+        'kebab-grid-responsive' => 'grid grid-md-2',
+        'bem-organizer' => 'o-tabs o-tabs--orientation-vertical',
+        'naming-omission' => 'c-card',
     ];
-}
-
-function bindParityConfig(?array $caseConfig = null): void
-{
-    $container = Container::getInstance();
-
-    if (! $container->bound('config')) {
-        $container->instance('config', new Repository([]));
-    }
-
-    config([
-        'parity.tokens' => $caseConfig['tokens'] ?? [],
-        'parity.presets' => $caseConfig['presets'] ?? $caseConfig['common'] ?? [],
-        'parity.classes.strategy' => $caseConfig['classes']['strategy'] ?? 'tailwind',
-    ]);
 }
 
 it('produces stable normalized classes from the php renderer', function () {

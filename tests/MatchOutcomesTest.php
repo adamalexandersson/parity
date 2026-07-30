@@ -4,7 +4,7 @@ use Parity\Registries\TransformRegistry;
 use Parity\Render\SchemaRenderer;
 
 it('applies attr and style match outcomes in php', function () {
-    $schema = require __DIR__.'/Fixtures/outcomes-attr-style.php';
+    $schema = require __DIR__.'/Fixtures/Schemas/outcomes-attr-style.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
 
     $attributes = $renderer->renderComponentAttributes($schema, ['state' => 'disabled'], 'outcomes-attr-style');
@@ -15,7 +15,7 @@ it('applies attr and style match outcomes in php', function () {
 });
 
 it('applies aria attr outcomes without disabling', function () {
-    $schema = require __DIR__.'/Fixtures/outcomes-attr-style.php';
+    $schema = require __DIR__.'/Fixtures/Schemas/outcomes-attr-style.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
 
     $attributes = $renderer->renderComponentAttributes($schema, ['state' => 'active'], 'outcomes-attr-style');

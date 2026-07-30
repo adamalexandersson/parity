@@ -9,6 +9,7 @@ use Parity\Exceptions\SchemaException;
 use Parity\Registries\TransformRegistry;
 use Parity\Support\AttributeFactory;
 use Parity\Support\ClassFactory;
+use Parity\Support\ClassNameGenerator;
 use Parity\Support\IdInterpolator;
 use Parity\Support\InlineStyleFactory;
 use Parity\Support\InstanceIds;
@@ -38,6 +39,17 @@ class SchemaRenderer
     protected ?array $tokens = null;
 
     protected ?bool $debug = null;
+
+    protected ?ClassNameGenerator $classNames = null;
+
+    protected string $rootBlock = '';
+
+    protected bool $hasCategory = false;
+
+    protected bool $emitRootBlock = false;
+
+    /** @var array<string, mixed> */
+    protected array $componentSchema = [];
 
     public function __construct(
         protected TransformRegistry $transforms,
@@ -84,6 +96,11 @@ class SchemaRenderer
     {
         $this->contextProps = $props;
         $this->lookupCache = [];
+        $this->componentSchema = $schema;
+        $this->classNames = ClassNameGenerator::fromConfig();
+        $this->rootBlock = $this->classNames->resolveBlock($schema);
+        $this->hasCategory = ! empty($schema['category']);
+        $this->emitRootBlock = $this->classNames->shouldEmitBlock($schema);
         $this->instanceIds = new InstanceIds($componentName ?? ($schema['name'] ?? 'component'), $props);
         $this->predeclareIds($schema);
     }
@@ -99,7 +116,7 @@ class SchemaRenderer
         $styles = new InlineStyleFactory;
         $attr = new AttributeFactory;
 
-        $this->applyClassRules($schema['classRules'] ?? [], $props, $classes);
+        $this->applyClassRules($schema['classRules'] ?? [], $props, $classes, root: true);
         $this->applyMatches($schema['matches'] ?? [], $props, $classes, $attr, $styles, $schema);
 
         if (! empty($props['class'])) {
@@ -153,7 +170,7 @@ class SchemaRenderer
         $styles = new InlineStyleFactory;
         $attr = new AttributeFactory;
 
-        $this->applyClassRules($schema['classRules'] ?? [], $props, $classes);
+        $this->applyClassRules($schema['classRules'] ?? [], $props, $classes, root: false);
         $this->applyMatches($schema['matches'] ?? [], $props, $classes, $attr, $styles);
         $this->applyAttributes($schema['attributes'] ?? [], $props, $attr);
         $this->applyStyles($schema['styles'] ?? [], $props, $styles);
@@ -269,8 +286,40 @@ class SchemaRenderer
     }
 
     /** @param list<array<string, mixed>> $rules */
-    protected function applyClassRules(array $rules, array $props, ClassFactory $classes): void
+    protected function applyClassRules(array $rules, array $props, ClassFactory $classes, bool $root = false): void
     {
+        $generator = $this->classNames ??= ClassNameGenerator::fromConfig();
+        $style = $generator->namingStyle($rules, $this->hasCategory);
+        $base = $this->rootBlock;
+        $elementName = null;
+
+        foreach ($rules as $rule) {
+            if (($rule['mode'] ?? null) === 'element' && is_string($rule['element'] ?? null)) {
+                $elementName = (string) $rule['element'];
+                break;
+            }
+        }
+
+        $qualifierBase = $base;
+
+        if ($elementName !== null && $base !== '') {
+            $qualifierBase = $generator->elementClass($base, $elementName, $style);
+        }
+
+        if ($root && $this->emitRootBlock && $base !== '') {
+            $classes->apply($base);
+        }
+
+        if (! $root && $elementName !== null && $qualifierBase !== '') {
+            $classes->apply($qualifierBase);
+        }
+
+        // Child without element but with naming rules still qualifies against root block;
+        // modifiers attach to the root block class name string without re-emitting the block.
+        if (! $root && $elementName === null && $generator->rulesUseNaming($rules) && $base !== '') {
+            $qualifierBase = $base;
+        }
+
         foreach ($rules as $rule) {
             if (! $this->evaluateCondition($rule['condition'] ?? null)) {
                 continue;
@@ -288,7 +337,48 @@ class SchemaRenderer
                 continue;
             }
 
-            // Reserved / unknown modes (e.g. element, modifier) are no-ops until implemented.
+            if ($mode === 'element') {
+                continue;
+            }
+
+            if ($mode === 'modifier') {
+                if ($qualifierBase === '') {
+                    continue;
+                }
+
+                $token = $generator->modifierClass($qualifierBase, $rule, $props);
+
+                if ($token !== null) {
+                    $classes->apply($token);
+                }
+
+                continue;
+            }
+
+            if ($mode === 'variant') {
+                if ($qualifierBase === '') {
+                    continue;
+                }
+
+                $token = $generator->variantClass($qualifierBase, $rule, $props);
+
+                if ($token !== null) {
+                    $classes->apply($token);
+                }
+
+                continue;
+            }
+
+            if ($mode === 'state') {
+                $token = $generator->stateClass($rule, $props);
+
+                if ($token !== null) {
+                    $classes->apply($token);
+                }
+
+                continue;
+            }
+
             if ($mode !== null) {
                 continue;
             }

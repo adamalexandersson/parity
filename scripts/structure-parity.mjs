@@ -38,6 +38,13 @@ for (const [name, caseItem] of Object.entries(cases)) {
     const schema = caseItem.schema;
     const componentName = schema.name ?? name;
 
+    globalThis.parity = {
+        config: {
+            ...(caseItem.config ?? {}),
+            [componentName]: schema,
+        },
+    };
+
     const renderer = new SchemaRenderer(componentName, caseItem.props ?? {}, schema);
     const structure = renderer.renderStructure();
     const defaultSlot = schema.defaultSlot ?? null;

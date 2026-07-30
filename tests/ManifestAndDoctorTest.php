@@ -39,7 +39,7 @@ it('writes a committed manifest with reflected constructor props', function () {
         ->and($manifest['components'])->toHaveKey('reflect-props-test')
         ->and($manifest['components']['reflect-props-test']['exportName'])->toBe('ReflectPropsTest')
         ->and($manifest['components']['reflect-props-test']['class'])->toBe(
-            'Parity\\Tests\\Fixtures\\ReflectPropsTestComponent'
+            'Parity\\Tests\\Fixtures\\Components\\ReflectPropsTestComponent'
         )
         ->and($manifest['components']['reflect-props-test']['props'])->toContain([
             'name' => 'size',
@@ -57,7 +57,7 @@ it('fails doctor when the manifest drifts from discovered schemas', function () 
         'components' => [
             'shell-structure-test' => [
                 'exportName' => 'ShellStructureTest',
-                'class' => 'Parity\\Tests\\Fixtures\\ShellStructureTestComponent',
+                'class' => 'Parity\\Tests\\Fixtures\\Components\\ShellStructureTestComponent',
                 'props' => [],
             ],
         ],

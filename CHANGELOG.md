@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-30
+
+### Added
+
+- BEM / kebab / state class naming via `classRules` (`element`, `modifier`, `variant`, `state`)
+- Fluent API: `->category()`, `->block()`, `->element()`, `->modifier()`, `->variant()`, `->is()`, `->has()`
+- Config roots `parity.bem`, `parity.variant`, and `parity.state` (exported on `window.parity.config`)
+- Responsive naming: BEM `{block}@{bp}--{key}-{value}`, kebab `{block}-{bp}-{value}`, with prop inference (`cols` + `md` → `colsMd`)
+- Shared `ClassNameGenerator` in PHP and JS with parity fixtures
+
+### Changed
+
+- Reserved naming modes are now generated (no longer no-ops); unknown modes still no-op
+- CSS-naming projects should prefer `passthrough` class strategy so generated tokens are not Tailwind-merged
+
 ## [1.0.7] - 2026-07-28
 
 ### Performance

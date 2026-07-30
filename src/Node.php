@@ -17,6 +17,8 @@ use Parity\Schema\Version;
  */
 class Node
 {
+    private const NO_VALUE = "\0parity.no_value";
+
     protected ?string $key = null;
 
     protected ?string $tag = 'div';
@@ -104,7 +106,7 @@ class Node
         $lastIndex = count($this->classRules) - 1;
 
         if ($lastIndex < 0) {
-            throw new \RuntimeException('Call classes() before when().');
+            throw new \RuntimeException('Call a class rule method before when().');
         }
 
         $this->classRules[$lastIndex]['condition'] = $value === null
@@ -119,7 +121,7 @@ class Node
         $lastIndex = count($this->classRules) - 1;
 
         if ($lastIndex < 0) {
-            throw new \RuntimeException('Call classes() before unless().');
+            throw new \RuntimeException('Call a class rule method before unless().');
         }
 
         $this->classRules[$lastIndex]['condition'] = $value === null
@@ -132,6 +134,98 @@ class Node
     public function token(string $group, string $name): static
     {
         return $this->pushClassRule('', mode: 'token', tokenGroup: $group, token: $name);
+    }
+
+    public function element(string $name): static
+    {
+        $this->classRules[] = [
+            'classes' => '',
+            'condition' => null,
+            'mode' => 'element',
+            'element' => $name,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @param  string|list<string>  $source
+     */
+    public function modifier(
+        string|array $source,
+        ?string $as = null,
+        ?string $breakpoint = null,
+        mixed $value = self::NO_VALUE,
+    ): static {
+        $rule = [
+            'classes' => '',
+            'condition' => null,
+            'mode' => 'modifier',
+            'source' => $source,
+            'as' => $as ?? (is_string($source) ? $source : null),
+            'breakpoint' => $breakpoint,
+        ];
+
+        if ($value !== self::NO_VALUE) {
+            $rule['value'] = $value;
+        }
+
+        $this->classRules[] = $rule;
+
+        return $this;
+    }
+
+    /**
+     * @param  string|list<string>  $source
+     */
+    public function variant(
+        string|array $source,
+        ?string $breakpoint = null,
+        mixed $value = self::NO_VALUE,
+    ): static {
+        $rule = [
+            'classes' => '',
+            'condition' => null,
+            'mode' => 'variant',
+            'source' => $source,
+            'breakpoint' => $breakpoint,
+        ];
+
+        if ($value !== self::NO_VALUE) {
+            $rule['value'] = $value;
+        }
+
+        $this->classRules[] = $rule;
+
+        return $this;
+    }
+
+    public function is(string $name, ?string $source = null): static
+    {
+        $this->classRules[] = [
+            'classes' => '',
+            'condition' => null,
+            'mode' => 'state',
+            'state' => 'is',
+            'stateName' => $name,
+            'source' => $source ?? $name,
+        ];
+
+        return $this;
+    }
+
+    public function has(string $name, ?string $source = null): static
+    {
+        $this->classRules[] = [
+            'classes' => '',
+            'condition' => null,
+            'mode' => 'state',
+            'state' => 'has',
+            'stateName' => $name,
+            'source' => $source ?? $name,
+        ];
+
+        return $this;
     }
 
     public function match(string ...$props): MatchBuilder

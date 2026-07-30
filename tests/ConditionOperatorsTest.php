@@ -4,7 +4,7 @@ use Parity\Registries\TransformRegistry;
 use Parity\Render\SchemaRenderer;
 
 it('evaluates the extended condition operators', function () {
-    $schema = require __DIR__.'/Fixtures/conditions-operators.php';
+    $schema = require __DIR__.'/Fixtures/Schemas/conditions-operators.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
 
     $attributes = $renderer->renderComponentAttributes($schema, [

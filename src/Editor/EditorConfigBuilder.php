@@ -26,6 +26,9 @@ class EditorConfigBuilder
             'presets',
             'tokens',
             'classes',
+            'bem',
+            'variant',
+            'state',
             'debug',
             'editor',
         ];
@@ -41,6 +44,9 @@ class EditorConfigBuilder
             'classes' => [
                 'strategy' => config('parity.classes.strategy', 'tailwind'),
             ],
+            'bem' => config('parity.bem', []),
+            'variant' => config('parity.variant', []),
+            'state' => config('parity.state', []),
             'debug' => $this->host->isDebug(),
             'editor' => [
                 'alpine' => config('parity.editor.alpine', 'suppress'),

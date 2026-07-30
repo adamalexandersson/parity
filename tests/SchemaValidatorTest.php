@@ -4,7 +4,7 @@ use Parity\Schema\SchemaValidator;
 
 it('accepts a valid component schema', function () {
     $validator = new SchemaValidator;
-    $schema = require __DIR__.'/Fixtures/button.php';
+    $schema = require __DIR__.'/Fixtures/Schemas/button.php';
 
     expect($validator->validate($schema))->toBe([]);
 });
@@ -26,5 +26,7 @@ it('exposes feature enums for parity coverage', function () {
         ->and($catalog['conditionOperators'])->toContain('all')
         ->and($catalog['classRuleModes'])->toContain('element')
         ->and($catalog['classRuleModes'])->toContain('modifier')
+        ->and($catalog['classRuleModes'])->toContain('variant')
+        ->and($catalog['classRuleModes'])->toContain('state')
         ->and($catalog['outcomeTypes'])->toContain('classes');
 });

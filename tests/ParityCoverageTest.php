@@ -15,20 +15,9 @@ function collectFixtureFeatureCoverage(): array
         'slotKinds' => [],
     ];
 
-    $files = glob(__DIR__.'/Fixtures/*.php') ?: [];
+    $files = glob(__DIR__.'/Fixtures/Schemas/*.php') ?: [];
 
     foreach ($files as $file) {
-        $basename = basename($file);
-
-        // Schema fixtures return arrays. Component class fixtures must not be re-required.
-        if (
-            str_ends_with($file, '-cases.php')
-            || str_ends_with($basename, 'Component.php')
-            || str_contains($basename, 'Shell')
-        ) {
-            continue;
-        }
-
         $payload = require $file;
 
         if (! is_array($payload)) {

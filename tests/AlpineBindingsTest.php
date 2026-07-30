@@ -39,7 +39,7 @@ it('serializes alpine helpers and interpolates id placeholders', function () {
 });
 
 it('resolves placeholders from the alpine accordion fixture', function () {
-    $schema = require __DIR__.'/Fixtures/alpine-accordion.php';
+    $schema = require __DIR__.'/Fixtures/Schemas/alpine-accordion.php';
     $renderer = new SchemaRenderer(new TransformRegistry);
     $structure = $renderer->renderStructure($schema, ['instanceId' => 'fix'], 'alpine-accordion');
 

@@ -1,7 +1,7 @@
 <?php
 
 use Parity\Support\ComponentReflector;
-use Parity\Tests\Fixtures\ReflectPropsTestComponent;
+use Parity\Tests\Fixtures\Components\ReflectPropsTestComponent;
 
 it('reflects constructor props from a parity component class', function () {
     $props = ComponentReflector::constructorProps(ReflectPropsTestComponent::class);
