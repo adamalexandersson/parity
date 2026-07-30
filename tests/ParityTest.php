@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Config\Repository;
-use Illuminate\Container\Container;
 use Parity\Registries\TransformRegistry;
 use Parity\Render\SchemaRenderer;
 
