@@ -24,6 +24,17 @@ describe('ClassFactory', () => {
         expect(classes.get()).toBe('p-4 text-lg');
     });
 
+    it('keeps configured font-size names beside text colors', () => {
+        globalThis.parity.config.classes.fontSize = ['body', 'preamble'];
+
+        const classes = new ClassFactory();
+
+        classes.apply('px-7 text-body');
+        classes.apply('text-button-primary-solid-text');
+
+        expect(classes.get()).toBe('px-7 text-body text-button-primary-solid-text');
+    });
+
     it('deduplicates without conflict resolution for passthrough', () => {
         globalThis.parity.config.classes.strategy = 'passthrough';
 

@@ -65,6 +65,14 @@ return [
     */
     'classes' => [
         'strategy' => env('PARITY_CLASS_STRATEGY', 'tailwind'),
+
+        /*
+        | Font-size suffixes (body, heading-sm) the editor merger should keep
+        | in the font-size group. PHP hosts still register the same names with
+        | TailwindMerge\Support\Config::setAdditionalConfig().
+        |
+        */
+        'fontSize' => [],
     ],
 
     /*

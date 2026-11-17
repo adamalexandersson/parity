@@ -19,6 +19,8 @@ Configured in `config/parity.php`:
 
 The editor bundle always includes `tailwind-merge`, so the JS side resolves conflicts when the strategy is `tailwind`.
 
+Custom font-size names are not part of Tailwind's default scale. Register them before the first merge or `text-body` is classified as a text color and removed when another `text-*` color is present. In PHP, pass the suffixes through `TailwindMerge\Support\Config::setAdditionalConfig()` under `classGroups.font-size`. In the editor, set `parity.classes.fontSize` to that same list (`body`, `heading-sm`). It is exported on `window.parity.config.classes.fontSize`.
+
 **Tailwind vs CSS-naming:** Generation (`modifier` / `variant` / `element` / `is` / `has`) runs first; the strategy only merges the resulting tokens. Projects that author BEM or kebab class names should set `parity.classes.strategy` to `passthrough` so `@`-breakpoints and `--` modifiers are not treated as Tailwind utilities.
 
 Naming is **not** a class strategy. BEM/kebab stay in `classRules`; strategies remain merge-only.

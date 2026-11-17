@@ -43,6 +43,7 @@ class EditorConfigBuilder
             'tokens' => config('parity.tokens', []),
             'classes' => [
                 'strategy' => config('parity.classes.strategy', 'tailwind'),
+                'fontSize' => config('parity.classes.fontSize', []),
             ],
             'bem' => config('parity.bem', []),
             'variant' => config('parity.variant', []),

@@ -3,13 +3,14 @@
 namespace Parity\Support\ClassStrategies;
 
 use Parity\Contracts\ClassStrategy;
+use TailwindMerge\Support\Config;
 use TailwindMerge\TailwindMerge;
 
 final class TailwindClassStrategy implements ClassStrategy
 {
     /**
-     * TailwindMerge::instance() rebuilds the whole merged config on every call,
-     * so the instance is shared for the lifetime of the process.
+     * The merger is shared for the process. TailwindMerge::instance() resets
+     * additional config, so this reads the config the host already registered.
      */
     private static ?TailwindMerge $merger = null;
 
@@ -58,7 +59,7 @@ final class TailwindClassStrategy implements ClassStrategy
             );
         }
 
-        return self::$merger = TailwindMerge::instance();
+        return self::$merger = new TailwindMerge(Config::getMergedConfig());
     }
 
     /**

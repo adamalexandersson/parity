@@ -1,4 +1,4 @@
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge, twMerge } from 'tailwind-merge';
 
 function toReactStyleProperty(property) {
     if (!property.includes('-')) {
@@ -37,7 +37,43 @@ function mergeClassParts(parts) {
         return unique.join(' ');
     }
 
-    return twMerge(...parts);
+    return tailwindMerge(...parts);
+}
+
+const mergers = new Map();
+
+function resolveFontSize() {
+    const root = typeof globalThis !== 'undefined' ? globalThis : {};
+    const parity = root.window?.parity ?? root.parity;
+    const fontSize = parity?.config?.classes?.fontSize;
+
+    if (!Array.isArray(fontSize)) {
+        return [];
+    }
+
+    return fontSize.filter((name) => typeof name === 'string' && name !== '');
+}
+
+function tailwindMerge(...parts) {
+    const fontSize = resolveFontSize();
+    const key = fontSize.join('\0');
+    let merge = mergers.get(key);
+
+    if (!merge) {
+        merge = fontSize.length === 0
+            ? twMerge
+            : extendTailwindMerge({
+                extend: {
+                    classGroups: {
+                        'font-size': [{ text: fontSize }],
+                    },
+                },
+            });
+
+        mergers.set(key, merge);
+    }
+
+    return merge(...parts);
 }
 
 export class ClassFactory {

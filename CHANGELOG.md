@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-11-17
+
+### Fixed
+
+- Tailwind merging keeps configuration the host registered before the first render. `TailwindMerge::instance()` cleared that configuration, so custom font sizes such as `text-body` were treated as text colors and dropped beside utilities like `text-button-primary-solid-text`
+
+### Added
+
+- `parity.classes.fontSize` is exported on `window.parity.config`. The editor merger treats those suffixes as font sizes, matching the PHP strategy
+
 ## [1.1.1] - 2026-07-30
 
 ### Fixed
